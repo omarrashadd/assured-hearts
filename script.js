@@ -1,4 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.getElementById('loginBtn');
+  const signupBtn = document.getElementById('signupBtn');
+  const loginModal = document.getElementById('loginModal');
+  const signupModal = document.getElementById('signupModal');
+  const loginClose = document.getElementById('loginClose');
+  const signupClose = document.getElementById('signupClose');
+
+  loginBtn && loginBtn.addEventListener('click', ()=> loginModal.classList.remove('hidden'));
+  signupBtn && signupBtn.addEventListener('click', ()=> signupModal.classList.remove('hidden'));
+  loginClose && loginClose.addEventListener('click', ()=> loginModal.classList.add('hidden'));
+  signupClose && signupClose.addEventListener('click', ()=> signupModal.classList.add('hidden'));
+
+  loginModal && loginModal.addEventListener('click', e=> { if(e.target === loginModal) loginModal.classList.add('hidden'); });
+  signupModal && signupModal.addEventListener('click', e=> { if(e.target === signupModal) signupModal.classList.add('hidden'); });
+
+  const loginForm = document.getElementById('loginForm');
+  if(loginForm) loginForm.addEventListener('submit', e=> { e.preventDefault(); alert('Login successful!'); loginModal.classList.add('hidden'); loginForm.reset(); });
+
+  const signupForm = document.getElementById('signupForm');
+  if(signupForm) signupForm.addEventListener('submit', e=> { e.preventDefault(); const email = new FormData(signupForm).get('email'); alert('Welcome, ' + email + '!'); signupModal.classList.add('hidden'); signupForm.reset(); });
+
   const findBtn = document.getElementById('findBtn');
   const becomeBtn = document.getElementById('becomeBtn');
   const findSection = document.getElementById('find');

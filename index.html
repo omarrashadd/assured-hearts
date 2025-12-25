@@ -9,16 +9,76 @@
   </head>
 
   <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo">Assured Heart</div>
+        <div class="nav-auth">
+          <button id="loginBtn" class="btn-auth login">Log in</button>
+          <button id="signupBtn" class="btn-auth signup">Sign up</button>
+        </div>
+      </div>
+    </nav>
+
+    <div id="loginModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="loginClose">&times;</button>
+        <h2>Log in</h2>
+        <form id="loginForm">
+          <label>Email
+            <input type="email" name="email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" required>
+          </label>
+          <button type="submit" class="btn">Log in</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="signupModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="signupClose">&times;</button>
+        <h2>Sign up</h2>
+        <form id="signupForm">
+          <label>Email
+            <input type="email" name="email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" required>
+          </label>
+          <label>Confirm Password
+            <input type="password" name="confirm" required>
+          </label>
+          <button type="submit" class="btn">Sign up</button>
+        </form>
+      </div>
+    </div>
+
     <header class="hero">
       <div class="container">
         <h1>Welcome to Assured Hearts</h1>
-        <p class="lead">Trusted local babysitters — vetted and caring.</p>
+        <p class="lead">Caring Hands, Shared Islamic Values, Peace of Mind.</p>
         <div class="actions">
-          <button id="findBtn" class="btn">Find a babysitter</button>
-          <button id="becomeBtn" class="btn outline">Become a babysitter</button>
+          <button id="findBtn" class="btn">Find Trusted Childcare</button>
+          <button id="becomeBtn" class="btn outline">Become a Childcare Provider</button>
         </div>
       </div>
     </header>
+
+    <section class="hero-block">
+      <div class="hero-image">
+        <img src="assets/Childcare%20Image%20Stock.jpg" alt="Childcare">
+      </div>
+      <div class="hero-content">
+        <div>
+          <h2>Faith-aligned childcare for Muslim families</h2>
+          <p class="hero-sub">A trusted childcare platform connecting Muslim families with vetted, faith-aligned caregivers who provide safe, compassionate care rooted in shared values.</p>
+          <div class="hero-cta">
+            <button class="btn learn">Learn more</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <main class="container">
       <section id="find" class="panel hidden">
