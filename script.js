@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Get Started button scroll to signup
+  const getStartedBtn = document.getElementById('getStartedBtn');
+  if(getStartedBtn){
+    getStartedBtn.addEventListener('click', ()=> {
+      const signupSection = document.querySelector('.signup-section');
+      if(signupSection) signupSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   const loginBtn = document.getElementById('loginBtn');
   const signupBtn = document.getElementById('signupBtn');
   const loginModal = document.getElementById('loginModal');
@@ -38,6 +47,95 @@ document.addEventListener('DOMContentLoaded', () => {
   findBack && findBack.addEventListener('click', ()=> { findSection.classList.add('hidden'); window.scrollTo({top:0,behavior:'smooth'}) });
   becomeBack && becomeBack.addEventListener('click', ()=> { becomeSection.classList.add('hidden'); window.scrollTo({top:0,behavior:'smooth'}) });
 
+  // Mobile menu toggle
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const mobileMenuClose = document.getElementById('mobileMenuClose');
+
+  function openMobileMenu(){
+    mobileMenu.classList.remove('hidden');
+    setTimeout(()=> mobileMenu.classList.add('open'));
+    mobileMenu.setAttribute('aria-hidden','false');
+    mobileMenuBtn && mobileMenuBtn.setAttribute('aria-expanded','true');
+    mobileMenuBtn && mobileMenuBtn.classList.add('open');
+  }
+  function closeMobileMenu(){
+    mobileMenu.classList.remove('open');
+    mobileMenu.setAttribute('aria-hidden','true');
+    mobileMenuBtn && mobileMenuBtn.setAttribute('aria-expanded','false');
+    mobileMenuBtn && mobileMenuBtn.classList.remove('open');
+    setTimeout(()=> mobileMenu.classList.add('hidden'), 360);
+  }
+
+  mobileMenuBtn && mobileMenuBtn.addEventListener('click', openMobileMenu);
+  mobileMenuClose && mobileMenuClose.addEventListener('click', closeMobileMenu);
+  mobileMenu && mobileMenu.addEventListener('click', e=>{ if(e.target === mobileMenu) closeMobileMenu(); });
+
+  // Mobile menu links
+  document.querySelectorAll('.mobile-nav a').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      const target = a.dataset.target;
+      closeMobileMenu();
+      if(target === 'find' && findSection) return setTimeout(()=> show(findSection),380);
+      if(target === 'become' && becomeSection) return setTimeout(()=> show(becomeSection),380);
+      // for other anchors, try to find an element with matching id
+      const href = a.getAttribute('href');
+      if(href && href.startsWith('#')){
+        const id = href.slice(1);
+        const el = document.getElementById(id);
+        if(el) return setTimeout(()=> window.scrollTo({top: el.offsetTop - 20, behavior:'smooth'}),380);
+      }
+    });
+  });
+
+  // Desktop nav links (show/Become/scroll)
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      const target = a.dataset.target;
+      if(target === 'find' && findSection) return show(findSection);
+      if(target === 'become' && becomeSection) return show(becomeSection);
+      const href = a.getAttribute('href');
+      if(href && href.startsWith('#')){
+        const id = href.slice(1);
+        const el = document.getElementById(id);
+        if(el) return window.scrollTo({top: el.offsetTop - 20, behavior:'smooth'});
+      }
+    });
+  });
+
+  // Footer contact form
+  const contactForm = document.getElementById('contactForm');
+  const contactResult = document.getElementById('contactResult');
+  if(contactForm){
+    contactForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const data = new FormData(contactForm);
+      const email = data.get('email');
+      contactResult.innerHTML = `<div style="color:#67B3C2;margin-top:12px">Thanks for reaching out! We'll be in touch soon.</div>`;
+      contactForm.reset();
+      setTimeout(()=>{ contactResult.innerHTML = ''; }, 4000);
+    });
+  }
+
+  // Footer nav links
+  document.querySelectorAll('.footer-section a[href]').forEach(a=>{
+    a.addEventListener('click', e=>{
+      if(!a.getAttribute('href').startsWith('#')) return;
+      e.preventDefault();
+      const target = a.dataset.target;
+      if(target === 'find' && findSection) return show(findSection);
+      if(target === 'become' && becomeSection) return show(becomeSection);
+      const href = a.getAttribute('href');
+      if(href && href.startsWith('#')){
+        const id = href.slice(1);
+        const el = document.getElementById(id);
+        if(el) return window.scrollTo({top: el.offsetTop - 20, behavior:'smooth'});
+      }
+    });
+  });
+
   // Fake search handler
   const findForm = document.getElementById('findForm');
   const results = document.getElementById('results');
@@ -66,8 +164,38 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const data = new FormData(becomeForm);
       const name = data.get('fullname') || 'Applicant';
-      applyResult.innerHTML = `<div class="card">Thanks, <strong>${name}</strong>! We received your application and will be in touch.</div>`;
+      const email = data.get('email');
+      applyResult.innerHTML = `<div class="card" style="color:#06464E;margin-top:16px;font-weight:600">Thanks, <strong>${name}</strong>! We're sending a detailed application to <strong>${email}</strong>. Check your inbox to get started.</div>`;
       becomeForm.reset();
+      setTimeout(()=>{ applyResult.innerHTML = ''; }, 5000);
+    });
+  }
+
+  // How It Works tabs
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const tabName = btn.dataset.tab;
+      // Remove active class from all buttons and panels
+      document.querySelectorAll('.tab-btn').forEach(b=> b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=> p.classList.remove('active'));
+      // Add active class to clicked button and corresponding panel
+      btn.classList.add('active');
+      const panel = document.getElementById(tabName + '-tab');
+      if(panel) panel.classList.add('active');
+    });
+  });
+
+  // Signup form handler
+  const signupFormMain = document.getElementById('signupFormMain');
+  const signupResult = document.getElementById('signupResult');
+  if(signupFormMain){
+    signupFormMain.addEventListener('submit', e=>{
+      e.preventDefault();
+      const data = new FormData(signupFormMain);
+      const name = data.get('fullname') || 'Friend';
+      signupResult.innerHTML = `<div style="color:#06464E;margin-top:12px;font-weight:600">Account created! Welcome, ${name}. Check your email to get started.</div>`;
+      signupFormMain.reset();
+      setTimeout(()=>{ signupResult.innerHTML = ''; }, 4000);
     });
   }
 });

@@ -11,13 +11,36 @@
   <body>
     <nav class="navbar">
       <div class="nav-container">
-        <div class="logo">Assured Heart</div>
+        <div class="logo"><img src="assets/Assured%20Hearts%20Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></div>
+        <div class="nav-links">
+          <a href="#" data-target="find">Find Childcare
+          </a>
+          <a href="#" data-target="become">Join Our Care Network</a>
+          <a href="#how">Our Care Process</a>
+          <a href="#resources">Family Resources</a>
+          <a href="#faq">FAQ</a>
+        </div>
         <div class="nav-auth">
           <button id="loginBtn" class="btn-auth login">Log in</button>
           <button id="signupBtn" class="btn-auth signup">Sign up</button>
         </div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </nav>
+
+    <div id="mobileMenu" class="mobile-menu-panel hidden" aria-hidden="true">
+      <button id="mobileMenuClose" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="#" data-target="find">Find Childcare</a>
+        <a href="#" data-target="become">Join Our Care Network</a>
+        <a href="#how">Our Care Process</a>
+        <a href="#resources">Family Resources</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
 
     <div id="loginModal" class="modal hidden">
       <div class="modal-content">
@@ -56,7 +79,7 @@
 
     <header class="hero">
       <div class="container">
-        <h1>Welcome to Assured Hearts</h1>
+        <h1>Childcare Designed for Muslim Families</h1>
         <p class="lead">Caring Hands, Shared Islamic Values, Peace of Mind.</p>
         <div class="actions">
           <button id="findBtn" class="btn">Find Trusted Childcare</button>
@@ -71,10 +94,119 @@
       </div>
       <div class="hero-content">
         <div>
-          <h2>Faith-aligned childcare for Muslim families</h2>
-          <p class="hero-sub">A trusted childcare platform connecting Muslim families with vetted, faith-aligned caregivers who provide safe, compassionate care rooted in shared values.</p>
+          <h2>Faith-aligned childcare for Muslim families, built for learning and growth.</h2>
+          <p class="hero-sub">A trusted childcare platform connecting Muslim families with vetted, faith-aligned caregivers who provide safe, compassionate care rooted in shared values—so your children are not only safe, but supported in their learning, character, and spiritual growth.</p>
           <div class="hero-cta">
             <button class="btn learn">Learn more</button>
+            <button class="btn btn-primary" id="getStartedBtn">Get Started</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="benefits-block">
+      <div class="benefits-content">
+        <h2>Why Families Choose Us</h2>
+        <div class="benefits-points">
+          <div class="benefit-item">
+            <div class="benefit-icon">✓</div>
+            <h3>Vetted & Faith-Aligned Caregivers</h3>
+            <p>Every caregiver on our platform is carefully screened and selected based on shared Islamic values, verified experience, and a deep commitment to providing safe, nurturing, and high-quality childcare you can trust.</p>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-icon">✓</div>
+            <h3>Peace of Mind & Safety</h3>
+            <p>Know exactly what your children are learning and being exposed to through our structured Islamic curriculum, thoughtfully designed to strengthen their values, understanding, and character. Transparent communication, verified backgrounds, and trusted reviews give you confidence in every childcare choice you make.</p>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-icon">✓</div>
+            <h3>Parenal Empowerment</h3>
+            <p>Stay meaningfully involved in your child’s day, even when you’re away. By logging in, you will receive thoughtful updates and moments from your child’s care, giving you visibility into what they’re learning, practicing, and experiencing. From posting shared reflections to learning highlights, your child can showcase their growth, helping you stay connected, informed, and engaged no matter where you are.</p>
+          </div>
+        </div>
+      </div>
+      <div class="benefits-image">
+        <img src="assets/Family%20Pic.jpg" alt="Why Choose Us">
+      </div>
+    </section>
+
+    <section class="how-it-works" id="how">
+      <div class="how-container">
+        <h2>How It Works</h2>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="parents">For Parents</button>
+          <button class="tab-btn" data-tab="caregivers">For Caregivers</button>
+        </div>
+        <div class="tab-content">
+          <div class="tab-panel active" id="parents-tab">
+            <div class="steps">
+              <div class="step">
+                <div class="step-number">1</div>
+                <h3>Find a Caregiver</h3>
+                <p>Browse vetted, faith-aligned caregivers in your area. Read reviews, check availability, and find someone who matches your family's values.</p>
+              </div>
+              <div class="step">
+                <div class="step-number">2</div>
+                <h3>Book with Confidence</h3>
+                <p>Secure booking with verified profiles, transparent rates, and clear communication. Know exactly who will care for your children.</p>
+              </div>
+              <div class="step">
+                <div class="step-number">3</div>
+                <h3>Stay Connected Through Check-ins</h3>
+                <p>Receive real-time updates, photos, and messages from your caregiver. Peace of mind, every single day.</p>
+              </div>
+            </div>
+          </div>
+          <div class="tab-panel" id="caregivers-tab">
+            <div class="steps">
+              <div class="step">
+                <div class="step-number">1</div>
+                <h3>Apply & Get Vetted</h3>
+                <p>Complete our thorough application process. We verify your background, experience, and commitment to faith-aligned childcare values.</p>
+              </div>
+              <div class="step">
+                <div class="step-number">2</div>
+                <h3>Set Availability</h3>
+                <p>Control your schedule. Set your available hours, rates, and preferences. You're in charge of your time and boundaries.</p>
+              </div>
+              <div class="step">
+                <div class="step-number">3</div>
+                <h3>Care with Purpose</h3>
+                <p>Connect with families who value your work. Build meaningful relationships and grow your childcare business with purpose.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mission-section" id="mission">
+      <div class="mission-container">
+        <div class="mission-layout">
+          <div class="mission-content">
+          <h2>Our Mission</h2>
+          <p class="mission-intro">Assured Hearts was built with <strong>niyyah</strong>—pure intention rooted in faith, family, and community.</p>
+          
+          <div class="mission-cards">
+            <div class="mission-card">
+              <h3>Why We Built This</h3>
+              <p>Muslim families deserve childcare that honors their values. We created Assured Hearts to bridge the gap between safe, quality care and faith-aligned support. Your children should grow up with caregivers who understand your traditions, your values, and your vision for their future.</p>
+            </div>
+            
+            <div class="mission-card">
+              <h3>Our Core Values</h3>
+              <ul class="values-list">
+                <li><strong>Faith & Integrity:</strong> Everything we do is grounded in Islamic values and honesty</li>
+                <li><strong>Family First:</strong> We prioritize the well-being and trust of every family we serve</li>
+                <li><strong>Community:</strong> We believe in building networks of support, not just transactions</li>
+                <li><strong>Excellence:</strong> Quality childcare that meets the highest standards</li>
+              </ul>
+            </div>
+            
+            <div class="mission-card">
+              <h3>Our Intention</h3>
+              <p>We're not just connecting families with caregivers. We're building a movement of compassionate, vetted childcare professionals who share your faith and values. We're creating peace of mind for parents and empowering caregivers to work with purpose. This is more than a platform—it's a community rooted in trust and <strong>niyyah</strong>.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -102,28 +234,143 @@
       </section>
 
       <section id="become" class="panel hidden">
-        <h2>Become a Babysitter</h2>
+        <h2>Become a Care Provider</h2>
         <form id="becomeForm">
           <label>Full name
-            <input name="fullname" required>
+            <input type="text" name="fullname" required>
           </label>
           <label>Email
             <input type="email" name="email" required>
           </label>
-          <label>Phone
-            <input name="phone">
+          <label>Phone Number
+            <input type="tel" name="phone" required>
           </label>
-          <label>Experience
-            <textarea name="experience" rows="4"></textarea>
+          <label>Age
+            <input type="number" name="age" min="18" required>
+          </label>
+          <label>Gender
+            <select name="gender" required>
+              <option value="">Select gender</option>
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+            </select>
           </label>
           <div class="form-actions">
-            <button type="submit" class="btn">Submit</button>
+            <button type="submit" class="btn">Send Me an Application</button>
             <button type="button" id="becomeBack" class="btn ghost">Back</button>
           </div>
         </form>
         <div id="applyResult"></div>
       </section>
     </main>
+
+    <section class="signup-section">
+      <div class="signup-container">
+        <h2>Get Started Today</h2>
+        <p>Join the Assured Hearts community and find childcare that aligns with your values.</p>
+        <form id="signupFormMain" class="signup-form">
+          <div class="form-row">
+            <label>Full Name
+              <input type="text" name="fullname" required>
+            </label>
+            <label>Email
+              <input type="email" name="email" required>
+            </label>
+          </div>
+          
+          <div class="form-row">
+            <label>Phone Number
+              <input type="tel" name="phone" required>
+            </label>
+            <label>Number of Children
+              <input type="number" name="num_children" min="1" required>
+            </label>
+          </div>
+          
+          <div class="form-row">
+            <label>How Often Do You Need Childcare?
+              <select name="frequency" required>
+                <option value="">Select frequency</option>
+                <option value="1-2">1-2 times a week</option>
+                <option value="2-5">2-5 times a week</option>
+                <option value="5+">5+ times a week</option>
+              </select>
+            </label>
+            <label>City
+              <select name="city" required>
+                <option value="">Select city</option>
+                <option value="Regina">Regina</option>
+                <option value="Saskatoon">Saskatoon</option>
+              </select>
+            </label>
+          </div>
+          
+          <fieldset class="form-fieldset">
+            <legend>Ages of Children</legend>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="ages" value="1-3">
+                <span>1-3 years</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="ages" value="4-7">
+                <span>4-7 years</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="ages" value="8-11">
+                <span>8-11 years</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="ages" value="12-16">
+                <span>12-16 years</span>
+              </label>
+            </div>
+          </fieldset>
+          
+          <button type="submit" class="btn btn-large">Create Account</button>
+          <div id="signupResult"></div>
+        </form>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Navigation</h3>
+          <ul>
+            <li><a href="#" data-target="find">Find Childcare</a></li>
+            <li><a href="#" data-target="become">Join Our Care Network</a></li>
+            <li><a href="#how">Our Care Process</a></li>
+            <li><a href="#resources">Family Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Contact Us</h3>
+          <form id="contactForm">
+            <input type="email" name="email" placeholder="Your email" required>
+            <textarea name="message" placeholder="Your message" rows="3" required></textarea>
+            <button type="submit" class="btn">Send</button>
+          </form>
+          <div id="contactResult"></div>
+        </div>
+        <div class="footer-section">
+          <h3>Follow Us</h3>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook">f</a>
+            <a href="#" aria-label="Instagram">📷</a>
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Assured Hearts. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="#privacy">Privacy Policy</a>
+          <a href="#terms">Terms of Service</a>
+        </div>
+      </div>
+    </footer>
 
     <script src="script.js"></script>
   </body>
