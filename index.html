@@ -1,34 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Assured Hearts</title>
-
-    <!-- Basic SEO -->
-    <meta name="description" content="Assured Hearts — a place for reflection, learning, and renewal." />
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Assured Hearts Babysitting</title>
+    <meta name="description" content="Assured Hearts — trusted local babysitters." />
+    <link rel="stylesheet" href="style.css">
   </head>
 
   <body>
-    <main>
-      <h1>Assured Hearts ❤️</h1>
+    <header class="hero">
+      <div class="container">
+        <h1>Welcome to Assured Hearts</h1>
+        <p class="lead">Trusted local babysitters — vetted and caring.</p>
+        <div class="actions">
+          <button id="findBtn" class="btn">Find a babysitter</button>
+          <button id="becomeBtn" class="btn outline">Become a babysitter</button>
+        </div>
+      </div>
+    </header>
 
-      <p>
-        Welcome. If you’re seeing this page, your site is live and working.
-      </p>
+    <main class="container">
+      <section id="find" class="panel hidden">
+        <h2>Find a Babysitter</h2>
+        <form id="findForm">
+          <label>Name
+            <input name="name" required>
+          </label>
+          <label>Location
+            <input name="location">
+          </label>
+          <label>Date
+            <input type="date" name="date">
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn">Search</button>
+            <button type="button" id="findBack" class="btn ghost">Back</button>
+          </div>
+        </form>
+        <div id="results"></div>
+      </section>
 
-      <p>
-        This is the foundation — we’ll build from here.
-      </p>
-
-      <button id="testBtn">Click me</button>
+      <section id="become" class="panel hidden">
+        <h2>Become a Babysitter</h2>
+        <form id="becomeForm">
+          <label>Full name
+            <input name="fullname" required>
+          </label>
+          <label>Email
+            <input type="email" name="email" required>
+          </label>
+          <label>Phone
+            <input name="phone">
+          </label>
+          <label>Experience
+            <textarea name="experience" rows="4"></textarea>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn">Submit</button>
+            <button type="button" id="becomeBack" class="btn ghost">Back</button>
+          </div>
+        </form>
+        <div id="applyResult"></div>
+      </section>
     </main>
 
-    <!-- Script -->
     <script src="script.js"></script>
   </body>
 </html>

@@ -1,20 +1,42 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #f7f7f7;
-  color: #222;
+:root{
+  --accent:#ff6b6b;
+  --muted:#6b7280;
+  --bg:#f7f7f7;
+  --card:#ffffff;
 }
 
-main {
-  max-width: 800px;
-  margin: 80px auto;
-  padding: 40px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);
+  color:#111;
+  -webkit-font-smoothing:antialiased;
 }
 
-h1 {
-  margin-top: 0;
+.container{max-width:900px;margin:0 auto;padding:24px}
+
+.hero{
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:64px 16px;background:linear-gradient(135deg,#fff 0%,#fff7f7 100%);
+}
+.hero .lead{color:var(--muted);margin-top:8px}
+.actions{margin-top:18px;display:flex;gap:12px;justify-content:center}
+
+.btn{background:var(--accent);color:#fff;border:0;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:600}
+.btn.outline{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn.ghost{background:transparent;border:1px solid #ddd;color:var(--muted)}
+
+.panel{background:var(--card);padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);margin-top:24px}
+.hidden{display:none}
+
+form{display:flex;flex-direction:column;gap:12px}
+label{display:flex;flex-direction:column;font-size:14px;color:var(--muted)}
+input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-top:6px}
+.form-actions{display:flex;gap:8px;margin-top:8px}
+
+#results .card{padding:12px;border-radius:8px;border:1px solid #eee;margin-top:12px}
+
+@media (min-width:720px){
+  .hero{padding:96px 16px}
+  .actions .btn{padding:12px 20px}
 }
