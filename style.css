@@ -105,3 +105,15 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   .hero{padding:96px 16px}
   .actions .btn{padding:12px 20px}
 }
+
+/* Mobile-specific adjustments for the hero image block */
+@media (max-width:719px){
+  .hero-block{flex-direction:column;margin:20px 0;border-radius:10px}
+  .hero-image{flex:0 0 auto;padding:16px;width:100%;min-height:200px}
+  .hero-image img{width:80%;max-width:360px;height:auto;object-fit:cover;object-position:left center;margin:0 auto;border-radius:8px}
+  .hero-content{padding:24px;justify-content:flex-start;text-align:center}
+  .hero-content h2{font-size:22px}
+  .hero-sub{font-size:15px;max-width:100%}
+  .hero-cta{margin-top:16px}
+  .btn.learn{width:100%;padding:10px 12px}
+}
