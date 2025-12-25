@@ -171,19 +171,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // How It Works tabs
-  document.querySelectorAll('.tab-btn').forEach(btn=>{
+  // How It Works tabs with auto-circulation
+  let tabAutoCirculate = true;
+  let currentTabIndex = 0;
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  
+  function switchTab(index){
+    const btn = tabBtns[index];
+    const tabName = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=> b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=> p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById(tabName + '-tab');
+    if(panel) panel.classList.add('active');
+  }
+  
+  tabBtns.forEach((btn, index)=>{
     btn.addEventListener('click', ()=>{
-      const tabName = btn.dataset.tab;
-      // Remove active class from all buttons and panels
-      document.querySelectorAll('.tab-btn').forEach(b=> b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p=> p.classList.remove('active'));
-      // Add active class to clicked button and corresponding panel
-      btn.classList.add('active');
-      const panel = document.getElementById(tabName + '-tab');
-      if(panel) panel.classList.add('active');
+      tabAutoCirculate = false;
+      currentTabIndex = index;
+      switchTab(currentTabIndex);
     });
   });
+  
+  // Auto-circulate tabs every 5 seconds
+  setInterval(()=>{
+    if(tabAutoCirculate && tabBtns.length > 0){
+      currentTabIndex = (currentTabIndex + 1) % tabBtns.length;
+      switchTab(currentTabIndex);
+    }
+  }, 5000);
 
   // Signup form handler
   const signupFormMain = document.getElementById('signupFormMain');
@@ -198,4 +215,46 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(()=>{ signupResult.innerHTML = ''; }, 4000);
     });
   }
+
+  // Mission carousel
+  let currentSlide = 0;
+  const titleBtns = document.querySelectorAll('.carousel-title-btn');
+  const missionCards = document.querySelectorAll('.mission-card');
+  const dots = document.querySelectorAll('.carousel-dots .dot');
+  
+  function showSlide(index){
+    titleBtns.forEach(b=> b.classList.remove('active'));
+    missionCards.forEach(card=> card.classList.remove('active'));
+    dots.forEach(dot=> dot.classList.remove('active'));
+    titleBtns[index].classList.add('active');
+    missionCards[index].classList.add('active');
+    dots[index].classList.add('active');
+  }
+  
+  titleBtns.forEach((btn, index)=>{
+    btn.addEventListener('click', ()=>{
+      currentSlide = index;
+      showSlide(currentSlide);
+    });
+  });
+  
+  dots.forEach((dot, index)=>{
+    dot.addEventListener('click', ()=>{
+      currentSlide = index;
+      showSlide(currentSlide);
+    });
+  });
+  
+  missionCards.forEach((card, index)=>{
+    card.addEventListener('click', ()=>{
+      currentSlide = index;
+      showSlide(currentSlide);
+    });
+  });
+  
+  // Auto-circulate every 5 seconds
+  setInterval(()=>{
+    currentSlide = (currentSlide + 1) % missionCards.length;
+    showSlide(currentSlide);
+  }, 5000);
 });

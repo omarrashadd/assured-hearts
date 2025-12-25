@@ -85,6 +85,9 @@
           <button id="findBtn" class="btn">Find Trusted Childcare</button>
           <button id="becomeBtn" class="btn outline">Become a Childcare Provider</button>
         </div>
+        <div class="login-prompt">
+          <p>Already have an account? <button id="loginBtn" class="btn">Log In</button></p>
+        </div>
       </div>
     </header>
 
@@ -187,25 +190,39 @@
           <h2>Our Mission</h2>
           <p class="mission-intro">Assured Hearts was built with <strong>niyyah</strong>—pure intention rooted in faith, family, and community.</p>
           
-          <div class="mission-cards">
-            <div class="mission-card">
-              <h3>Why We Built This</h3>
-              <p>Muslim families deserve childcare that honors their values. We created Assured Hearts to bridge the gap between safe, quality care and faith-aligned support. Your children should grow up with caregivers who understand your traditions, your values, and your vision for their future.</p>
+          <div class="mission-carousel">
+            <div class="carousel-titles">
+              <button class="carousel-title-btn active" data-slide="0">Why We Built This</button>
+              <button class="carousel-title-btn" data-slide="1">Our Core Values</button>
+              <button class="carousel-title-btn" data-slide="2">Our Intention</button>
             </div>
             
-            <div class="mission-card">
-              <h3>Our Core Values</h3>
-              <ul class="values-list">
-                <li><strong>Faith & Integrity:</strong> Everything we do is grounded in Islamic values and honesty</li>
-                <li><strong>Family First:</strong> We prioritize the well-being and trust of every family we serve</li>
-                <li><strong>Community:</strong> We believe in building networks of support, not just transactions</li>
-                <li><strong>Excellence:</strong> Quality childcare that meets the highest standards</li>
-              </ul>
+            <div class="carousel-slides">
+              <div class="mission-card active">
+                <h3>Why We Built This</h3>
+                <p>Muslim families deserve childcare that honors their values. We created Assured Hearts to bridge the gap between safe, quality care and faith-aligned support. Your children should grow up with caregivers who understand your traditions, your values, and your vision for their future.</p>
+              </div>
+              
+              <div class="mission-card">
+                <h3>Our Core Values</h3>
+                <ul class="values-list">
+                  <li><strong>Faith & Integrity:</strong> Everything we do is grounded in Islamic values and honesty</li>
+                  <li><strong>Family First:</strong> We prioritize the well-being and trust of every family we serve</li>
+                  <li><strong>Community:</strong> We believe in building networks of support, not just transactions</li>
+                  <li><strong>Excellence:</strong> Quality childcare that meets the highest standards</li>
+                </ul>
+              </div>
+              
+              <div class="mission-card">
+                <h3>Our Intention</h3>
+                <p>We're not just connecting families with caregivers. We're building a movement of compassionate, vetted childcare professionals who share your faith and values. We're creating peace of mind for parents and empowering caregivers to work with purpose. This is more than a platform—it's a community rooted in trust and <strong>niyyah</strong>.</p>
+              </div>
             </div>
             
-            <div class="mission-card">
-              <h3>Our Intention</h3>
-              <p>We're not just connecting families with caregivers. We're building a movement of compassionate, vetted childcare professionals who share your faith and values. We're creating peace of mind for parents and empowering caregivers to work with purpose. This is more than a platform—it's a community rooted in trust and <strong>niyyah</strong>.</p>
+            <div class="carousel-dots">
+              <button class="dot active" data-slide="0"></button>
+              <button class="dot" data-slide="1"></button>
+              <button class="dot" data-slide="2"></button>
             </div>
           </div>
         </div>
@@ -248,6 +265,13 @@
           <label>Age
             <input type="number" name="age" min="18" required>
           </label>
+          <label>City
+            <select name="city" required>
+              <option value="">Select city</option>
+              <option value="Regina">Regina</option>
+              <option value="Saskatoon">Saskatoon</option>
+            </select>
+          </label>
           <label>Gender
             <select name="gender" required>
               <option value="">Select gender</option>
@@ -282,25 +306,37 @@
             <label>Phone Number
               <input type="tel" name="phone" required>
             </label>
-            <label>Number of Children
-              <input type="number" name="num_children" min="1" required>
+            <label>City
+              <select name="city" required>
+                <option value="">Select city</option>
+                <option value="Regina">Regina</option>
+                <option value="Saskatoon">Saskatoon</option>
+              </select>
             </label>
           </div>
           
           <div class="form-row">
+            <label>Number of Children Requiring Care
+              <select name="num_children" required>
+                <option value="">Select number</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </label>
             <label>How Often Do You Need Childcare?
               <select name="frequency" required>
                 <option value="">Select frequency</option>
                 <option value="1-2">1-2 times a week</option>
                 <option value="2-5">2-5 times a week</option>
                 <option value="5+">5+ times a week</option>
-              </select>
-            </label>
-            <label>City
-              <select name="city" required>
-                <option value="">Select city</option>
-                <option value="Regina">Regina</option>
-                <option value="Saskatoon">Saskatoon</option>
               </select>
             </label>
           </div>
@@ -330,6 +366,49 @@
           <button type="submit" class="btn btn-large">Create Account</button>
           <div id="signupResult"></div>
         </form>
+      </div>
+    </section>
+
+    <section class="app-section">
+      <div class="app-container">
+        <h2>Assured Hearts App</h2>
+        <p class="app-subtitle">Coming Soon</p>
+        <div class="app-showcase">
+          <div class="iphone-mockup">
+            <div class="iphone-notch"></div>
+            <div class="iphone-screen">
+              <div class="app-display">
+                <img src="Assets/assured Hearts Logo.png" alt="Assured Hearts App" class="app-logo">
+                <h3>Assured Hearts</h3>
+                <p>Childcare at Your Fingertips</p>
+                <p class="coming-soon-text">Coming Soon to iOS & Android</p>
+              </div>
+            </div>
+            <div class="iphone-home"></div>
+          </div>
+        </div>
+        <div class="app-features">
+          <div class="feature-item">
+            <h4>Curriculum Access</h4>
+            <p>Access the curriculum, track learning progress, and see how your child’s understanding and skills develop over time.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Care Updates & Parent Connection</h4>
+            <p>Real-time updates, photos, and direct communication with caregivers and our support team, all in one place.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Family Resources</h4>
+            <p>Access helpful guides and support materials designed to extend learning, encourage reflection, and support your child’s ongoing development. </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="support-section">
+      <div class="support-container">
+        <h2>Support This Project</h2>
+        <p>Help us bring faith-aligned childcare to more Muslim families across Canada and beyond.</p>
+        <button class="btn donate-btn">Donate to Fund This Project</button>
       </div>
     </section>
 
