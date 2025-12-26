@@ -134,28 +134,13 @@ body{
 .container{max-width:900px;margin:0 auto;padding:24px}
 
 .hero{
-  position:relative;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 16px;overflow:hidden;min-height:600px;
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 16px;background:linear-gradient(135deg,#fff 0%,#fff7f7 100%);
 }
-.hero-video{
-  position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1;
-}
-.hero-overlay{
-  position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2;
-}
-.hero .container{
-  position:relative;z-index:3;color:#fff;
-}
-.hero h1{
-  color:#fff;
-}
-.hero .lead{color:#f0f0f0;margin-top:8px}
+.hero .lead{color:var(--muted);margin-top:8px}
 .actions{margin-top:18px;display:flex;gap:12px;justify-content:center}
 .login-prompt{margin-top:24px;text-align:center;border-top:1px solid rgba(255,255,255,0.1);padding-top:16px;}
 .login-prompt p{margin:0;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;gap:12px;}
 .login-prompt .btn{padding:10px 20px;font-size:14px;}
-.hero .login-prompt p{color:#f0f0f0;}
-.hero .login-prompt .btn{background:#fff;color:var(--accent);}
-.hero .login-prompt .btn:hover{background:rgba(255,255,255,0.9)}
 
 .hero-block{
   display:flex;align-items:stretch;margin:0 0 30px;border-radius:12px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.06);background:#000;
@@ -191,8 +176,6 @@ body{
 .btn.secondary{background:#f3f4f6;color:var(--accent);border:1px solid #d1d5db;}
 .btn.secondary:hover{background:#e5e7eb;filter:none;}
 .btn.outline{background:transparent;color:var(--accent);border:2px solid var(--accent)}
-.hero .btn.outline{background:transparent;color:#fff;border:2px solid #fff;}
-.hero .btn.outline:hover{background:rgba(255,255,255,0.15)}
 .btn.ghost{background:transparent;border:1px solid #ddd;color:var(--muted)}
 
 .panel{background:var(--card);padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);margin-top:24px}
