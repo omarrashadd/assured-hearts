@@ -9,6 +9,29 @@
   </head>
 
   <body>
+    <div id="welcomeModal" class="welcome-modal">
+      <div class="welcome-modal-content">
+        <button class="modal-close" id="welcomeModalClose">&times;</button>
+        <div class="welcome-inner">
+          <h3 class="login-form-title">Already have an account?</h3>
+          <form id="welcomeLoginForm" class="hero-login-form">
+            <label>Username or Email
+              <input type="text" name="username" placeholder="Enter username or email" required>
+            </label>
+            <label>Password
+              <input type="password" name="password" placeholder="Enter password" required>
+            </label>
+            <button type="submit" class="btn btn-large">Sign In</button>
+          </form>
+          
+          <div class="form-divider">or</div>
+          
+          <h2>Get Started Today</h2>
+          <p>Join the Assured Hearts community and find childcare that aligns with your values.</p>
+          <button class="btn btn-large" id="welcomeModalSignupBtn">Create Account</button>
+        </div>
+      </div>
+    </div>
     <nav class="navbar">
       <div class="nav-container">
         <div class="logo"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></div>
@@ -318,7 +341,30 @@
           
           <div class="form-row">
             <label>Phone Number
-              <input type="tel" name="phone" required>
+              <div class="phone-input-group">
+                <select name="country_code" class="country-code-select" required>
+                  <option value="+1">+1 (Canada/US)</option>
+                  <option value="+44">+44 (UK)</option>
+                  <option value="+1-242">+1-242 (Bahamas)</option>
+                  <option value="+358">+358 (Finland)</option>
+                  <option value="+33">+33 (France)</option>
+                  <option value="+49">+49 (Germany)</option>
+                  <option value="+91">+91 (India)</option>
+                  <option value="+39">+39 (Italy)</option>
+                  <option value="+81">+81 (Japan)</option>
+                  <option value="+31">+31 (Netherlands)</option>
+                  <option value="+64">+64 (New Zealand)</option>
+                  <option value="+48">+48 (Poland)</option>
+                  <option value="+65">+65 (Singapore)</option>
+                  <option value="+34">+34 (Spain)</option>
+                  <option value="+46">+46 (Sweden)</option>
+                  <option value="+41">+41 (Switzerland)</option>
+                  <option value="+966">+966 (Saudi Arabia)</option>
+                  <option value="+971">+971 (UAE)</option>
+                  <option value="+92">+92 (Pakistan)</option>
+                </select>
+                <input type="tel" name="phone" placeholder="Phone number" required>
+              </div>
             </label>
             <label>City
               <select name="city" required>

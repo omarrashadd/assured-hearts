@@ -1,4 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Welcome modal on page load
+  const welcomeModal = document.getElementById('welcomeModal');
+  const welcomeModalClose = document.getElementById('welcomeModalClose');
+  const welcomeModalSignupBtn = document.getElementById('welcomeModalSignupBtn');
+  
+  if(welcomeModal){
+    // Show modal on page load
+    setTimeout(()=> welcomeModal.classList.remove('hidden'), 500);
+    
+    // Close modal handlers
+    welcomeModalClose && welcomeModalClose.addEventListener('click', ()=> welcomeModal.classList.add('hidden'));
+    welcomeModal.addEventListener('click', e=> { if(e.target === welcomeModal) welcomeModal.classList.add('hidden'); });
+    welcomeModalSignupBtn && welcomeModalSignupBtn.addEventListener('click', ()=> welcomeModal.classList.add('hidden'));
+  }
+
   // Hero video loop from 0-6 seconds
   const heroVideo = document.querySelector('.hero-video');
   if(heroVideo){
