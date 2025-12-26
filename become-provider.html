@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Become a Childcare Provider - Assured Hearts</title>
+    <meta name="description" content="Join our network of trusted childcare providers." />
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="nav-links">
+          <a href="find-childcare.html">Find Childcare</a>
+          <a href="become-provider.html">Join Our Care Network</a>
+          <a href="care-process.html">Our Care Process</a>
+          <a href="learning.html">At-Home Learning</a>
+        </div>
+        <div class="nav-auth">
+          <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
+          <a id="signupBtn" class="btn-auth signup" href="signup.html" role="button">Sign up</a>
+        </div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobileMenu" class="mobile-menu-panel hidden" aria-hidden="true">
+      <button id="mobileMenuClose" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="find-childcare.html">Find Childcare</a>
+        <a href="become-provider.html">Join Our Care Network</a>
+        <a href="care-process.html">Our Care Process</a>
+        <a href="learning.html">At-Home Learning</a>
+      </nav>
+    </div>
+
+    <div id="loginModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="loginClose">&times;</button>
+        <h2>Sign In</h2>
+        <form id="loginForm">
+          <label>Email
+            <input type="email" name="email" placeholder="Enter your email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" placeholder="Enter your password" required>
+          </label>
+          <button type="submit" class="btn">Sign In</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="signupModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="signupClose">&times;</button>
+        <h2>Sign up</h2>
+        <form id="signupForm">
+          <label>Email
+            <input type="email" name="email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" required>
+          </label>
+          <label>Confirm Password
+            <input type="password" name="confirm" required>
+          </label>
+          <button type="submit" class="btn">Sign up</button>
+        </form>
+      </div>
+    </div>
+
+    <header class="hero" style="padding: 64px 16px; background: linear-gradient(135deg, #fff 0%, #fff7f7 100%);">
+      <div class="container">
+        <h1 style="text-align: center; margin-bottom: 16px;">Join Our Care Network</h1>
+        <p class="lead" style="text-align: center; margin-bottom: 32px;">Start earning as a trusted childcare provider.</p>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 48px 24px; max-width: 900px;">
+      <section style="background: #f5f5f5; padding: 40px 32px; border-radius: 12px; margin-bottom: 32px;">
+        <h2 style="color: #06464E; margin-top: 0; font-size: 28px; line-height: 1.4;">Are you passionate about childcare and making a difference in children's lives?</h2>
+        <p style="color: #666; margin: 16px 0 0 0; font-size: 16px; line-height: 1.8;">Join Assured Hearts and become part of a community dedicated to providing Islamic-aligned, quality childcare. We're looking for caregivers who share our values and are committed to nurturing the next generation with compassion, integrity, and Islamic principles.</p>
+        <a href="apply.html" class="btn" style="background: linear-gradient(135deg, #06464E 0%, #0a5a6a 100%); color: white; padding: 18px 48px; font-size: 18px; font-weight: 700; display: inline-block; text-decoration: none; border-radius: 8px; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(6,70,78,0.2); margin-top: 24px;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 32px rgba(6,70,78,0.4)'; this.style.background='linear-gradient(135deg, #0a5a6a 0%, #06464E 100%)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(6,70,78,0.2)'; this.style.background='linear-gradient(135deg, #06464E 0%, #0a5a6a 100%)'">Apply Now →</a>
+      </section>
+
+      <section style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+        <h2 style="color: #06464E; margin-top: 0;">Why Join Assured Hearts?</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+          <div>
+            <h3 style="color: #06464E; margin-bottom: 8px;">📋 Flexible Schedule</h3>
+            <p style="color: #666; margin: 0; line-height: 1.6;">Set your own hours and take on jobs that fit your lifestyle.</p>
+          </div>
+          <div>
+            <h3 style="color: #06464E; margin-bottom: 8px;">💰 Competitive Pay</h3>
+            <p style="color: #666; margin: 0; line-height: 1.6;">Earn competitive rates for your childcare expertise.</p>
+          </div>
+          <div>
+            <h3 style="color: #06464E; margin-bottom: 8px;">🤝 Community</h3>
+            <p style="color: #666; margin: 0; line-height: 1.6;">Join a vetted community of Islamic-aligned caregivers.</p>
+          </div>
+          <div>
+            <h3 style="color: #06464E; margin-bottom: 8px;">✓ Support</h3>
+            <p style="color: #666; margin: 0; line-height: 1.6;">Get resources, training, and ongoing support.</p>
+          </div>
+        </div>
+      </section>
+
+      <section style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-top: 32px;">
+        <h2 style="color: #06464E; margin-top: 0;">Application Requirements</h2>
+        <ul style="color: #666; line-height: 1.8;">
+          <li>Must be 18+ years old</li>
+          <li>Background check and reference verification</li>
+          <li>CPR/First Aid certification (we can help)</li>
+          <li>Commitment to Islamic values</li>
+          <li>Reliable transportation</li>
+        </ul>
+      </section>
+
+      <section style="background: #f5f5f5; padding: 32px; border-radius: 12px; margin-top: 32px;">
+        <h2 style="color: #06464E; margin-top: 0;">Get Started Today</h2>
+        <p style="color: #666; margin: 16px 0;">Apply now to join our growing network of caregivers.</p>
+        <a href="apply.html" class="btn" style="background: linear-gradient(135deg, #06464E 0%, #0a5a6a 100%); color: white; padding: 18px 48px; font-size: 18px; font-weight: 700; display: inline-block; text-decoration: none; border-radius: 8px; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(6,70,78,0.2);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 32px rgba(6,70,78,0.4)'; this.style.background='linear-gradient(135deg, #0a5a6a 0%, #06464E 100%)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(6,70,78,0.2)'; this.style.background='linear-gradient(135deg, #06464E 0%, #0a5a6a 100%)'">Apply Now →</a>
+      </section>
+    </main>
+
+    <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Our Care Process - Assured Hearts</title>
+    <meta name="description" content="Learn about our vetting and care process." />
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="nav-links">
+          <a href="find-childcare.html">Find Childcare</a>
+          <a href="become-provider.html">Join Our Care Network</a>
+          <a href="care-process.html">Our Care Process</a>
+          <a href="learning.html">At-Home Learning</a>
+        </div>
+        <div class="nav-auth">
+          <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
+          <a id="signupBtn" class="btn-auth signup" href="signup.html" role="button">Sign up</a>
+        </div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobileMenu" class="mobile-menu-panel hidden" aria-hidden="true">
+      <button id="mobileMenuClose" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="find-childcare.html">Find Childcare</a>
+        <a href="become-provider.html">Join Our Care Network</a>
+        <a href="care-process.html">Our Care Process</a>
+        <a href="learning.html">At-Home Learning</a>
+      </nav>
+    </div>
+
+    <div id="loginModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="loginClose">&times;</button>
+        <h2>Sign In</h2>
+        <form id="loginForm">
+          <label>Email
+            <input type="email" name="email" placeholder="Enter your email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" placeholder="Enter your password" required>
+          </label>
+          <button type="submit" class="btn">Sign In</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="signupModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="signupClose">&times;</button>
+        <h2>Sign up</h2>
+        <form id="signupForm">
+          <label>Email
+            <input type="email" name="email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" required>
+          </label>
+          <label>Confirm Password
+            <input type="password" name="confirm" required>
+          </label>
+          <button type="submit" class="btn">Sign up</button>
+        </form>
+      </div>
+    </div>
+
+    <header class="hero" style="padding: 64px 16px; background: linear-gradient(135deg, #fff 0%, #fff7f7 100%);">
+      <div class="container">
+        <h1 style="text-align: center; margin-bottom: 16px;">Our Care Process</h1>
+        <p class="lead" style="text-align: center; margin-bottom: 20px;">How we ensure the best care for your family.</p>
+        <div style="display: flex; justify-content: center;">
+          <a href="create-account.html" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; padding: 12px 22px; border-radius: 10px; font-weight: 700; text-decoration: none;">Get started today</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 48px 24px; max-width: 1100px;">
+      <section style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+        <h2 style="color: #06464E; margin-top: 0;">Families & Caregivers, Hand in Hand</h2>
+        <p style="color: #666; line-height: 1.8; margin: 8px 0 24px 0;">Two tracks that move together so everyone stays aligned from the first hello to ongoing support.</p>
+
+        <div style="display: grid; grid-template-columns: 80px 1fr 1fr; column-gap: 16px; row-gap: 24px; align-items: start;">
+          <div></div>
+          <div style="padding-bottom: 8px; border-bottom: 2px solid #dce7ea;">
+            <h3 style="margin: 0; color: #06464E; font-size: 18px;">For Parents</h3>
+            <p style="margin: 6px 0 0 0; color: #667;">What you do</p>
+          </div>
+          <div style="padding-bottom: 8px; border-bottom: 2px solid #dce7ea;">
+            <h3 style="margin: 0; color: #06464E; font-size: 18px;">For Childcare Providers</h3>
+            <p style="margin: 6px 0 0 0; color: #667;">What we guide you through</p>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <div style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">1</div>
+          </div>
+          <div style="background: #f8fbfc; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h4 style="margin: 0 0 6px 0; color: #06464E;">Share your needs</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Tell us your schedule, childrens ages, and any preferences so we can personalize your matches.</p>
+          </div>
+          <div style="background: #fdfaf6; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h4 style="margin: 0 0 6px 0; color: #06464E;">Apply and share experience</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Providers apply, outline their skills, and complete an interview so we understand their strengths.</p>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <div style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">2</div>
+          </div>
+          <div style="background: #f8fbfc; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h4 style="margin: 0 0 6px 0; color: #06464E;">Review curated matches</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">We send vetted caregivers that fit your criteria so you can shortlist with confidence.</p>
+          </div>
+          <div style="background: #fdfaf6; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h4 style="margin: 0 0 6px 0; color: #06464E;">Safety screening</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Background checks, values alignment, and CPR/First Aid verification keep every profile trusted.</p>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <div style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">3</div>
+          </div>
+          <div style="background: #f8fbfc; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h4 style="margin: 0 0 6px 0; color: #06464E;">Meet and decide</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Chat, interview, or request a trial sit to confirm fit for your home and children.</p>
+          </div>
+          <div style="background: #fdfaf6; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h4 style="margin: 0 0 6px 0; color: #06464E;">Connect with families</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Meet matched families, understand their routines, and align on expectations before booking.</p>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <div style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">4</div>
+          </div>
+          <div style="background: #f8fbfc; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h4 style="margin: 0 0 6px 0; color: #06464E;">Book with confidence</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Confirm your caregiver, set the schedule, and know we are here to support your family.</p>
+          </div>
+          <div style="background: #fdfaf6; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h4 style="margin: 0 0 6px 0; color: #06464E;">Onboard and keep growing</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">We finalize onboarding, provide resources, and stay available for coaching and feedback.</p>
+          </div>
+        </div>
+      </section>
+
+      <section style="background: white; padding: 32px; border-radius: 12px; margin-top: 32px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+        <h2 style="color: #06464E; margin: 0 0 12px 0;">Learning Pathways & Curriculum</h2>
+        <p style="color: #666; line-height: 1.8; margin: 0 0 20px 0;">Families pick the focus areas, providers guide the sessions, and children share what they learned—all within a safe, tech-enabled experience.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+          <div style="padding: 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f8fbfc;">
+            <h3 style="margin: 0 0 8px 0; color: #06464E; font-size: 17px;">Parent choice</h3>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Select curriculum tracks (prayer basics, Prophet stories, character, Arabic letters, kindness challenges) tailored to your child.</p>
+          </div>
+          <div style="padding: 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fdfaf6;">
+            <h3 style="margin: 0 0 8px 0; color: #06464E; font-size: 17px;">Provider-led, interactive</h3>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Caregivers use our guided content and activities during care time—hands-on practice, reflection prompts, and joyful storytelling.</p>
+          </div>
+          <div style="padding: 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f8fbfc;">
+            <h3 style="margin: 0 0 8px 0; color: #06464E; font-size: 17px;">Child portfolios</h3>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Kids showcase progress—reciting duas, sharing art, or summarizing stories—visible to parents in their accounts.</p>
+          </div>
+          <div style="padding: 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fdfaf6;">
+            <h3 style="margin: 0 0 8px 0; color: #06464E; font-size: 17px;">Feedback & praise loop</h3>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Parents can praise, leave notes, and suggest next focuses; providers see the feedback and adjust sessions accordingly.</p>
+          </div>
+          <div style="padding: 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #eef7f2;">
+            <h3 style="margin: 0 0 8px 0; color: #06464E; font-size: 17px;">Positive use of tech</h3>
+            <p style="margin: 0; color: #666; line-height: 1.6;">We keep technology purposeful—simple dashboards, gentle reminders, and secure sharing—so learning feels warm, not screen-heavy.</p>
+          </div>
+          <div style="padding: 18px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f8fbfc;">
+            <h3 style="margin: 0 0 8px 0; color: #06464E; font-size: 17px;">At-home extensions</h3>
+            <p style="margin: 0; color: #666; line-height: 1.6;">Between sessions, children keep practicing at their pace—dua and salah basics, kindness missions, story retells—while providers see progress and parents can praise in their dashboard.</p>
+            <a href="learning.html" style="display: inline-block; margin-top: 12px; padding: 10px 14px; background: #06464E; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">Browse our at-home learning</a>
+          </div>
+        </div>
+      </section>
+
+      <section style="background: #f5f5f5; padding: 32px; border-radius: 12px; margin-top: 32px;">
+        <h2 style="color: #06464E; margin-top: 0;">Built-In Safety and Support</h2>
+        <p style="color: #666; line-height: 1.8;">Every step includes identity verification, background checks, and values alignment. We offer CPR and First Aid guidance for providers and a responsive support team for families so both sides feel confident long after the first booking.</p>
+      </section>
+    </main>
+
+    <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Create Account - Assured Hearts</title>
+    <meta name="description" content="Create your Assured Hearts account to find or provide childcare." />
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="nav-links">
+          <a href="find-childcare.html">Find Childcare</a>
+          <a href="become-provider.html">Join Our Care Network</a>
+          <a href="care-process.html">Our Care Process</a>
+          <a href="learning.html">At-Home Learning</a>
+        </div>
+        <div class="nav-auth">
+          <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
+          <a id="signupBtn" class="btn-auth signup" href="signup.html" role="button">Sign up</a>
+        </div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobileMenu" class="mobile-menu-panel hidden" aria-hidden="true">
+      <button id="mobileMenuClose" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="find-childcare.html">Find Childcare</a>
+        <a href="become-provider.html">Join Our Care Network</a>
+        <a href="care-process.html">Our Care Process</a>
+        <a href="learning.html">At-Home Learning</a>
+      </nav>
+    </div>
+
+    <header class="hero" style="padding: 64px 16px; background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%);">
+      <div class="container" style="max-width: 900px;">
+        <h1 style="text-align: center; margin-bottom: 12px;">Create your parent account</h1>
+        <p class="lead" style="text-align: center; margin-bottom: 24px;">Find trusted caregivers, book sessions, track learning, and stay connected with your children's care.</p>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 48px 24px; max-width: 900px;">
+      <section style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+        <h2 style="margin: 0 0 8px 0; color: #06464E;">Parent information</h2>
+        <p style="margin: 0 0 20px 0; color: #666; font-size: 14px;">Tell us about yourself so we can match you with the right caregivers.</p>
+        <form id="createAccountForm" style="display: grid; gap: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div>
+              <label for="firstName" style="display: block; margin-bottom: 6px; color: #333;">First name</label>
+              <input id="firstName" name="firstName" type="text" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+            <div>
+              <label for="lastName" style="display: block; margin-bottom: 6px; color: #333;">Last name</label>
+              <input id="lastName" name="lastName" type="text" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div>
+              <label for="email" style="display: block; margin-bottom: 6px; color: #333;">Email</label>
+              <input id="email" name="email" type="email" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+            <div>
+              <label for="phone" style="display: block; margin-bottom: 6px; color: #333;">Phone number</label>
+              <input id="phone" name="phone" type="tel" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div>
+              <label for="password" style="display: block; margin-bottom: 6px; color: #333;">Password</label>
+              <input id="password" name="password" type="password" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+            <div>
+              <label for="confirm" style="display: block; margin-bottom: 6px; color: #333;">Confirm password</label>
+              <input id="confirm" name="confirm" type="password" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+          </div>
+          <div>
+            <label for="role" style="display: block; margin-bottom: 6px; color: #333;">I am the</label>
+            <select id="role" name="role" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+              <option value="">Select an option</option>
+              <option value="mother">Mother</option>
+              <option value="father">Father</option>
+              <option value="guardian">Guardian</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div>
+              <label for="city" style="display: block; margin-bottom: 6px; color: #333;">City</label>
+              <input id="city" name="city" type="text" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+            <div>
+              <label for="province" style="display: block; margin-bottom: 6px; color: #333;">Province</label>
+              <select id="province" name="province" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+                <option value="">Select a province</option>
+                <option value="AB">Alberta</option>
+                <option value="BC">British Columbia</option>
+                <option value="MB">Manitoba</option>
+                <option value="NB">New Brunswick</option>
+                <option value="NL">Newfoundland and Labrador</option>
+                <option value="NS">Nova Scotia</option>
+                <option value="ON">Ontario</option>
+                <option value="PE">Prince Edward Island</option>
+                <option value="QC">Quebec</option>
+                <option value="SK">Saskatchewan</option>
+                <option value="NT">Northwest Territories</option>
+                <option value="NU">Nunavut</option>
+                <option value="YT">Yukon</option>
+              </select>
+            </div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 8px 0;">
+
+          <h3 style="margin: 0 0 12px 0; color: #06464E; font-size: 18px;">About your children</h3>
+          <div>
+            <label for="numChildren" style="display: block; margin-bottom: 6px; color: #333;">Number of children</label>
+            <select id="numChildren" name="numChildren" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+              <option value="">Select</option>
+              <option value="1">1 child</option>
+              <option value="2">2 children</option>
+              <option value="3">3 children</option>
+              <option value="4">4 children</option>
+              <option value="5">5+ children</option>
+            </select>
+          </div>
+          
+          <div id="childrenAgesContainer" style="display: none; padding: 16px; background: #f8fbfc; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <!-- Dynamic child age inputs will appear here -->
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 8px 0;">
+
+          <h3 style="margin: 0 0 12px 0; color: #06464E; font-size: 18px;">Care needs</h3>
+          <div>
+            <label for="frequency" style="display: block; margin-bottom: 6px; color: #333;">How often do you need childcare?</label>
+            <select id="frequency" name="frequency" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+              <option value="">Select frequency</option>
+              <option value="daily">Daily</option>
+              <option value="few-times-week">A few times a week</option>
+              <option value="weekly">Weekly</option>
+              <option value="bi-weekly">Bi-weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="occasional">Occasional/as needed</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="preferredSchedule" style="display: block; margin-bottom: 6px; color: #333;">Preferred schedule (optional)</label>
+            <textarea id="preferredSchedule" name="preferredSchedule" rows="3" placeholder="E.g., Weekday mornings, Saturday evenings..." style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px; font-family: inherit;"></textarea>
+          </div>
+
+          <div>
+            <label for="specialNeeds" style="display: block; margin-bottom: 6px; color: #333;">Any special requirements? (optional)</label>
+            <textarea id="specialNeeds" name="specialNeeds" rows="3" placeholder="Dietary needs, allergies, special accommodations..." style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px; font-family: inherit;"></textarea>
+          </div>
+
+          <button type="submit" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; padding: 14px 16px; border: none; border-radius: 10px; font-weight: 700; margin-top: 8px;">Submit application</button>
+          <p style="margin: 0; color: #666; font-size: 14px;">By submitting this application you agree to our terms and privacy policy.</p>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      // Handle dynamic child age inputs
+      document.getElementById('numChildren').addEventListener('change', function(e) {
+        const container = document.getElementById('childrenAgesContainer');
+        const numChildren = parseInt(e.target.value);
+        
+        if (numChildren > 0) {
+          container.style.display = 'block';
+          container.innerHTML = '<h4 style="margin: 0 0 12px 0; color: #06464E; font-size: 16px;">Ages of your children</h4>';
+          
+          for (let i = 1; i <= numChildren; i++) {
+            const childDiv = document.createElement('div');
+            childDiv.style.marginBottom = '12px';
+            childDiv.innerHTML = `
+              <label for="child${i}Age" style="display: block; margin-bottom: 6px; color: #333;">Child ${i} age</label>
+              <input id="child${i}Age" name="child${i}Age" type="number" min="0" max="17" required placeholder="Age in years" style="width: 100%; padding: 10px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            `;
+            container.appendChild(childDiv);
+          }
+        } else {
+          container.style.display = 'none';
+          container.innerHTML = '';
+        }
+      });
+
+      // Form submission
+      document.getElementById('createAccountForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        console.log('Parent account data:', data);
+        alert('Account created successfully! Welcome to Assured Hearts.');
+        window.location.href = 'index.html';
+      });
+    </script>
+
+    <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
