@@ -1,3 +1,7 @@
+@media (prefers-color-scheme: dark) {
+  * { color-scheme: light !important; }
+}
+
 .nav-links a {
   position:relative;
   overflow:hidden;
