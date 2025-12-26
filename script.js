@@ -111,8 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Remove any existing results
-      const existingResults = heroFindForm.nextElementSibling;
-      if(existingResults && existingResults.style.textAlign === 'center'){
+      const existingResults = document.getElementById('heroSearchResults');
+      if(existingResults){
         existingResults.remove();
       }
 
@@ -122,33 +122,42 @@ document.addEventListener('DOMContentLoaded', () => {
       if(hasAvailable){
         const numCaregivers = Math.floor(Math.random() * 5) + 3;
         resultsHTML = `
-          <div style="text-align: center; margin-top: 16px; background: #f0f8f7; padding: 16px; border-radius: 8px;">
-            <p style="color: #333; margin: 0 0 16px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
-            <div style="display: flex; gap: 12px; justify-content: center;">
-              <button id="heroCreateAccountBtn" class="btn" style="background-color: #06464E; color: white;">Create Account</button>
-              <button id="heroLoginBtn" class="btn" style="background-color: #67B3C2; color: white;">Log In</button>
+          <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
+            <p style="color: #333; margin: 0 0 12px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+              <button id="heroCreateAccountBtn" class="btn" style="background: white; color: #06464E; border: 2px solid #06464E; font-weight: 600;">Create Account</button>
+              <button id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
             </div>
+            <button id="heroCloseResultsBtn" type="button" style="margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
           </div>
         `;
       } else {
         resultsHTML = `
-          <div style="text-align: center; margin-top: 16px; background: #f0f8f7; padding: 16px; border-radius: 8px;">
-            <p style="color: #333; margin: 0 0 16px 0;"><strong>No caregivers available in ${location} yet</strong></p>
+          <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
+            <p style="color: #333; margin: 0 0 12px 0;"><strong>No caregivers available in ${location} yet</strong></p>
             <p style="color: #666; margin: 0 0 12px 0; font-size: 14px;">Join our waitlist to be notified when caregivers become available.</p>
-            <input type="email" placeholder="Enter your email" id="heroWaitlistEmail" required style="width: 100%; max-width: 300px; padding: 8px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            <input type="email" placeholder="Enter your email" id="heroWaitlistEmail" style="width: 100%; max-width: 300px; padding: 8px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 4px;">
             <button type="button" id="heroJoinWaitlistBtn" class="btn" style="background-color: #06464E; color: white; width: 100%; max-width: 300px;">Join Waitlist</button>
+            <button id="heroCloseResultsBtn" type="button" style="margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline; display: block; margin-left: auto; margin-right: auto;">Close</button>
           </div>
         `;
       }
 
-      const resultsContainer = document.createElement('div');
       heroFindForm.insertAdjacentHTML('afterend', resultsHTML);
       
-      const newResultsDiv = heroFindForm.nextElementSibling;
+      const newResultsDiv = document.getElementById('heroSearchResults');
+      
+      // Move results inside the form's container before the "or" text
+      const formContainer = heroFindForm.parentElement;
+      const orText = formContainer.querySelector('[style*="color: #999"]');
+      if(orText) {
+        orText.parentElement.insertBefore(newResultsDiv, orText);
+      }
 
       if(hasAvailable){
         const createAcctBtn = newResultsDiv.querySelector('#heroCreateAccountBtn');
         const loginBtn = newResultsDiv.querySelector('#heroLoginBtn');
+        const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
         
         createAcctBtn && createAcctBtn.addEventListener('click', ()=>{
           const signupModal = document.getElementById('signupModal');
@@ -159,8 +168,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const loginModal = document.getElementById('loginModal');
           if(loginModal) loginModal.classList.remove('hidden');
         });
+        
+        closeBtn && closeBtn.addEventListener('click', ()=>{
+          newResultsDiv.remove();
+          heroFindForm.reset();
+        });
       } else {
         const waitlistBtn = newResultsDiv.querySelector('#heroJoinWaitlistBtn');
+        const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
         waitlistBtn && waitlistBtn.addEventListener('click', ()=>{
           const email = newResultsDiv.querySelector('#heroWaitlistEmail').value;
           if(email){
@@ -168,6 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
             newResultsDiv.remove();
             heroFindForm.reset();
           }
+        });
+        closeBtn && closeBtn.addEventListener('click', ()=>{
+          newResultsDiv.remove();
+          heroFindForm.reset();
         });
       }
     });
