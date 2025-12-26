@@ -556,6 +556,56 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
 .donate-btn:hover{
   transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);
 }
+
+/* At-Home Learning Section */
+.home-learning-section{
+  background:#000;padding:0;margin:0 0 30px;text-align:left;color:#fff;
+}
+.home-learning-container{
+  max-width:none;margin:0;display:flex;align-items:stretch;border-radius:12px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.06);
+}
+.home-learning-content{
+  flex:1;padding:80px 40px;display:flex;flex-direction:column;justify-content:center;text-align:left;
+}
+.home-learning-section h2{
+  font-size:28px;margin:0 0 20px;color:#fff;line-height:1.4;
+}
+.home-learning-intro{
+  font-size:16px;line-height:1.6;color:#d1d5db;margin:0 0 28px;
+}
+.home-learning-section .btn{
+  background:var(--accent-gradient);color:#fff;border:none;width:fit-content;
+}
+.home-learning-section .btn:hover{
+  transform:translateY(-2px);box-shadow:0 8px 20px rgba(6,70,78,0.3);filter:brightness(1.1);
+}
+
+/* Computer Mockup */
+.learning-display{
+  flex:0 0 50%;min-height:300px;display:flex;justify-content:center;align-items:center;padding:22px;background:transparent;overflow:hidden;
+}
+.computer-mockup{
+  width:55%;max-width:none;
+}
+.computer-screen{
+  background:linear-gradient(135deg,#67B3C2 0%,#06464E 100%);border:8px solid #333;border-radius:12px;padding:30px;min-height:280px;display:flex;align-items:center;justify-content:center;box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
+.screen-content{
+  text-align:center;color:#fff;
+}
+.screen-content h3{
+  margin:0 0 12px;font-size:20px;color:#fff;
+}
+.screen-content p{
+  margin:0;font-size:14px;color:#e0e7ff;
+}
+.computer-base{
+  background:#333;height:20px;border-radius:0 0 8px 8px;margin-top:2px;position:relative;
+}
+.computer-base::after{
+  content:'';position:absolute;width:60%;height:8px;background:#555;bottom:-8px;left:20%;border-radius:4px;
+}
+
 #signupResult{
   margin-top:12px;text-align:center;
 }
@@ -689,4 +739,14 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   .support-section{padding:40px 16px;}
   .support-section h2{font-size:24px;}
   .support-section p{font-size:14px;}
+  .home-learning-section{padding:0;margin:20px 0;border-radius:10px}
+  .home-learning-container{flex-direction:column;margin:20px 0}
+  .home-learning-content{padding:24px;justify-content:flex-start;text-align:center;}
+  .home-learning-section h2{font-size:22px}
+  .home-learning-intro{font-size:15px;max-width:100%}
+  .home-learning-section .btn{width:100%}
+  .learning-display{flex:0 0 auto;padding:16px;width:100%;min-height:auto;background:#000;display:flex;justify-content:center;}
+  .computer-mockup{width:70%;max-width:220px;}
+  .computer-screen{padding:15px;min-height:150px;}
+  .screen-content h3{font-size:14px;}
 }
