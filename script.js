@@ -9,9 +9,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(()=> welcomeModal.classList.remove('hidden'), 500);
     
     // Close modal handlers
-    welcomeModalClose && welcomeModalClose.addEventListener('click', ()=> welcomeModal.classList.add('hidden'));
+    if(welcomeModalClose){
+      welcomeModalClose.addEventListener('click', (e)=> {
+        e.stopPropagation();
+        welcomeModal.classList.add('hidden');
+      });
+    }
     welcomeModal.addEventListener('click', e=> { if(e.target === welcomeModal) welcomeModal.classList.add('hidden'); });
-    welcomeModalSignupBtn && welcomeModalSignupBtn.addEventListener('click', ()=> welcomeModal.classList.add('hidden'));
+    if(welcomeModalSignupBtn){
+      welcomeModalSignupBtn.addEventListener('click', ()=> welcomeModal.classList.add('hidden'));
+    }
   }
 
   // Hero video loop from 0-6 seconds
