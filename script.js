@@ -1,4 +1,47 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // GPS location button handler
+  const gpsBtn = document.getElementById('gpsBtn');
+  const locationInput = document.getElementById('locationInput');
+  
+  if(gpsBtn && locationInput){
+    gpsBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(navigator.geolocation){
+        gpsBtn.disabled = true;
+        gpsBtn.style.opacity = '0.5';
+        navigator.geolocation.getCurrentPosition(
+          (position)=>{
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            // Use OpenStreetMap Nominatim API for reverse geocoding
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+              .then(response => response.json())
+              .then(data => {
+                // Try to get city name from the response
+                const city = data.address.city || data.address.town || data.address.village || data.address.county || 'Unknown Location';
+                locationInput.value = city;
+                gpsBtn.disabled = false;
+                gpsBtn.style.opacity = '1';
+              })
+              .catch(error => {
+                console.error('Geocoding error:', error);
+                alert('Could not determine city. Please enter manually.');
+                gpsBtn.disabled = false;
+                gpsBtn.style.opacity = '1';
+              });
+          },
+          (error)=>{
+            alert('Unable to get your location. Please enter manually.');
+            gpsBtn.disabled = false;
+            gpsBtn.style.opacity = '1';
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by your browser.');
+      }
+    });
+  }
+
   // Welcome modal on page load
   const welcomeModal = document.getElementById('welcomeModal');
   const welcomeModalClose = document.getElementById('welcomeModalClose');
@@ -176,16 +219,28 @@ document.addEventListener('DOMContentLoaded', () => {
     findForm.addEventListener('submit', e=>{
       e.preventDefault();
       const data = new FormData(findForm);
-      const name = data.get('name') || 'Parent';
       const location = data.get('location') || 'your area';
       results.innerHTML = '';
-      // mock results
-      for(let i=1;i<=3;i++){
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `<strong>Babysitter ${i}</strong> — Experienced caregiver near ${location}. <div style="margin-top:8px"><button class="btn" onclick="alert('Contact request sent to Babysitter ${i}')">Request</button></div>`;
-        results.appendChild(div);
-      }
+      
+      // Generate random number of available caregivers (1-8)
+      const availableCount = Math.floor(Math.random() * 8) + 1;
+      
+      const div = document.createElement('div');
+      div.style.textAlign = 'center';
+      div.style.padding = '24px';
+      div.style.backgroundColor = '#f5f5f5';
+      div.style.borderRadius = '8px';
+      div.style.marginTop = '16px';
+      div.innerHTML = `
+        <div style="font-size: 18px; font-weight: 600; color: #06464E; margin-bottom: 8px;">
+          ${availableCount} caregiver${availableCount !== 1 ? 's' : ''} available near ${location}
+        </div>
+        <div style="font-size: 14px; color: #666; margin-bottom: 16px;">
+          Create an account to view more details and get connected
+        </div>
+        <button class="btn btn-large" style="margin-top: 12px;">Create Account</button>
+      `;
+      results.appendChild(div);
     });
   }
 
@@ -196,7 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
     becomeForm.addEventListener('submit', e=>{
       e.preventDefault();
       const data = new FormData(becomeForm);
-      const name = data.get('fullname') || 'Applicant';
+      const firstname = data.get('firstname') || '';
+      const lastname = data.get('lastname') || '';
+      const name = (firstname + ' ' + lastname).trim() || 'Applicant';
       const email = data.get('email');
       applyResult.innerHTML = `<div class="card" style="color:#06464E;margin-top:16px;font-weight:600">Thanks, <strong>${name}</strong>! We're sending a detailed application to <strong>${email}</strong>. Check your inbox to get started.</div>`;
       becomeForm.reset();
@@ -242,7 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
     signupFormMain.addEventListener('submit', e=>{
       e.preventDefault();
       const data = new FormData(signupFormMain);
-      const name = data.get('fullname') || 'Friend';
+      const firstname = data.get('firstname') || '';
+      const lastname = data.get('lastname') || '';
+      const name = (firstname + ' ' + lastname).trim() || 'Friend';
       signupResult.innerHTML = `<div style="color:#06464E;margin-top:12px;font-weight:600">Account created! Welcome, ${name}. Check your email to get started.</div>`;
       signupFormMain.reset();
       setTimeout(()=>{ signupResult.innerHTML = ''; }, 4000);

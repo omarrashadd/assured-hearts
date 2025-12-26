@@ -255,19 +255,32 @@
 
     <main class="container">
       <section id="find" class="panel hidden">
-        <h2>Find a Babysitter</h2>
+        <h2 style="text-align: center;">Find a Caregiver</h2>
         <form id="findForm">
-          <label>Name
-            <input name="name" required>
-          </label>
-          <label>Location
-            <input name="location">
-          </label>
-          <label>Date
-            <input type="date" name="date">
-          </label>
-          <div class="form-actions">
-            <button type="submit" class="btn">Search</button>
+          <div style="display: flex; gap: 12px; align-items: center; justify-content: center;">
+            <input name="location" id="locationInput" placeholder="Enter your location" style="width: 180px; height: 38px; padding: 8px;" list="cityList" required>
+            <datalist id="cityList">
+              <option value="Regina"></option>
+              <option value="Saskatoon"></option>
+              <option value="Prince Albert"></option>
+              <option value="Swift Current"></option>
+              <option value="Moose Jaw"></option>
+              <option value="Yorkton"></option>
+              <option value="North Battleford"></option>
+              <option value="Edmonton"></option>
+              <option value="Calgary"></option>
+              <option value="Winnipeg"></option>
+              <option value="Vancouver"></option>
+              <option value="Toronto"></option>
+              <option value="Montreal"></option>
+              <option value="Ottawa"></option>
+            </datalist>
+            <button type="button" id="gpsBtn" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;">
+              <img src="Assets/send.png" alt="Use GPS location" style="width: 20px; height: 20px; transform: rotate(45deg);">
+            </button>
+          </div>
+          <div class="form-actions" style="display: flex; justify-content: center;">
+            <button type="submit" class="btn">Check Availability</button>
             <button type="button" id="findBack" class="btn ghost">Back</button>
           </div>
         </form>
@@ -277,9 +290,14 @@
       <section id="become" class="panel hidden">
         <h2>Become a Care Provider</h2>
         <form id="becomeForm">
-          <label>Full name
-            <input type="text" name="fullname" required>
-          </label>
+          <div class="form-row">
+            <label>First Name
+              <input type="text" name="firstname" required>
+            </label>
+            <label>Last Name
+              <input type="text" name="lastname" required>
+            </label>
+          </div>
           <label>Email
             <input type="email" name="email" required>
           </label>
@@ -294,6 +312,18 @@
               <option value="">Select city</option>
               <option value="Regina">Regina</option>
               <option value="Saskatoon">Saskatoon</option>
+            </select>
+          </label>
+          <label>Province/State
+            <select name="province" required>
+              <option value="">Select province</option>
+              <option value="SK">Saskatchewan</option>
+              <option value="AB">Alberta</option>
+              <option value="BC">British Columbia</option>
+              <option value="MB">Manitoba</option>
+              <option value="ON">Ontario</option>
+              <option value="QC">Quebec</option>
+              <option value="Other">Other</option>
             </select>
           </label>
           <label>Gender
@@ -331,15 +361,18 @@
         <p>Join the Assured Hearts community and find childcare that aligns with your values.</p>
         <form id="signupFormMain" class="signup-form">
           <div class="form-row">
-            <label>Full Name
-              <input type="text" name="fullname" required>
+            <label>First Name
+              <input type="text" name="firstname" required>
             </label>
-            <label>Email
-              <input type="email" name="email" required>
+            <label>Last Name
+              <input type="text" name="lastname" required>
             </label>
           </div>
           
           <div class="form-row">
+            <label>Email
+              <input type="email" name="email" required>
+            </label>
             <label>Phone Number
               <div class="phone-input-group">
                 <select name="country_code" class="country-code-select" required>
@@ -371,6 +404,18 @@
                 <option value="">Select city</option>
                 <option value="Regina">Regina</option>
                 <option value="Saskatoon">Saskatoon</option>
+              </select>
+            </label>
+            <label>Province/State
+              <select name="province" required>
+                <option value="">Select province</option>
+                <option value="SK">Saskatchewan</option>
+                <option value="AB">Alberta</option>
+                <option value="BC">British Columbia</option>
+                <option value="MB">Manitoba</option>
+                <option value="ON">Ontario</option>
+                <option value="QC">Quebec</option>
+                <option value="Other">Other</option>
               </select>
             </label>
           </div>
