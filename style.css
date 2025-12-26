@@ -150,7 +150,7 @@ body{
   display:flex;align-items:stretch;margin:0 0 30px;border-radius:12px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.06);background:#000;
 }
 .hero-image{
-  flex:0 0 50%;min-height:300px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;padding:22px;background:transparent;
+  flex:0 0 50%;min-height:300px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;padding:22px;background:transparent;overflow:hidden;
 }
 .hero-image img{
   width:55%;
@@ -160,6 +160,14 @@ body{
   object-position:left center;
   display:block;
   border-radius:10px;
+}
+.hero-video{
+  width:55%;
+  height:auto;
+  max-height:100%;
+  object-fit:cover;
+  border-radius:10px;
+  display:block;
 }
 .hero-content{
   flex:1;padding:80px 40px;display:flex;align-items:center;justify-content:center;

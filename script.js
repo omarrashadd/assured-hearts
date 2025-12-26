@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Hero video loop from 0-6 seconds
+  const heroVideo = document.querySelector('.hero-video');
+  if(heroVideo){
+    heroVideo.addEventListener('timeupdate', ()=> {
+      if(heroVideo.currentTime >= 6){
+        heroVideo.currentTime = 0;
+      }
+    });
+    heroVideo.currentTime = 0;
+  }
+
   // Get Started button scroll to signup
   const getStartedBtn = document.getElementById('getStartedBtn');
   if(getStartedBtn){
