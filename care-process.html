@@ -6,6 +6,20 @@
     <title>Our Care Process - Assured Hearts</title>
     <meta name="description" content="Learn about our vetting and care process." />
     <link rel="stylesheet" href="style.css">
+    <style>
+      .care-flow { display: none; }
+      @media (max-width: 640px) {
+        .care-grid { display: none !important; }
+        .care-flow { display: block; }
+        .flow-step { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; position: relative; }
+        .flow-step::before { content: ""; position: absolute; left: -12px; top: 0; bottom: 0; width: 3px; background: rgba(103,179,194,0.35); border-radius: 3px; }
+        .flow-step:not(:last-child)::after { content: ""; position: absolute; left: -10px; bottom: -10px; width: 10px; height: 10px; border-right: 2px solid rgba(103,179,194,0.5); border-bottom: 2px solid rgba(103,179,194,0.5); transform: rotate(45deg); }
+        .step-chip { display: inline-block; background: #67B3C2; color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 4px 8px; margin-bottom: 6px; }
+        .flow-step h4 { margin: 6px 0 6px 0; color: #06464E; font-size: 15px; }
+        .flow-step h5 { margin: 0 0 6px 0; color: #06464E; font-size: 14px; font-weight: 600; }
+        .flow-step p { margin: 0; color: #666; font-size: 13px; line-height: 1.5; }
+      }
+    </style>
   </head>
 
   <body>
@@ -91,7 +105,7 @@
         <h2 style="color: #06464E; margin-top: 0;">Families & Caregivers, Hand in Hand</h2>
         <p style="color: #666; line-height: 1.8; margin: 8px 0 24px 0;">Two tracks that move together so everyone stays aligned from the first hello to ongoing support.</p>
 
-        <div style="display: grid; grid-template-columns: 80px 1fr 1fr; column-gap: 16px; row-gap: 24px; align-items: start;">
+        <div class="care-grid" style="display: grid; grid-template-columns: 80px 1fr 1fr; column-gap: 16px; row-gap: 24px; align-items: start;">
           <div></div>
           <div style="padding-bottom: 8px; border-bottom: 2px solid #dce7ea;">
             <h3 style="margin: 0; color: #06464E; font-size: 18px;">For Parents</h3>
@@ -103,7 +117,7 @@
           </div>
 
           <div style="display: flex; align-items: center; justify-content: center;">
-            <div style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">1</div>
+            <div class="step-number" style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">1</div>
           </div>
           <div style="background: #f8fbfc; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <h4 style="margin: 0 0 6px 0; color: #06464E;">Share your needs</h4>
@@ -115,7 +129,7 @@
           </div>
 
           <div style="display: flex; align-items: center; justify-content: center;">
-            <div style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">2</div>
+            <div class="step-number" style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">2</div>
           </div>
           <div style="background: #f8fbfc; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <h4 style="margin: 0 0 6px 0; color: #06464E;">Review curated matches</h4>
@@ -127,7 +141,7 @@
           </div>
 
           <div style="display: flex; align-items: center; justify-content: center;">
-            <div style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">3</div>
+            <div class="step-number" style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">3</div>
           </div>
           <div style="background: #f8fbfc; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <h4 style="margin: 0 0 6px 0; color: #06464E;">Meet and decide</h4>
@@ -139,7 +153,7 @@
           </div>
 
           <div style="display: flex; align-items: center; justify-content: center;">
-            <div style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">4</div>
+            <div class="step-number" style="width: 54px; height: 54px; background: #67B3C2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">4</div>
           </div>
           <div style="background: #f8fbfc; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <h4 style="margin: 0 0 6px 0; color: #06464E;">Book with confidence</h4>
@@ -148,6 +162,45 @@
           <div style="background: #fdfaf6; padding: 16px 18px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <h4 style="margin: 0 0 6px 0; color: #06464E;">Onboard and keep growing</h4>
             <p style="margin: 0; color: #666; line-height: 1.6;">We finalize onboarding, provide resources, and stay available for coaching and feedback.</p>
+          </div>
+        </div>
+        <!-- Mobile flow chart representation -->
+        <div class="care-flow">
+          <div class="flow-step">
+            <span class="step-chip">Step 1</span>
+            <h4>Parents</h4>
+            <h5>Share your needs</h5>
+            <p>Tell us your schedule, childrens ages, and any preferences so we can personalize your matches.</p>
+            <h4>Providers</h4>
+            <h5>Apply and share experience</h5>
+            <p>Providers apply, outline their skills, and complete an interview so we understand their strengths.</p>
+          </div>
+          <div class="flow-step">
+            <span class="step-chip">Step 2</span>
+            <h4>Parents</h4>
+            <h5>Review curated matches</h5>
+            <p>We send vetted caregivers that fit your criteria so you can shortlist with confidence.</p>
+            <h4>Providers</h4>
+            <h5>Safety screening</h5>
+            <p>Background checks, values alignment, and CPR/First Aid verification keep every profile trusted.</p>
+          </div>
+          <div class="flow-step">
+            <span class="step-chip">Step 3</span>
+            <h4>Parents</h4>
+            <h5>Meet and decide</h5>
+            <p>Chat, interview, or request a trial sit to confirm fit for your home and children.</p>
+            <h4>Providers</h4>
+            <h5>Connect with families</h5>
+            <p>Meet matched families, understand their routines, and align on expectations before booking.</p>
+          </div>
+          <div class="flow-step">
+            <span class="step-chip">Step 4</span>
+            <h4>Parents</h4>
+            <h5>Book with confidence</h5>
+            <p>Confirm your caregiver, set the schedule, and know we are here to support your family.</p>
+            <h4>Providers</h4>
+            <h5>Onboard and keep growing</h5>
+            <p>We finalize onboarding, provide resources, and stay available for coaching and feedback.</p>
           </div>
         </div>
       </section>
