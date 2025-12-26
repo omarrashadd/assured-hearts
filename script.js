@@ -328,34 +328,56 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mobile menu links
   document.querySelectorAll('.mobile-nav a').forEach(a=>{
     a.addEventListener('click', e=>{
-      e.preventDefault();
       const target = a.dataset.target;
-      closeMobileMenu();
-      if(target === 'find' && findSection) return setTimeout(()=> show(findSection),380);
-      if(target === 'become' && becomeSection) return setTimeout(()=> show(becomeSection),380);
-      // for other anchors, try to find an element with matching id
-      const href = a.getAttribute('href');
-      if(href && href.startsWith('#')){
+      const href = a.getAttribute('href') || '';
+      const isHash = href.startsWith('#');
+
+      // Handle in-page navigation
+      if(target === 'find' && findSection){
+        e.preventDefault();
+        closeMobileMenu();
+        return setTimeout(()=> show(findSection),380);
+      }
+      if(target === 'become' && becomeSection){
+        e.preventDefault();
+        closeMobileMenu();
+        return setTimeout(()=> show(becomeSection),380);
+      }
+      if(isHash){
+        e.preventDefault();
+        closeMobileMenu();
         const id = href.slice(1);
         const el = document.getElementById(id);
         if(el) return setTimeout(()=> window.scrollTo({top: el.offsetTop - 20, behavior:'smooth'}),380);
       }
+
+      // Default: allow normal navigation but close the menu for a tidy UX
+      closeMobileMenu();
     });
   });
 
   // Desktop nav links (show/Become/scroll)
   document.querySelectorAll('.nav-links a').forEach(a=>{
     a.addEventListener('click', e=>{
-      e.preventDefault();
       const target = a.dataset.target;
-      if(target === 'find' && findSection) return show(findSection);
-      if(target === 'become' && becomeSection) return show(becomeSection);
-      const href = a.getAttribute('href');
-      if(href && href.startsWith('#')){
+      const href = a.getAttribute('href') || '';
+      const isHash = href.startsWith('#');
+
+      if(target === 'find' && findSection){
+        e.preventDefault();
+        return show(findSection);
+      }
+      if(target === 'become' && becomeSection){
+        e.preventDefault();
+        return show(becomeSection);
+      }
+      if(isHash){
+        e.preventDefault();
         const id = href.slice(1);
         const el = document.getElementById(id);
         if(el) return window.scrollTo({top: el.offsetTop - 20, behavior:'smooth'});
       }
+      // otherwise let the browser follow the link normally
     });
   });
 
