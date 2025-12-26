@@ -102,7 +102,7 @@
       <div class="container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <h1>Childcare Designed for Muslim Families</h1>
         <p class="lead">Caring Hands, Shared Islamic Values, Peace of Mind.</p>
-        <form id="heroFindForm" style="margin: 24px 0; display: flex; justify-content: center;">
+        <form id="heroFindForm" style="margin: 24px 0 -20px 0; display: flex; justify-content: center;">
           <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
             <div style="display: flex; align-items: center; background: white; border-radius: 50px; padding: 8px 16px; border: 2px solid #06464E; gap: 12px; width: 100%; max-width: 700px; box-shadow: 0 2px 8px rgba(6, 70, 78, 0.1);">
               <button type="button" id="heroFindLocationBtn" title="Use current location" style="background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
@@ -146,13 +146,12 @@
               </svg>
             </button>
             </div>
-            <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">Check availability</p>
+            <p style="margin: 8px 0 8px 0; color: #666; font-size: 12px;">Check availability</p>
+            <button id="loginBtn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; border: none; padding: 8px 16px; border-radius: 50px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(6,70,78,0.3)'; this.style.filter='brightness(1.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.filter='brightness(1)'"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 18px; height: 18px;">Sign In</button>
+            <p style="margin: 8px 0 8px 0; color: #999; font-size: 12px;">or</p>
+            <button id="becomeBtn" class="btn outline" style="padding: 12px 24px; font-size: 14px;">Become a Childcare Provider</button>
           </div>
         </form>
-        <div class="login-prompt" style="margin-top: 8px;">
-          <p>Already have an account? <button id="loginBtn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; border: none; padding: 8px 16px; border-radius: 50px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(6,70,78,0.3)'; this.style.filter='brightness(1.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.filter='brightness(1)'"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 18px; height: 18px;">Log In</button></p>
-          <p style="margin-top: 12px;"><button id="becomeBtn" class="btn outline">Become a Childcare Provider</button></p>
-        </div>
       </div>
     </header>
 
@@ -329,7 +328,7 @@
       </section>
 
       <section id="become" class="panel hidden">
-        <h2>Become a Care Provider</h2>
+        <h2>Become a Childcare Provider</h2>
         <form id="becomeForm">
           <div class="form-row">
             <label>First Name
@@ -349,7 +348,7 @@
             <input type="number" name="age" min="18" required>
           </label>
           <label>City
-            <select name="city" required>
+            <select name="city" required style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: white; cursor: pointer;">
               <option value="">Select city</option>
               <option value="St. John's">St. John's, NL</option>
               <option value="Halifax">Halifax, NS</option>
@@ -383,7 +382,7 @@
             </select>
           </label>
           <label>Province/State
-            <select name="province" required>
+            <select name="province" required style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: white; cursor: pointer;">
               <option value="">Select province</option>
               <option value="SK">Saskatchewan</option>
               <option value="AB">Alberta</option>
@@ -395,7 +394,7 @@
             </select>
           </label>
           <label>Gender
-            <select name="gender" required>
+            <select name="gender" required style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: white; cursor: pointer;">
               <option value="">Select gender</option>
               <option value="Female">Female</option>
               <option value="Male">Male</option>
