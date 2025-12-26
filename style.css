@@ -134,13 +134,28 @@ body{
 .container{max-width:900px;margin:0 auto;padding:24px}
 
 .hero{
-  display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 16px;background:linear-gradient(135deg,#fff 0%,#fff7f7 100%);
+  position:relative;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 16px;overflow:hidden;min-height:600px;
 }
-.hero .lead{color:var(--muted);margin-top:8px}
+.hero-video{
+  position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1;
+}
+.hero-overlay{
+  position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2;
+}
+.hero .container{
+  position:relative;z-index:3;color:#fff;
+}
+.hero h1{
+  color:#fff;
+}
+.hero .lead{color:#f0f0f0;margin-top:8px}
 .actions{margin-top:18px;display:flex;gap:12px;justify-content:center}
 .login-prompt{margin-top:24px;text-align:center;border-top:1px solid rgba(255,255,255,0.1);padding-top:16px;}
 .login-prompt p{margin:0;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;gap:12px;}
 .login-prompt .btn{padding:10px 20px;font-size:14px;}
+.hero .login-prompt p{color:#f0f0f0;}
+.hero .login-prompt .btn{background:#fff;color:var(--accent);}
+.hero .login-prompt .btn:hover{background:rgba(255,255,255,0.9)}
 
 .hero-block{
   display:flex;align-items:stretch;margin:0 0 30px;border-radius:12px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.06);background:#000;
@@ -173,7 +188,11 @@ body{
 
 .btn{background:var(--accent-gradient);color:#fff;border:0;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:600;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
 .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(6,70,78,0.3);filter:brightness(1.1)}
+.btn.secondary{background:#f3f4f6;color:var(--accent);border:1px solid #d1d5db;}
+.btn.secondary:hover{background:#e5e7eb;filter:none;}
 .btn.outline{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.hero .btn.outline{background:transparent;color:#fff;border:2px solid #fff;}
+.hero .btn.outline:hover{background:rgba(255,255,255,0.15)}
 .btn.ghost{background:transparent;border:1px solid #ddd;color:var(--muted)}
 
 .panel{background:var(--card);padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);margin-top:24px}
@@ -259,7 +278,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   padding:20px;border-radius:10px;background:#f9fafb;border-left:4px solid var(--accent-gradient);
 }
 .benefit-icon{
-  display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--accent-gradient);color:#fff;border-radius:50%;font-weight:bold;margin-bottom:12px;
+  display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;background:none;color:#06464E;border-radius:0;font-weight:bold;margin-bottom:12px;font-size:32px;
 }
 .benefit-item h3{
   margin:0 0 8px;font-size:16px;color:#111;
@@ -444,7 +463,27 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   cursor:pointer;width:16px;height:16px;accent-color:var(--accent);
 }
 .btn-large{
-  padding:12px 24px;font-size:16px;margin-top:12px;
+  padding:12px 24px;font-size:16px;margin-top:12px;width:100%;
+}
+
+.form-divider{
+  text-align:center;margin:16px 0;color:#9ca3af;font-size:14px;font-weight:500;
+}
+
+.hero-login-form{
+  margin-top:16px;display:flex;flex-direction:column;gap:12px;
+}
+.login-form-title{
+  margin:0 0 12px;font-size:18px;font-weight:600;color:#111;
+}
+.hero-login-form label{
+  display:flex;flex-direction:column;gap:6px;color:#111;font-weight:500;font-size:14px;
+}
+.hero-login-form input{
+  padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;
+}
+.hero-login-form input:focus{
+  outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(6,70,78,0.1);
 }
 
 /* App Section */

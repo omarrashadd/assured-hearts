@@ -78,6 +78,11 @@
     </div>
 
     <header class="hero">
+      <video autoplay muted loop playsinline class="hero-video">
+        <source src="Assets/hero video intro.mp4" type="video/mp4">
+        <source src="Assets/hero video intro.webm" type="video/webm">
+      </video>
+      <div class="hero-overlay"></div>
       <div class="container">
         <h1>Childcare Designed for Muslim Families</h1>
         <p class="lead">Caring Hands, Shared Islamic Values, Peace of Mind.</p>
@@ -112,17 +117,17 @@
         <h2>Why Families Choose Us</h2>
         <div class="benefits-points">
           <div class="benefit-item">
-            <div class="benefit-icon">✓</div>
+            <div class="benefit-icon">🔒</div>
             <h3>Vetted & Faith-Aligned Caregivers</h3>
             <p>Every caregiver on our platform is carefully screened and selected based on shared Islamic values, verified experience, and a deep commitment to providing safe, nurturing, and high-quality childcare you can trust.</p>
           </div>
           <div class="benefit-item">
-            <div class="benefit-icon">✓</div>
+            <div class="benefit-icon">❤️</div>
             <h3>Peace of Mind & Safety</h3>
             <p>Know exactly what your children are learning and being exposed to through our structured Islamic curriculum, thoughtfully designed to strengthen their values, understanding, and character. Transparent communication, verified backgrounds, and trusted reviews give you confidence in every childcare choice you make.</p>
           </div>
           <div class="benefit-item">
-            <div class="benefit-icon">✓</div>
+            <div class="benefit-icon">👨‍👩‍👧‍👦</div>
             <h3>Parenal Empowerment</h3>
             <p>Stay meaningfully involved in your child’s day, even when you’re away. By logging in, you will receive thoughtful updates and moments from your child’s care, giving you visibility into what they’re learning, practicing, and experiencing. From posting shared reflections to learning highlights, your child can showcase their growth, helping you stay connected, informed, and engaged no matter where you are.</p>
           </div>
@@ -290,6 +295,19 @@
 
     <section class="signup-section">
       <div class="signup-container">
+        <h3 class="login-form-title">Already have an account?</h3>
+        <form id="heroLoginForm" class="hero-login-form">
+          <label>Username or Email
+            <input type="text" name="username" placeholder="Enter username or email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" placeholder="Enter password" required>
+          </label>
+          <button type="submit" class="btn btn-large">Sign In</button>
+        </form>
+        
+        <div class="form-divider">or</div>
+        
         <h2>Get Started Today</h2>
         <p>Join the Assured Hearts community and find childcare that aligns with your values.</p>
         <form id="signupFormMain" class="signup-form">
@@ -390,7 +408,7 @@
         <div class="app-features">
           <div class="feature-item">
             <h4>Curriculum Access</h4>
-            <p>Access the curriculum, track learning progress, and see how your child’s understanding and skills develop over time.</p>
+            <p>Access the curriculum, set goals, track learning progress, and see how your child’s understanding and skills develop over time.</p>
           </div>
           <div class="feature-item">
             <h4>Care Updates & Parent Connection</h4>

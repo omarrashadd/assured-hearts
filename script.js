@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Hero video loop from 1-6 seconds
+  const heroVideo = document.querySelector('.hero-video');
+  if(heroVideo){
+    heroVideo.addEventListener('timeupdate', ()=> {
+      if(heroVideo.currentTime >= 6){
+        heroVideo.currentTime = 1;
+      }
+    });
+    heroVideo.currentTime = 1;
+  }
+
   // Get Started button scroll to signup
   const getStartedBtn = document.getElementById('getStartedBtn');
   if(getStartedBtn){
@@ -218,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Mission carousel
   let currentSlide = 0;
+  let missionAutoCirculate = true;
   const titleBtns = document.querySelectorAll('.carousel-title-btn');
   const missionCards = document.querySelectorAll('.mission-card');
   const dots = document.querySelectorAll('.carousel-dots .dot');
@@ -235,6 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', ()=>{
       currentSlide = index;
       showSlide(currentSlide);
+      missionAutoCirculate = false;
     });
   });
   
@@ -242,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dot.addEventListener('click', ()=>{
       currentSlide = index;
       showSlide(currentSlide);
+      missionAutoCirculate = false;
     });
   });
   
@@ -249,12 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
     card.addEventListener('click', ()=>{
       currentSlide = index;
       showSlide(currentSlide);
+      missionAutoCirculate = false;
     });
   });
   
   // Auto-circulate every 5 seconds
   setInterval(()=>{
-    currentSlide = (currentSlide + 1) % missionCards.length;
-    showSlide(currentSlide);
+    if(missionAutoCirculate){
+      currentSlide = (currentSlide + 1) % missionCards.length;
+      showSlide(currentSlide);
+    }
   }, 5000);
 });
