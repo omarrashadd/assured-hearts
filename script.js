@@ -236,6 +236,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const signupForm = document.getElementById('signupForm');
   if(signupForm) signupForm.addEventListener('submit', e=> { e.preventDefault(); const email = new FormData(signupForm).get('email'); alert('Welcome, ' + email + '!'); signupModal.classList.add('hidden'); signupForm.reset(); });
 
+  // Social login buttons
+  const googleBtn = document.getElementById('googleBtn');
+  const facebookBtn = document.getElementById('facebookBtn');
+  const appleBtn = document.getElementById('appleBtn');
+
+  googleBtn && googleBtn.addEventListener('click', () => {
+    alert('Redirecting to Google login...');
+    loginModal.classList.add('hidden');
+  });
+
+  facebookBtn && facebookBtn.addEventListener('click', () => {
+    alert('Redirecting to Facebook login...');
+    loginModal.classList.add('hidden');
+  });
+
+  appleBtn && appleBtn.addEventListener('click', () => {
+    alert('Redirecting to Apple login...');
+    loginModal.classList.add('hidden');
+  });
+
   const findBtn = document.getElementById('findBtn');
   const becomeBtn = document.getElementById('becomeBtn');
   const findSection = document.getElementById('find');
