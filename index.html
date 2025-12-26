@@ -99,15 +99,59 @@
     </div>
 
     <header class="hero">
-      <div class="container">
+      <div class="container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <h1>Childcare Designed for Muslim Families</h1>
         <p class="lead">Caring Hands, Shared Islamic Values, Peace of Mind.</p>
-        <div class="actions">
-          <button id="findBtn" class="btn">Find Trusted Childcare</button>
-          <button id="becomeBtn" class="btn outline">Become a Childcare Provider</button>
-        </div>
-        <div class="login-prompt">
-          <p>Already have an account? <button id="loginBtn" class="btn">Log In</button></p>
+        <form id="heroFindForm" style="margin: 24px 0; display: flex; justify-content: center;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; background: white; border-radius: 50px; padding: 8px 16px; border: 2px solid #06464E; gap: 12px; width: 100%; max-width: 700px; box-shadow: 0 2px 8px rgba(6, 70, 78, 0.1);">
+              <button type="button" id="heroFindLocationBtn" title="Use current location" style="background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <img src="Assets/findmylocation.png" alt="Use current location" style="width: 24px; height: 24px;">
+              </button>
+              <select name="location" id="heroLocationInput" style="flex: 1; border: none; outline: none; padding: 8px; font-size: 14px; background: transparent; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                <option value="">Enter your location</option>
+              <option value="St. John's">St. John's, NL</option>
+              <option value="Halifax">Halifax, NS</option>
+              <option value="Saint John">Saint John, NB</option>
+              <option value="Charlottetown">Charlottetown, PE</option>
+              <option value="Quebec City">Quebec City, QC</option>
+              <option value="Montreal">Montreal, QC</option>
+              <option value="Toronto">Toronto, ON</option>
+              <option value="Ottawa">Ottawa, ON</option>
+              <option value="Hamilton">Hamilton, ON</option>
+              <option value="London">London, ON</option>
+              <option value="Winnipeg">Winnipeg, MB</option>
+              <option value="Calgary">Calgary, AB</option>
+              <option value="Edmonton">Edmonton, AB</option>
+              <option value="Red Deer">Red Deer, AB</option>
+              <option value="Lethbridge">Lethbridge, AB</option>
+              <option value="Regina">Regina, SK</option>
+              <option value="Saskatoon">Saskatoon, SK</option>
+              <option value="Prince Albert">Prince Albert, SK</option>
+              <option value="Moose Jaw">Moose Jaw, SK</option>
+              <option value="Yorkton">Yorkton, SK</option>
+              <option value="Swift Current">Swift Current, SK</option>
+              <option value="Vancouver">Vancouver, BC</option>
+              <option value="Victoria">Victoria, BC</option>
+              <option value="Surrey">Surrey, BC</option>
+              <option value="Burnaby">Burnaby, BC</option>
+              <option value="Kelowna">Kelowna, BC</option>
+              <option value="Whitehorse">Whitehorse, YT</option>
+              <option value="Yellowknife">Yellowknife, NT</option>
+              <option value="Iqaluit">Iqaluit, NU</option>
+            </select>
+            <button type="submit" style="background: #06464E; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(6,70,78,0.3)'; this.style.filter='brightness(1.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.filter='brightness(1)'">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 8h14M8 1l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            </div>
+            <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">Check availability</p>
+          </div>
+        </form>
+        <div class="login-prompt" style="margin-top: 8px;">
+          <p>Already have an account? <button id="loginBtn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; border: none; padding: 8px 16px; border-radius: 50px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(6,70,78,0.3)'; this.style.filter='brightness(1.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.filter='brightness(1)'"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 18px; height: 18px;">Log In</button></p>
+          <p style="margin-top: 12px;"><button id="becomeBtn" class="btn outline">Become a Childcare Provider</button></p>
         </div>
       </div>
     </header>
@@ -258,26 +302,23 @@
         <h2 style="text-align: center;">Find a Caregiver</h2>
         <form id="findForm">
           <div style="display: flex; gap: 12px; align-items: center; justify-content: center;">
-            <input name="location" id="locationInput" placeholder="Enter your location" style="width: 180px; height: 38px; padding: 8px;" list="cityList" required>
-            <datalist id="cityList">
-              <option value="Regina"></option>
-              <option value="Saskatoon"></option>
-              <option value="Prince Albert"></option>
-              <option value="Swift Current"></option>
-              <option value="Moose Jaw"></option>
-              <option value="Yorkton"></option>
-              <option value="North Battleford"></option>
-              <option value="Edmonton"></option>
-              <option value="Calgary"></option>
-              <option value="Winnipeg"></option>
-              <option value="Vancouver"></option>
-              <option value="Toronto"></option>
-              <option value="Montreal"></option>
-              <option value="Ottawa"></option>
-            </datalist>
-            <button type="button" id="gpsBtn" style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;">
-              <img src="Assets/send.png" alt="Use GPS location" style="width: 20px; height: 20px; transform: rotate(45deg);">
-            </button>
+            <select name="location" id="locationInput" style="width: 180px; height: 38px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" required>
+              <option value="">Select a city</option>
+              <option value="Regina">Regina</option>
+              <option value="Saskatoon">Saskatoon</option>
+              <option value="Prince Albert">Prince Albert</option>
+              <option value="Swift Current">Swift Current</option>
+              <option value="Moose Jaw">Moose Jaw</option>
+              <option value="Yorkton">Yorkton</option>
+              <option value="North Battleford">North Battleford</option>
+              <option value="Edmonton">Edmonton</option>
+              <option value="Calgary">Calgary</option>
+              <option value="Winnipeg">Winnipeg</option>
+              <option value="Vancouver">Vancouver</option>
+              <option value="Toronto">Toronto</option>
+              <option value="Montreal">Montreal</option>
+              <option value="Ottawa">Ottawa</option>
+            </select>
           </div>
           <div class="form-actions" style="display: flex; justify-content: center;">
             <button type="submit" class="btn">Check Availability</button>
@@ -310,8 +351,35 @@
           <label>City
             <select name="city" required>
               <option value="">Select city</option>
-              <option value="Regina">Regina</option>
-              <option value="Saskatoon">Saskatoon</option>
+              <option value="St. John's">St. John's, NL</option>
+              <option value="Halifax">Halifax, NS</option>
+              <option value="Saint John">Saint John, NB</option>
+              <option value="Charlottetown">Charlottetown, PE</option>
+              <option value="Quebec City">Quebec City, QC</option>
+              <option value="Montreal">Montreal, QC</option>
+              <option value="Toronto">Toronto, ON</option>
+              <option value="Ottawa">Ottawa, ON</option>
+              <option value="Hamilton">Hamilton, ON</option>
+              <option value="London">London, ON</option>
+              <option value="Winnipeg">Winnipeg, MB</option>
+              <option value="Calgary">Calgary, AB</option>
+              <option value="Edmonton">Edmonton, AB</option>
+              <option value="Red Deer">Red Deer, AB</option>
+              <option value="Lethbridge">Lethbridge, AB</option>
+              <option value="Regina">Regina, SK</option>
+              <option value="Saskatoon">Saskatoon, SK</option>
+              <option value="Prince Albert">Prince Albert, SK</option>
+              <option value="Moose Jaw">Moose Jaw, SK</option>
+              <option value="Yorkton">Yorkton, SK</option>
+              <option value="Swift Current">Swift Current, SK</option>
+              <option value="Vancouver">Vancouver, BC</option>
+              <option value="Victoria">Victoria, BC</option>
+              <option value="Surrey">Surrey, BC</option>
+              <option value="Burnaby">Burnaby, BC</option>
+              <option value="Kelowna">Kelowna, BC</option>
+              <option value="Whitehorse">Whitehorse, YT</option>
+              <option value="Yellowknife">Yellowknife, NT</option>
+              <option value="Iqaluit">Iqaluit, NU</option>
             </select>
           </label>
           <label>Province/State
@@ -402,8 +470,35 @@
             <label>City
               <select name="city" required>
                 <option value="">Select city</option>
-                <option value="Regina">Regina</option>
-                <option value="Saskatoon">Saskatoon</option>
+                <option value="St. John's">St. John's, NL</option>
+                <option value="Halifax">Halifax, NS</option>
+                <option value="Saint John">Saint John, NB</option>
+                <option value="Charlottetown">Charlottetown, PE</option>
+                <option value="Quebec City">Quebec City, QC</option>
+                <option value="Montreal">Montreal, QC</option>
+                <option value="Toronto">Toronto, ON</option>
+                <option value="Ottawa">Ottawa, ON</option>
+                <option value="Hamilton">Hamilton, ON</option>
+                <option value="London">London, ON</option>
+                <option value="Winnipeg">Winnipeg, MB</option>
+                <option value="Calgary">Calgary, AB</option>
+                <option value="Edmonton">Edmonton, AB</option>
+                <option value="Red Deer">Red Deer, AB</option>
+                <option value="Lethbridge">Lethbridge, AB</option>
+                <option value="Regina">Regina, SK</option>
+                <option value="Saskatoon">Saskatoon, SK</option>
+                <option value="Prince Albert">Prince Albert, SK</option>
+                <option value="Moose Jaw">Moose Jaw, SK</option>
+                <option value="Yorkton">Yorkton, SK</option>
+                <option value="Swift Current">Swift Current, SK</option>
+                <option value="Vancouver">Vancouver, BC</option>
+                <option value="Victoria">Victoria, BC</option>
+                <option value="Surrey">Surrey, BC</option>
+                <option value="Burnaby">Burnaby, BC</option>
+                <option value="Kelowna">Kelowna, BC</option>
+                <option value="Whitehorse">Whitehorse, YT</option>
+                <option value="Yellowknife">Yellowknife, NT</option>
+                <option value="Iqaluit">Iqaluit, NU</option>
               </select>
             </label>
             <label>Province/State
@@ -439,6 +534,7 @@
             <label>How Often Do You Need Childcare?
               <select name="frequency" required>
                 <option value="">Select frequency</option>
+                <option value="occasionally">Occasionally</option>
                 <option value="1-2">1-2 times a week</option>
                 <option value="2-5">2-5 times a week</option>
                 <option value="5+">5+ times a week</option>
@@ -562,9 +658,7 @@
           <h3>Follow Us</h3>
           <div class="social-links">
             <a href="#" aria-label="Facebook">f</a>
-            <a href="#" aria-label="Instagram">📷</a>
-            <a href="#" aria-label="Twitter">𝕏</a>
-            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="Instagram"><img src="Assets/igicon.png" alt="Instagram" style="width: 16px; height: 16px;"></a>
           </div>
         </div>
       </div>

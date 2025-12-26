@@ -42,14 +42,145 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Hero Find Caregiver form
+  const heroLocationInput = document.getElementById('heroLocationInput');
+  const heroFindLocationBtn = document.getElementById('heroFindLocationBtn');
+  const heroFindForm = document.getElementById('heroFindForm');
+  
+  if(heroFindLocationBtn && heroLocationInput){
+    heroFindLocationBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(navigator.geolocation){
+        heroFindLocationBtn.disabled = true;
+        heroFindLocationBtn.style.opacity = '0.5';
+        navigator.geolocation.getCurrentPosition(
+          (position)=>{
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+              .then(response => response.json())
+              .then(data => {
+                const address = data.address || {};
+                const city = address.city || address.town || address.village || address.county;
+                if(city){
+                  // Find matching option in select
+                  const options = heroLocationInput.querySelectorAll('option');
+                  let found = false;
+                  options.forEach(option => {
+                    if(option.textContent.includes(city)){
+                      heroLocationInput.value = option.value;
+                      found = true;
+                    }
+                  });
+                  if(!found){
+                    alert('City "' + city + '" not in our list. Please select from the dropdown.');
+                  }
+                } else {
+                  alert('Could not determine your city. Please select manually.');
+                }
+                heroFindLocationBtn.disabled = false;
+                heroFindLocationBtn.style.opacity = '1';
+              })
+              .catch(error => {
+                console.error('Geocoding error:', error);
+                alert('Could not determine location. Please select manually.');
+                heroFindLocationBtn.disabled = false;
+                heroFindLocationBtn.style.opacity = '1';
+              });
+          },
+          (error)=>{
+            alert('Location access denied. Please select your city manually.');
+            heroFindLocationBtn.disabled = false;
+            heroFindLocationBtn.style.opacity = '1';
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by your browser.');
+      }
+    });
+  }
+
+  // Hero Find Form submission
+  if(heroFindForm){
+    heroFindForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const location = heroLocationInput.value;
+      if(!location){
+        alert('Please enter a location');
+        return;
+      }
+
+      // Remove any existing results
+      const existingResults = heroFindForm.nextElementSibling;
+      if(existingResults && existingResults.style.textAlign === 'center'){
+        existingResults.remove();
+      }
+
+      const hasAvailable = Math.random() < 0.7;
+      let resultsHTML;
+
+      if(hasAvailable){
+        const numCaregivers = Math.floor(Math.random() * 5) + 3;
+        resultsHTML = `
+          <div style="text-align: center; margin-top: 16px; background: #f0f8f7; padding: 16px; border-radius: 8px;">
+            <p style="color: #333; margin: 0 0 16px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+              <button id="heroCreateAccountBtn" class="btn" style="background-color: #06464E; color: white;">Create Account</button>
+              <button id="heroLoginBtn" class="btn" style="background-color: #67B3C2; color: white;">Log In</button>
+            </div>
+          </div>
+        `;
+      } else {
+        resultsHTML = `
+          <div style="text-align: center; margin-top: 16px; background: #f0f8f7; padding: 16px; border-radius: 8px;">
+            <p style="color: #333; margin: 0 0 16px 0;"><strong>No caregivers available in ${location} yet</strong></p>
+            <p style="color: #666; margin: 0 0 12px 0; font-size: 14px;">Join our waitlist to be notified when caregivers become available.</p>
+            <input type="email" placeholder="Enter your email" id="heroWaitlistEmail" required style="width: 100%; max-width: 300px; padding: 8px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            <button type="button" id="heroJoinWaitlistBtn" class="btn" style="background-color: #06464E; color: white; width: 100%; max-width: 300px;">Join Waitlist</button>
+          </div>
+        `;
+      }
+
+      const resultsContainer = document.createElement('div');
+      heroFindForm.insertAdjacentHTML('afterend', resultsHTML);
+      
+      const newResultsDiv = heroFindForm.nextElementSibling;
+
+      if(hasAvailable){
+        const createAcctBtn = newResultsDiv.querySelector('#heroCreateAccountBtn');
+        const loginBtn = newResultsDiv.querySelector('#heroLoginBtn');
+        
+        createAcctBtn && createAcctBtn.addEventListener('click', ()=>{
+          const signupModal = document.getElementById('signupModal');
+          if(signupModal) signupModal.classList.remove('hidden');
+        });
+        
+        loginBtn && loginBtn.addEventListener('click', ()=>{
+          const loginModal = document.getElementById('loginModal');
+          if(loginModal) loginModal.classList.remove('hidden');
+        });
+      } else {
+        const waitlistBtn = newResultsDiv.querySelector('#heroJoinWaitlistBtn');
+        waitlistBtn && waitlistBtn.addEventListener('click', ()=>{
+          const email = newResultsDiv.querySelector('#heroWaitlistEmail').value;
+          if(email){
+            alert(`Thank you! We've added ${email} to the waitlist for ${location}.`);
+            newResultsDiv.remove();
+            heroFindForm.reset();
+          }
+        });
+      }
+    });
+  }
+
   // Welcome modal on page load
   const welcomeModal = document.getElementById('welcomeModal');
   const welcomeModalClose = document.getElementById('welcomeModalClose');
   const welcomeModalSignupBtn = document.getElementById('welcomeModalSignupBtn');
   
   if(welcomeModal){
-    // Show modal on page load
-    setTimeout(()=> welcomeModal.classList.remove('hidden'), 500);
+    // Show modal on page load - DISABLED FOR NOW
+    // setTimeout(()=> welcomeModal.classList.remove('hidden'), 500);
     
     // Close modal handlers
     if(welcomeModalClose){
@@ -222,8 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const location = data.get('location') || 'your area';
       results.innerHTML = '';
       
-      // Generate random number of available caregivers (1-8)
-      const availableCount = Math.floor(Math.random() * 8) + 1;
+      // Randomly decide if there are caregivers available (70% chance yes, 30% chance no)
+      const hasAvailable = Math.random() < 0.7;
       
       const div = document.createElement('div');
       div.style.textAlign = 'center';
@@ -231,15 +362,38 @@ document.addEventListener('DOMContentLoaded', () => {
       div.style.backgroundColor = '#f5f5f5';
       div.style.borderRadius = '8px';
       div.style.marginTop = '16px';
-      div.innerHTML = `
-        <div style="font-size: 18px; font-weight: 600; color: #06464E; margin-bottom: 8px;">
-          ${availableCount} caregiver${availableCount !== 1 ? 's' : ''} available near ${location}
-        </div>
-        <div style="font-size: 14px; color: #666; margin-bottom: 16px;">
-          Create an account to view more details and get connected
-        </div>
-        <button class="btn btn-large" style="margin-top: 12px;">Create Account</button>
-      `;
+      
+      if(hasAvailable){
+        // Show available caregivers
+        const availableCount = Math.floor(Math.random() * 8) + 1;
+        div.innerHTML = `
+          <div style="font-size: 18px; font-weight: 600; color: #06464E; margin-bottom: 8px;">
+            ${availableCount} caregiver${availableCount !== 1 ? 's' : ''} available near ${location}
+          </div>
+          <div style="font-size: 14px; color: #666; margin-bottom: 20px;">
+            Create an account or log in to view more details and get connected
+          </div>
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-large" style="background-color: #06464E; margin-top: 0;">Create Account</button>
+            <button class="btn btn-large" style="background-color: #67B3C2; margin-top: 0;">Log In</button>
+          </div>
+        `;
+      } else {
+        // Show waitlist prompt
+        div.innerHTML = `
+          <div style="font-size: 18px; font-weight: 600; color: #06464E; margin-bottom: 8px;">
+            No caregivers available in ${location} yet
+          </div>
+          <div style="font-size: 14px; color: #666; margin-bottom: 16px;">
+            Join our waitlist and we'll notify you as soon as we expand to your area
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;">
+            <input type="email" placeholder="Enter your email" style="flex: 1; max-width: 250px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px;" id="waitlistEmail" required>
+            <button class="btn" style="margin-top: 0;">Join Waitlist</button>
+          </div>
+        `;
+      }
+      
       results.appendChild(div);
     });
   }
