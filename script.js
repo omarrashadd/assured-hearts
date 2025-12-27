@@ -819,6 +819,7 @@ document.addEventListener('DOMContentLoaded', () => {
     childDemographicsForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const fd = new FormData(childDemographicsForm);
+      const childName = fd.get('childName');
       const numChildren = fd.get('numChildren');
       const frequency = fd.get('frequency');
       const preferredSchedule = fd.get('preferredSchedule');
@@ -836,6 +837,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try{
         const payload = {
           user_id,
+          name: childName,
           numChildren: parseInt(numChildren),
           frequency,
           preferredSchedule,

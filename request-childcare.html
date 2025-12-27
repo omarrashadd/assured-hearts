@@ -51,10 +51,14 @@
         
         <div style="margin-bottom: 20px;">
           <label for="childSelect" style="display: block; margin-bottom: 8px; color: #06464E; font-weight: 600; font-size: 14px;">Which child is this request for?</label>
-          <select id="childSelect" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
-            <option value="">Loading your children...</option>
-          </select>
-          <p style="margin: 8px 0 0 0; color: #999; font-size: 12px;">If you don't see your child, a new entry will be created when you submit.</p>
+          <div style="display: flex; gap: 8px;">
+            <select id="childSelect" style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+              <option value="">Loading your children...</option>
+            </select>
+            <button id="newChildBtn" type="button" style="padding: 10px 16px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-size: 14px; font-weight: 600; color: #06464E;">+ New</button>
+          </div>
+          <input id="newChildName" type="text" placeholder="Enter child's name" style="display: none; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+          <p style="margin: 8px 0 0 0; color: #999; font-size: 12px;">Select an existing child or create a new one.</p>
         </div>
         
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -75,6 +79,8 @@
       const available = localStorage.getItem('care_available') === 'true';
       const submitRequestBtn = document.getElementById('submitRequestBtn');
       const childSelect = document.getElementById('childSelect');
+      const newChildBtn = document.getElementById('newChildBtn');
+      const newChildName = document.getElementById('newChildName');
       const notMsg = document.getElementById('notAvailableMsg');
       const availabilityCard = document.getElementById('availabilityCard');
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
@@ -100,15 +106,33 @@
             const children = data.children || [];
             if(children.length > 0){
               childSelect.innerHTML = '<option value="">-- Select a child --</option>' + 
-                children.map((child, idx) => `<option value="${child.id}">Child ${idx + 1}</option>`).join('');
+                children.map((child) => `<option value="${child.id}">${child.name || 'Unnamed Child'}</option>`).join('');
             } else {
-              childSelect.innerHTML = '<option value="">No children yet - a new entry will be created</option>';
+              childSelect.innerHTML = '<option value="">No children yet</option>';
             }
           })
           .catch(err => {
             console.warn('Failed to load children:', err);
             childSelect.innerHTML = '<option value="">Unable to load children</option>';
           });
+
+        // Handle new child button
+        newChildBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          const isHidden = newChildName.style.display === 'none';
+          if(isHidden){
+            newChildName.style.display = 'block';
+            newChildBtn.textContent = '✓ Done';
+            childSelect.value = '';
+            childSelect.disabled = true;
+            newChildName.focus();
+          } else {
+            newChildName.style.display = 'none';
+            newChildBtn.textContent = '+ New';
+            childSelect.disabled = false;
+            newChildName.value = '';
+          }
+        });
       }
 
       if(!available){
@@ -126,10 +150,16 @@
           e.preventDefault();
           const location = localStorage.getItem('last_search_location') || '';
           const childId = childSelect.value;
+          const newName = newChildName.value.trim();
           
           if(!location){
             showBanner('Please search for childcare in your area first.', 'info');
             setTimeout(() => window.location.href = 'find-childcare.html', 1500);
+            return;
+          }
+
+          if(newChildName.style.display !== 'none' && !newName){
+            showBanner('Please enter your child\'s name.', 'error');
             return;
           }
 
@@ -140,7 +170,13 @@
             const res = await fetch(`${API_BASE}/forms/request`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ user_id: userId, child_id: childId ? parseInt(childId) : null, location, notes: '' })
+              body: JSON.stringify({ 
+                user_id: userId, 
+                child_id: childId ? parseInt(childId) : null, 
+                location, 
+                notes: '',
+                childName: newName || null
+              })
             });
             
             if(!res.ok) throw new Error('Failed to submit request');
