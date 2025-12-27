@@ -292,12 +292,18 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const waitlistBtn = newResultsDiv.querySelector('#heroJoinWaitlistBtn');
         const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
-        waitlistBtn && waitlistBtn.addEventListener('click', ()=>{
+        waitlistBtn && waitlistBtn.addEventListener('click', async ()=>{
           const email = newResultsDiv.querySelector('#heroWaitlistEmail').value;
           if(email){
-            showBanner(`Thank you! We've added ${email} to the waitlist for ${location}.`, 'success');
-            newResultsDiv.remove();
-            heroFindForm.reset();
+            try{
+              await postJSON('/forms/waitlist', { email, city: location });
+              showBanner(`Thank you! We've added ${email} to the waitlist for ${location}.`, 'success');
+              newResultsDiv.remove();
+              heroFindForm.reset();
+            }catch(err){
+              showBanner('Failed to add to waitlist. Please try again.', 'error');
+              console.error('Waitlist error:', err);
+            }
           }
         });
         closeBtn && closeBtn.addEventListener('click', ()=>{
