@@ -69,15 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dashLink.style.gap = '6px';
         dashLink.style.justifyContent = variant === 'mobile' ? 'center' : '';
 
-        const signed = document.createElement('span');
-        signed.textContent = `Signed in as ${userName || 'Member'}`;
-        if(variant === 'mobile'){
+        const signed = variant === 'mobile' ? document.createElement('span') : null;
+        if(signed){
+          signed.textContent = `Signed in as ${userName || 'Member'}`;
           signed.className = 'signed-label';
-        } else {
-          signed.style.color = '#06464E';
-          signed.style.fontWeight = '500';
-          signed.style.fontSize = '12px';
-          signed.style.margin = '0 8px';
         }
 
         const logoutBtn = document.createElement('button');
@@ -95,11 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(variant === 'mobile'){
           container.appendChild(dashLink);
-          container.appendChild(signed);
+          if(signed) container.appendChild(signed);
           container.appendChild(logoutBtn);
         } else {
           container.appendChild(dashLink);
-          container.appendChild(signed);
           container.appendChild(logoutBtn);
         }
       } else {
