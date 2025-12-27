@@ -338,42 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(loginModal) loginModal.classList.remove('hidden');
           });
         }
-        // Fetch caregiver preview list and render cards (only if signed in)
-        if(isSignedIn){
-          const previewDiv = newResultsDiv.querySelector('#heroPreview');
-          if(previewDiv){
-            try{
-              const resList = await fetch(`${API_BASE}/search/list?city=${encodeURIComponent(location)}&limit=3`);
-              const dataList = await resList.json();
-              const items = (dataList.caregivers || []).slice(0,3);
-              if(items.length > 0){
-                const cards = items.map(c => {
-                  const nameParts = (c.name || '').trim().split(/\s+/);
-                  const first = nameParts[0] || '';
-                  const lastInitial = nameParts[1] ? nameParts[1][0].toUpperCase() + '.' : '';
-                  const displayName = `${first} ${lastInitial}`.trim();
-                  const summarySource = (c.experience || '').trim() || (c.certifications || '').trim();
-                  const summary = summarySource.length > 90 ? summarySource.slice(0, 90) + '…' : summarySource || 'Experienced, values-aligned caregiver.';
-                  const nameRow = displayName ? `<div style="font-weight:700; color:#06464E;">${displayName}</div>` : '';
-                  return `
-                    <div style="flex:1 1 220px; min-width:220px; background:#fff; border:1px solid #eee; border-radius:10px; padding:12px; text-align:left;">
-                      ${nameRow}
-                      <div style="font-size:12px; color:#666;">${c.city || ''}${c.province ? ', ' + c.province : ''}</div>
-                      <div style="font-size:12px; color:#333; margin-top:6px;">${summary}</div>
-                    </div>
-                  `;
-                }).join('');
-                const note = `Top caregivers near ${location}`;
-                previewDiv.innerHTML = `
-                  <p style="font-size:14px; color:#666; margin:0 0 8px 0;">${note}</p>
-                  <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">${cards}</div>
-                `;
-              }
-            }catch(err){
-              console.warn('Caregiver preview failed:', err);
-            }
-          }
-        }
+
         closeBtn && closeBtn.addEventListener('click', ()=>{
           newResultsDiv.remove();
           heroFindForm.reset();
