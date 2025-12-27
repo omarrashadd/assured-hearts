@@ -69,12 +69,9 @@
       const availabilityCard = document.getElementById('availabilityCard');
 
       if(!userId){
-        // No account: redirect on click (keep CTA as Add Child)
-        addChildBtn.addEventListener('click', function(e){
-          e.preventDefault();
-          alert('Please create an account first.');
-          window.location.href = 'account-signup.html';
-        });
+        // Require login to access this page
+        alert('Please sign in to request childcare.');
+        window.location.href = 'account-signup.html';
       }
 
       if(!available){
