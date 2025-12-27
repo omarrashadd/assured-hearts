@@ -792,9 +792,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = `${fd.get('firstName') || ''} ${fd.get('lastName') || ''}`.trim();
       const email = fd.get('email');
       const phone = fd.get('phone');
+      const password = fd.get('password');
+      const confirmPassword = fd.get('confirmPassword');
       const experience = fd.get('experience');
       const city = fd.get('city');
       const province = fd.get('province');
+      
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        showBanner('Passwords do not match', 'error');
+        return;
+      }
+      
       try{
         await postJSON('/forms/provider', { name, email, phone, password, experience, meta: { city, province } });
         const successMsg = document.getElementById('successMessage');
