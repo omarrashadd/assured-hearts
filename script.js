@@ -183,6 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         loginBtn && loginBtn.addEventListener('click', ()=>{
           localStorage.setItem('care_available', 'true');
+          // After login, go to request-childcare confirmation page
+          localStorage.setItem('post_login_target', 'request-childcare');
           const loginModal = document.getElementById('loginModal');
           if(loginModal) loginModal.classList.remove('hidden');
         });
@@ -292,7 +294,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const loginForm = document.getElementById('loginForm');
-  if(loginForm) loginForm.addEventListener('submit', e=> { e.preventDefault(); alert('Login successful!'); loginModal.classList.add('hidden'); loginForm.reset(); });
+  if(loginForm) loginForm.addEventListener('submit', e=> {
+    e.preventDefault();
+    // Simulate setting a user id on login
+    const fakeUserId = Math.floor(Math.random() * 100000) + 1;
+    localStorage.setItem('user_id', String(fakeUserId));
+    const target = localStorage.getItem('post_login_target');
+    alert('Login successful!');
+    loginModal.classList.add('hidden');
+    loginForm.reset();
+    if(target === 'request-childcare'){
+      window.location.href = 'request-childcare.html';
+    } else {
+      window.location.href = 'parent-dashboard.html';
+    }
+  });
 
   const signupForm = document.getElementById('signupForm');
   if(signupForm) signupForm.addEventListener('submit', e=> { e.preventDefault(); const email = new FormData(signupForm).get('email'); alert('Welcome, ' + email + '!'); signupModal.classList.add('hidden'); signupForm.reset(); });
