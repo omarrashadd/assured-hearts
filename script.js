@@ -69,9 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
         dashLink.style.gap = '6px';
         dashLink.style.justifyContent = variant === 'mobile' ? 'center' : '';
 
-        const signed = variant === 'mobile' ? null : document.createElement('span');
-        if(signed){
-          signed.textContent = `Signed in as ${userName || 'Member'}`;
+        const signed = document.createElement('span');
+        signed.textContent = `Signed in as ${userName || 'Member'}`;
+        if(variant === 'mobile'){
+          signed.className = 'signed-label';
+        } else {
           signed.style.color = '#06464E';
           signed.style.fontWeight = '500';
           signed.style.fontSize = '12px';
@@ -93,10 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(variant === 'mobile'){
           container.appendChild(dashLink);
+          container.appendChild(signed);
           container.appendChild(logoutBtn);
         } else {
           container.appendChild(dashLink);
-          if(signed) container.appendChild(signed);
+          container.appendChild(signed);
           container.appendChild(logoutBtn);
         }
       } else {
