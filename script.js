@@ -13,6 +13,73 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return json;
   }
+  // Banner helper
+  function showBanner(message, type='success'){
+    const existing = document.getElementById('globalBanner');
+    if(existing) existing.remove();
+    const div = document.createElement('div');
+    div.id = 'globalBanner';
+    const base = 'position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 9999; padding: 12px 16px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); font-weight: 700; min-width: 280px; text-align: center;';
+    const styles = {
+      success: 'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;',
+      error: 'background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;',
+      info: 'background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;'
+    };
+    div.setAttribute('style', base + (styles[type] || styles.success));
+    div.textContent = message;
+    document.body.appendChild(div);
+    setTimeout(()=>{ div.style.opacity = '0'; div.style.transition = 'opacity 300ms'; setTimeout(()=> div.remove(), 300); }, 2500);
+  }
+  // Flash message support across redirects
+  const flashMsg = localStorage.getItem('flash_message');
+  if(flashMsg){
+    showBanner(flashMsg, 'success');
+    localStorage.removeItem('flash_message');
+  }
+  // Render auth UI in navbar
+  function renderAuthNav(){
+    const navAuth = document.querySelector('.nav-auth');
+    if(!navAuth) return;
+    const userId = localStorage.getItem('user_id');
+    const userType = localStorage.getItem('user_type');
+    const userName = localStorage.getItem('user_name');
+    if(userId){
+      navAuth.innerHTML = '';
+      const signed = document.createElement('span');
+      signed.textContent = `Signed in as ${userName || 'Member'}`;
+      signed.style.color = '#06464E';
+      signed.style.fontWeight = '600';
+      signed.style.marginRight = '12px';
+      const dashLink = document.createElement('a');
+      dashLink.href = userType === 'provider' ? 'caregiver-dashboard.html' : 'parent-dashboard.html';
+      dashLink.textContent = 'Dashboard';
+      dashLink.style.display = 'flex';
+      dashLink.style.alignItems = 'center';
+      dashLink.style.gap = '6px';
+      dashLink.style.color = '#06464E';
+      dashLink.style.textDecoration = 'none';
+      dashLink.style.fontWeight = '600';
+      dashLink.style.marginRight = '8px';
+      const logoutBtn = document.createElement('button');
+      logoutBtn.id = 'logoutBtn';
+      logoutBtn.className = 'btn-auth';
+      logoutBtn.textContent = 'Log out';
+      logoutBtn.style.background = '#f5f5f5';
+      logoutBtn.style.color = '#333';
+      logoutBtn.style.border = '1px solid #e5e7eb';
+      navAuth.appendChild(signed);
+      navAuth.appendChild(dashLink);
+      navAuth.appendChild(logoutBtn);
+      logoutBtn.addEventListener('click', ()=>{
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('user_type');
+        localStorage.removeItem('user_name');
+        localStorage.setItem('flash_message', 'You have been logged out.');
+        window.location.href = 'index.html';
+      });
+    }
+  }
+  renderAuthNav();
   // GPS location button handler
   const gpsBtn = document.getElementById('gpsBtn');
   const locationInput = document.getElementById('locationInput');
@@ -321,9 +388,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const resp = await postJSON('/forms/login', { email, password });
       localStorage.setItem('user_id', String(resp.userId));
       localStorage.setItem('user_type', resp.type || 'parent');
-      alert('Login successful!');
+      if(resp.name) localStorage.setItem('user_name', resp.name);
+      localStorage.setItem('flash_message', 'Login successful!');
       loginModal.classList.add('hidden');
       loginForm.reset();
+      renderAuthNav();
       const target = localStorage.getItem('post_login_target');
       if(target === 'request-childcare'){
         window.location.href = 'request-childcare.html';
@@ -331,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'parent-dashboard.html';
       }
     }catch(err){
-      alert('Invalid email or password. Please try again.');
+      showBanner('Invalid email or password. Please try again.', 'error');
       console.error(err);
     }
   });
