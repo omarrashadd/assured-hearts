@@ -50,7 +50,6 @@
         <p style="margin: 0 0 16px 0; color: #666;">Add your child's details so caregivers can tailor their support.</p>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
           <a id="addChildBtn" href="child-demographics.html" class="btn" style="padding: 12px 16px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: 700;">Add Child Details →</a>
-          <a href="find-childcare.html" class="btn" style="padding: 12px 16px; background: white; color: #06464E; border: 2px solid #06464E; border-radius: 10px; font-weight: 700; text-decoration: none;">Browse Caregivers</a>
         </div>
         <p id="notAvailableMsg" style="display:none; margin-top: 12px; color: #8b6914; background: #fff9e6; padding: 10px 12px; border-radius: 8px;">Care is not yet confirmed for your area. Please search in <a href="find-childcare.html" style="color:#06464E; font-weight:600; text-decoration:none;">Find Childcare</a>.</p>
       </section>
@@ -70,9 +69,12 @@
       const availabilityCard = document.getElementById('availabilityCard');
 
       if(!userId){
-        // No account
-        addChildBtn.setAttribute('href', 'account-signup.html');
-        addChildBtn.textContent = 'Create Account to Continue';
+        // No account: redirect on click (keep CTA as Add Child)
+        addChildBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          alert('Please create an account first.');
+          window.location.href = 'account-signup.html';
+        });
       }
 
       if(!available){
@@ -80,8 +82,10 @@
         availabilityCard.querySelector('span').textContent = 'Not Confirmed';
         availabilityCard.querySelector('span').style.background = '#fff9e6';
         availabilityCard.querySelector('span').style.color = '#8b6914';
-        addChildBtn.setAttribute('href', 'find-childcare.html');
-        addChildBtn.textContent = 'Check Availability';
+        addChildBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          window.location.href = 'find-childcare.html';
+        });
       }
 
       // Optional: show last searched location
