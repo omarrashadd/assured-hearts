@@ -252,25 +252,33 @@
           submitRequestBtn.textContent = 'Submitting...';
 
           try {
+            const payload = { 
+              user_id: userId, 
+              child_id: childId ? parseInt(childId) : null, 
+              location, 
+              notes: '',
+              childName: childName || null
+            };
+            
+            console.log('Submitting request with payload:', payload);
+            
             const res = await fetch(`${API_BASE}/forms/request`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 
-                user_id: userId, 
-                child_id: childId ? parseInt(childId) : null, 
-                location, 
-                notes: '',
-                childName: childName || null
-              })
+              body: JSON.stringify(payload)
             });
             
-            if(!res.ok) throw new Error('Failed to submit request');
+            console.log('Response status:', res.status);
+            const data = await res.json();
+            console.log('Response data:', data);
+            
+            if(!res.ok) throw new Error(data.error || 'Failed to submit request');
             
             showBanner('Request submitted successfully!', 'success');
             setTimeout(() => window.location.href = 'parent-dashboard.html', 1500);
           } catch (err) {
             console.error('Request submission error:', err);
-            showBanner('Failed to submit request. Please try again.', 'error');
+            showBanner(`Error: ${err.message}`, 'error');
             submitRequestBtn.disabled = false;
             submitRequestBtn.textContent = 'Submit Request →';
           }
