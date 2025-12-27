@@ -37,50 +37,96 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('flash_message');
   }
   // Render auth UI in navbar
+  function ensureMobileAuthContainer(){
+    const panel = document.getElementById('mobileMenu');
+    if(!panel) return null;
+    let mobileAuth = panel.querySelector('.mobile-auth');
+    if(!mobileAuth){
+      mobileAuth = document.createElement('div');
+      mobileAuth.className = 'mobile-auth';
+      panel.appendChild(mobileAuth);
+    }
+    return mobileAuth;
+  }
+
   function renderAuthNav(){
     const navAuth = document.querySelector('.nav-auth');
-    if(!navAuth) return;
+    const mobileAuth = ensureMobileAuthContainer();
     const userId = localStorage.getItem('user_id');
     const userType = localStorage.getItem('user_type');
     const userName = localStorage.getItem('user_name');
-    if(userId){
-      navAuth.innerHTML = '';
-      const signed = document.createElement('span');
-      signed.textContent = `Signed in as ${userName || 'Member'}`;
-      signed.style.color = '#06464E';
-      signed.style.fontWeight = '500';
-      signed.style.fontSize = '12px';
-      signed.style.margin = '0 8px';
-      const dashLink = document.createElement('a');
-      dashLink.href = userType === 'provider' ? 'caregiver-dashboard.html' : 'parent-dashboard.html';
-      dashLink.textContent = 'My Dashboard';
-      dashLink.style.display = 'flex';
-      dashLink.style.alignItems = 'center';
-      dashLink.style.gap = '6px';
-      dashLink.style.color = '#06464E';
-      dashLink.style.textDecoration = 'none';
-      dashLink.style.fontWeight = '600';
-      dashLink.style.marginRight = '8px';
-      const logoutBtn = document.createElement('button');
-      logoutBtn.id = 'logoutBtn';
-      logoutBtn.className = 'btn-auth';
-      logoutBtn.textContent = 'Log out';
-      logoutBtn.style.background = '#f5f5f5';
-      logoutBtn.style.color = '#333';
-      logoutBtn.style.border = '1px solid #e5e7eb';
-      logoutBtn.style.marginLeft = '4px';
-      // Order: My Dashboard | Signed in as ... | Log out
-      navAuth.appendChild(dashLink);
-      navAuth.appendChild(signed);
-      navAuth.appendChild(logoutBtn);
-      logoutBtn.addEventListener('click', ()=>{
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('user_type');
-        localStorage.removeItem('user_name');
-        localStorage.setItem('flash_message', 'You have been logged out.');
-        window.location.href = 'index.html';
-      });
+
+    function renderAuth(container, variant){
+      if(!container) return;
+      container.innerHTML = '';
+      if(userId){
+        const dashLink = document.createElement('a');
+        dashLink.href = userType === 'provider' ? 'caregiver-dashboard.html' : 'parent-dashboard.html';
+        dashLink.textContent = 'My Dashboard';
+        dashLink.className = 'btn-auth signup';
+        dashLink.style.display = 'flex';
+        dashLink.style.alignItems = 'center';
+        dashLink.style.gap = '6px';
+        dashLink.style.justifyContent = variant === 'mobile' ? 'center' : '';
+
+        const signed = document.createElement('span');
+        signed.textContent = `Signed in as ${userName || 'Member'}`;
+        signed.className = variant === 'mobile' ? 'signed-label' : '';
+        if(variant !== 'mobile'){
+          signed.style.color = '#06464E';
+          signed.style.fontWeight = '500';
+          signed.style.fontSize = '12px';
+          signed.style.margin = '0 8px';
+        }
+
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'btn-auth login';
+        logoutBtn.textContent = 'Log out';
+        logoutBtn.style.marginLeft = variant === 'mobile' ? '0' : '4px';
+        logoutBtn.addEventListener('click', ()=>{
+          localStorage.removeItem('user_id');
+          localStorage.removeItem('user_type');
+          localStorage.removeItem('user_name');
+          localStorage.setItem('flash_message', 'You have been logged out.');
+          if(typeof closeMobileMenu === 'function') closeMobileMenu();
+          window.location.href = 'index.html';
+        });
+
+        if(variant === 'mobile'){
+          container.appendChild(dashLink);
+          container.appendChild(signed);
+          container.appendChild(logoutBtn);
+        } else {
+          container.appendChild(dashLink);
+          container.appendChild(signed);
+          container.appendChild(logoutBtn);
+        }
+      } else {
+        const loginBtnEl = document.createElement('button');
+        loginBtnEl.className = 'btn-auth login';
+        loginBtnEl.textContent = 'Sign In';
+        loginBtnEl.addEventListener('click', (e)=>{
+          e.preventDefault();
+          if(typeof closeMobileMenu === 'function') closeMobileMenu();
+          const modal = document.getElementById('loginModal');
+          if(modal) modal.classList.remove('hidden');
+          else window.location.href = 'create-account.html';
+        });
+
+        const signupEl = document.createElement('a');
+        signupEl.className = 'btn-auth signup';
+        signupEl.textContent = 'Sign up';
+        signupEl.href = 'account-signup.html';
+        signupEl.style.textAlign = 'center';
+        signupEl.addEventListener('click', ()=>{ if(typeof closeMobileMenu === 'function') closeMobileMenu(); });
+
+        container.appendChild(loginBtnEl);
+        container.appendChild(signupEl);
+      }
     }
+
+    if(navAuth) renderAuth(navAuth, 'desktop');
+    if(mobileAuth) renderAuth(mobileAuth, 'mobile');
   }
   renderAuthNav();
   // GPS location button handler
