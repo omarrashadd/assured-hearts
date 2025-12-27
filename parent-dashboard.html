@@ -113,7 +113,7 @@
 
     <script src="script.js"></script>
     <script>
-      const API_BASE = 'https://assured-hearts-api.onrender.com/api' || 'http://localhost:3000/api';
+      const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
 
       async function loadParentDashboard() {
         const userId = localStorage.getItem('user_id');
@@ -130,18 +130,70 @@
         }
 
         try {
-          const res = await fetch(`${API_BASE}/forms/parent/${userId}`);
+          const url = `${API_BASE}/forms/parent/${userId}`;
+          console.log('Loading dashboard from:', url);
+          const res = await fetch(url);
           if(!res.ok) {
             console.error('Failed to load dashboard:', res.status);
             return;
           }
 
           const data = await res.json();
-          const { profile, children } = data;
+          const { profile, children, requests, sessions } = data;
 
-          // Render requests list (placeholder for now)
+          // Update stats
+          document.getElementById('statRequests').textContent = requests.length;
+          document.getElementById('statUpcoming').textContent = sessions.length;
+
+          // Render requests list
           const requestsList = document.getElementById('requestsList');
-          requestsList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No childcare requests yet. <a href="request-childcare.html" style="color: #67B3C2; font-weight: 600;">Submit a request</a></p>';
+          if(requests.length === 0) {
+            requestsList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No childcare requests yet. <a href="request-childcare.html" style="color: #67B3C2; font-weight: 600;">Submit a request</a></p>';
+          } else {
+            requestsList.innerHTML = requests.map(request => {
+              const statusColors = {
+                pending: { bg: '#fff9e6', color: '#8b6914', text: 'Pending' },
+                matched: { bg: '#eef7f2', color: '#2d6b42', text: 'Matched' },
+                confirmed: { bg: '#eef7f2', color: '#2d6b42', text: 'Confirmed' },
+                cancelled: { bg: '#fee', color: '#991b1b', text: 'Cancelled' }
+              };
+              const status = statusColors[request.status] || statusColors.pending;
+              const dateStr = new Date(request.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              return `
+                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: start; gap: 12px;">
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+                      <p style="margin: 0; color: #06464E; font-weight: 500; font-size: 14px;">${request.location || 'Location not specified'}</p>
+                      <span style="background: ${status.bg}; color: ${status.color}; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap;">${status.text}</span>
+                    </div>
+                    <p style="margin: 0; color: #999; font-size: 12px;">Submitted ${dateStr}</p>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+
+          // Render upcoming sessions
+          const upcomingList = document.getElementById('upcomingList');
+          if(sessions.length === 0) {
+            upcomingList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No upcoming sessions scheduled</p>';
+          } else {
+            upcomingList.innerHTML = sessions.map(session => {
+              const dateStr = new Date(session.session_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+              const startTime = session.start_time ? session.start_time.slice(0, 5) : '';
+              const endTime = session.end_time ? session.end_time.slice(0, 5) : '';
+              return `
+                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px;">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px; gap: 12px;">
+                    <div style="flex: 1; min-width: 0;">
+                      <p style="margin: 0 0 4px 0; color: #06464E; font-weight: 500; font-size: 14px;">${session.provider_name || 'Provider TBD'}</p>
+                      <p style="margin: 0; color: #999; font-size: 12px;">${dateStr}, ${startTime} - ${endTime}</p>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
 
           // Render children list
           const childrenList = document.getElementById('childrenList');
