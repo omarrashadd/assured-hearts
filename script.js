@@ -142,8 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
             <p style="color: #333; margin: 0 0 12px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
             <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-              <button id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to browse</button>
-              <button id="heroCreateAccountBtn" class="btn" style="background: white; color: #06464E; border: 2px solid #06464E; font-weight: 600;">Create Account</button>
+              <button type="button" id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to browse</button>
+              <button type="button" id="heroCreateAccountBtn" class="btn" style="background: white; color: #06464E; border: 2px solid #06464E; font-weight: 600;">Create Account</button>
             </div>
             <button id="heroCloseResultsBtn" type="button" style="margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
           </div>
@@ -176,12 +176,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const loginBtn = newResultsDiv.querySelector('#heroLoginBtn');
         const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
         
-        createAcctBtn && createAcctBtn.addEventListener('click', ()=>{
+        createAcctBtn && createAcctBtn.addEventListener('click', (e)=>{
+          e.preventDefault();
           localStorage.setItem('care_available', 'true');
           window.location.href = 'account-signup.html';
         });
         
-        loginBtn && loginBtn.addEventListener('click', ()=>{
+        loginBtn && loginBtn.addEventListener('click', (e)=>{
+          e.preventDefault();
           localStorage.setItem('care_available', 'true');
           // After login, go to request-childcare confirmation page
           localStorage.setItem('post_login_target', 'request-childcare');
@@ -211,6 +213,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Fallback delegation in case dynamic listeners miss
+  document.addEventListener('click', (evt)=>{
+    const target = evt.target.closest('#heroLoginBtn, #heroCreateAccountBtn');
+    if(!target) return;
+    evt.preventDefault();
+    if(target.id === 'heroCreateAccountBtn'){
+      localStorage.setItem('care_available', 'true');
+      window.location.href = 'account-signup.html';
+    } else if(target.id === 'heroLoginBtn'){
+      localStorage.setItem('care_available', 'true');
+      localStorage.setItem('post_login_target', 'request-childcare');
+      const loginModal = document.getElementById('loginModal');
+      if(loginModal) loginModal.classList.remove('hidden');
+    }
+  }, { once: true });
 
   // Welcome modal on page load
   const welcomeModal = document.getElementById('welcomeModal');
