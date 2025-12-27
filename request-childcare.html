@@ -70,18 +70,9 @@
             </div>
             
             <div>
-              <label for="detailNumChildren" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Number of children</label>
-              <select id="detailNumChildren" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-                <option value="">Select</option>
-                <option value="1">1 child</option>
-                <option value="2">2 children</option>
-                <option value="3">3 children</option>
-                <option value="4">4 children</option>
-                <option value="5">5+ children</option>
-              </select>
+              <label for="detailChildAge" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Child's age</label>
+              <input id="detailChildAge" type="number" min="0" max="17" placeholder="Age in years" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
             </div>
-
-            <div id="childrenAgesContainer" style="display: none;"></div>
 
             <div>
               <label for="detailFrequency" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">How often do you need childcare?</label>
@@ -129,8 +120,7 @@
       const newChildBtn = document.getElementById('newChildBtn');
       const childDetailsSection = document.getElementById('childDetailsSection');
       const detailChildName = document.getElementById('detailChildName');
-      const detailNumChildren = document.getElementById('detailNumChildren');
-      const childrenAgesContainer = document.getElementById('childrenAgesContainer');
+      const detailChildAge = document.getElementById('detailChildAge');
       const detailFrequency = document.getElementById('detailFrequency');
       const detailSchedule = document.getElementById('detailSchedule');
       const detailSpecialNeeds = document.getElementById('detailSpecialNeeds');
@@ -195,34 +185,11 @@
           childDetailsSection.style.display = 'block';
           childDetailTitle.textContent = 'New Child Information';
           detailChildName.value = '';
-          detailNumChildren.value = '';
-          childrenAgesContainer.innerHTML = '';
-          childrenAgesContainer.style.display = 'none';
+          detailChildAge.value = '';
           detailFrequency.value = '';
           detailSchedule.value = '';
           detailSpecialNeeds.value = '';
           detailChildName.focus();
-        });
-
-        // Handle number of children change
-        detailNumChildren.addEventListener('change', function(e){
-          const numChildren = parseInt(e.target.value);
-          if(numChildren > 0){
-            childrenAgesContainer.style.display = 'block';
-            childrenAgesContainer.innerHTML = '';
-            for(let i = 1; i <= numChildren; i++){
-              const div = document.createElement('div');
-              div.style.marginBottom = '12px';
-              div.innerHTML = `
-                <label for="detailChild${i}Age" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Child ${i} age</label>
-                <input id="detailChild${i}Age" type="number" min="0" max="17" placeholder="Age in years" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-              `;
-              childrenAgesContainer.appendChild(div);
-            }
-          } else {
-            childrenAgesContainer.style.display = 'none';
-            childrenAgesContainer.innerHTML = '';
-          }
         });
       }
 
@@ -231,28 +198,19 @@
         childDetailTitle.textContent = isExisting ? 'Child Information' : 'New Child Information';
         detailChildName.value = child.name || '';
         detailChildName.disabled = isExisting; // Disable name editing for existing children
+        
+        // Populate age from first element of ages array
+        if(child.ages && Array.isArray(child.ages) && child.ages.length > 0){
+          detailChildAge.value = child.ages[0];
+        } else if(child.ages){
+          const ages = JSON.parse(child.ages || '[]');
+          detailChildAge.value = ages.length > 0 ? ages[0] : '';
+        }
+        detailChildAge.disabled = isExisting; // Disable age editing for existing children
+        
         detailFrequency.value = child.frequency || '';
         detailSchedule.value = child.preferred_schedule || '';
         detailSpecialNeeds.value = child.special_needs || '';
-        
-        // Populate ages if they exist
-        if(child.ages){
-          const ages = Array.isArray(child.ages) ? child.ages : JSON.parse(child.ages || '[]');
-          detailNumChildren.value = ages.length > 0 ? ages.length : '';
-          if(ages.length > 0){
-            childrenAgesContainer.style.display = 'block';
-            childrenAgesContainer.innerHTML = '';
-            ages.forEach((age, i) => {
-              const div = document.createElement('div');
-              div.style.marginBottom = '12px';
-              div.innerHTML = `
-                <label for="detailChild${i+1}Age" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Child ${i+1} age</label>
-                <input id="detailChild${i+1}Age" type="number" min="0" max="17" value="${age}" placeholder="Age in years" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;" ${isExisting ? 'disabled' : ''}>
-              `;
-              childrenAgesContainer.appendChild(div);
-            });
-          }
-        }
       }
 
       if(!available){

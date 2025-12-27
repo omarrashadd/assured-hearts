@@ -820,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const fd = new FormData(childDemographicsForm);
       const childName = fd.get('childName');
-      const numChildren = fd.get('numChildren');
+      const childAge = fd.get('childAge');
       const frequency = fd.get('frequency');
       const preferredSchedule = fd.get('preferredSchedule');
       const specialNeeds = fd.get('specialNeeds');
@@ -838,17 +838,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const payload = {
           user_id,
           name: childName,
-          numChildren: parseInt(numChildren),
+          ages: childAge ? [parseInt(childAge)] : [],
           frequency,
           preferredSchedule,
           specialNeeds
         };
-        
-        // Add dynamic child age fields
-        for(let i = 1; i <= numChildren; i++){
-          const age = fd.get(`child${i}Age`);
-          if(age) payload[`child${i}Age`] = age;
-        }
         
         await postJSON('/forms/children', payload);
         const banner = document.getElementById('childSuccessBanner');

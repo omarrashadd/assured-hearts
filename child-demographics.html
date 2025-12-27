@@ -71,21 +71,10 @@
             <label for="childName" style="display: block; margin-bottom: 6px; color: #333;">Child's name</label>
             <input id="childName" name="childName" type="text" placeholder="Enter your child's name" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
           </div>
-          
+
           <div>
-            <label for="numChildren" style="display: block; margin-bottom: 6px; color: #333;">Number of children</label>
-            <select id="numChildren" name="numChildren" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
-              <option value="">Select</option>
-              <option value="1">1 child</option>
-              <option value="2">2 children</option>
-              <option value="3">3 children</option>
-              <option value="4">4 children</option>
-              <option value="5">5+ children</option>
-            </select>
-          </div>
-          
-          <div id="childrenAgesContainer" style="display: none; padding: 16px; background: #f8fbfc; border-radius: 8px; border: 1px solid #e5e7eb;">
-            <!-- Dynamic child age inputs will appear here -->
+            <label for="childAge" style="display: block; margin-bottom: 6px; color: #333;">Child's age</label>
+            <input id="childAge" name="childAge" type="number" min="0" max="17" placeholder="Age in years" style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
           </div>
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 8px 0;">
@@ -127,32 +116,6 @@
     <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
       <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
     </footer>
-
-    <script>
-      // Handle dynamic child age inputs
-      document.getElementById('numChildren').addEventListener('change', function(e) {
-        const container = document.getElementById('childrenAgesContainer');
-        const numChildren = parseInt(e.target.value);
-        
-        if (numChildren > 0) {
-          container.style.display = 'block';
-          container.innerHTML = '<h4 style="margin: 0 0 12px 0; color: #06464E; font-size: 16px;">Ages of your children</h4>';
-          
-          for (let i = 1; i <= numChildren; i++) {
-            const childDiv = document.createElement('div');
-            childDiv.style.marginBottom = '12px';
-            childDiv.innerHTML = `
-              <label for="child${i}Age" style="display: block; margin-bottom: 6px; color: #333;">Child ${i} age</label>
-              <input id="child${i}Age" name="child${i}Age" type="number" min="0" max="17" required placeholder="Age in years" style="width: 100%; padding: 10px; border: 1px solid #dfe3e6; border-radius: 8px;">
-            `;
-            container.appendChild(childDiv);
-          }
-        } else {
-          container.style.display = 'none';
-          container.innerHTML = '';
-        }
-      });
-    </script>
 
     <script src="script.js"></script>
   </body>
