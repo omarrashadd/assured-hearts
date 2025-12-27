@@ -20,7 +20,7 @@
         </div>
         <div class="nav-auth">
           <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
-          <a id="signupBtn" class="btn-auth signup" href="signup.html" role="button">Sign up</a>
+          <a id="signupBtn" class="btn-auth signup" href="account-signup.html" role="button">Sign up</a>
         </div>
         <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
           <span></span>
@@ -65,7 +65,7 @@
     <main class="container" style="padding: 48px 24px; max-width: 1000px;">
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px;">
         
-        <a href="create-account.html" style="text-decoration: none; display: block;">
+        <a href="account-signup.html" style="text-decoration: none; display: block;">
           <div style="background: white; padding: 40px 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; height: 100%; display: flex; flex-direction: column; border: 2px solid transparent;">
             <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
               <span style="font-size: 40px;">👨‍👩‍👧‍👦</span>
@@ -105,7 +105,7 @@
     <script src="script.js"></script>
     <script>
       // Add hover effects
-      document.querySelectorAll('a[href*="create-account"], a[href*="apply"]').forEach(link => {
+      document.querySelectorAll('a[href*="account-signup"], a[href*="apply"]').forEach(link => {
         const card = link.querySelector('div');
         link.addEventListener('mouseenter', () => {
           card.style.transform = 'translateY(-4px)';

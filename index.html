@@ -45,7 +45,7 @@
         </div>
         <div class="nav-auth">
           <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
-          <a id="signupBtn" class="btn-auth signup" href="signup.html" role="button">Sign up</a>
+          <a id="signupBtn" class="btn-auth signup" href="account-signup.html" role="button">Sign up</a>
         </div>
         <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
           <span></span>
@@ -112,6 +112,22 @@
           </label>
           <button type="submit" class="btn">Sign up</button>
         </form>
+      </div>
+    </div>
+
+    <div id="signupChoiceModal" class="modal hidden">
+      <div class="modal-content" style="max-width: 500px; text-align: center;">
+        <button class="modal-close">&times;</button>
+        <h2>Join Assured Hearts</h2>
+        <p style="color: #666; margin-bottom: 32px;">I'm looking for...</p>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <button id="signupAsParentBtn" type="button" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; padding: 16px; font-size: 18px; font-weight: 600;">
+            A Caregiver (I'm a Parent)
+          </button>
+          <button id="signupAsCaregiverBtn" type="button" class="btn" style="background: #06464E; color: white; padding: 16px; font-size: 18px; font-weight: 600;">
+            To Provide Childcare (I'm a Caregiver)
+          </button>
+        </div>
       </div>
     </div>
 

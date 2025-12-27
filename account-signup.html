@@ -20,7 +20,7 @@
         </div>
         <div class="nav-auth">
           <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
-          <a id="signupBtn" class="btn-auth signup" href="signup.html" role="button">Sign up</a>
+          <a id="signupBtn" class="btn-auth signup" href="account-signup.html" role="button">Sign up</a>
         </div>
         <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
           <span></span>
@@ -125,7 +125,12 @@
 
           <button type="submit" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; padding: 14px 16px; border: none; border-radius: 10px; font-weight: 700; margin-top: 8px;">Create account</button>
           <p style="margin: 0; color: #666; font-size: 14px; text-align: center;">By creating an account you agree to our terms and privacy policy.</p>
+          <p style="margin: 0; color: #666; font-size: 14px; text-align: center;">By creating an account you agree to our terms and privacy policy.</p>
         </form>
+
+        <div id="parentSuccessBanner" class="hidden" style="background: #d4edda; color: #155724; padding: 16px; border-radius: 8px; margin-top: 16px;">
+          Account created successfully! Redirecting you to browse caregivers…
+        </div>
 
         <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; text-align: center;">
           <p style="margin: 0; color: #666;">Already have an account? <button id="loginLink" style="background: none; border: none; color: #06464E; font-weight: 600; text-decoration: underline; cursor: pointer;">Sign in</button></p>
@@ -139,25 +144,7 @@
 
     <script src="script.js"></script>
     <script>
-      // Form submission
-      document.getElementById('parentSignupForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const password = document.getElementById('password').value;
-        const confirm = document.getElementById('confirm').value;
-        
-        if (password !== confirm) {
-          alert('Passwords do not match. Please try again.');
-          return;
-        }
-        
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-        console.log('Parent signup data:', data);
-        alert('Account created successfully! You can now browse caregivers in your area.');
-        window.location.href = 'find-childcare.html';
-      });
-
-      // Login link handler
+      // Keep only the login link handler; form submission is handled in script.js
       document.getElementById('loginLink').addEventListener('click', () => {
         const loginModal = document.getElementById('loginModal');
         if(loginModal) loginModal.classList.remove('hidden');

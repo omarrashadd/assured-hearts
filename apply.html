@@ -59,7 +59,7 @@
         </div>
         <div class="nav-auth">
           <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
-          <a id="signupBtn" class="btn-auth signup" href="signup.html" role="button">Sign up</a>
+          <a id="signupBtn" class="btn-auth signup" href="account-signup.html" role="button">Sign up</a>
         </div>
         <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
           <span></span>
@@ -339,11 +339,11 @@
             <button type="submit" class="btn" style="background: #06464E; color: white; padding: 14px 32px; font-size: 16px; font-weight: 600; flex: 1;">Submit Application</button>
             <a href="become-provider.html" class="btn" style="background: transparent; color: #06464E; border: 2px solid #06464E; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; text-align: center;">Back</a>
           </div>
-
-          <div id="successMessage" class="hidden" style="background: #d4edda; color: #155724; padding: 16px; border-radius: 8px; margin-top: 16px;">
-            Thank you for applying! We'll review your application and contact you within 3-5 business days.
-          </div>
         </form>
+
+        <div id="successMessage" class="hidden" style="background: #d4edda; color: #155724; padding: 16px; border-radius: 8px; margin-top: 16px;">
+          Thank you for applying! We'll review your application and contact you within 3-5 business days.
+        </div>
       </section>
     </main>
 
@@ -352,17 +352,5 @@
     </footer>
 
     <script src="script.js"></script>
-    <script>
-      document.getElementById('applicationForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const successMsg = document.getElementById('successMessage');
-        e.target.style.display = 'none';
-        successMsg.classList.remove('hidden');
-        setTimeout(() => {
-          window.location.href = 'become-provider.html';
-        }, 3000);
-      });
-    </script>
   </body>
 </html>

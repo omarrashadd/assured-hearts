@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Request Childcare - Assured Hearts</title>
+    <meta name="description" content="Confirm availability and request childcare by adding child details." />
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="nav-links">
+          <a href="find-childcare.html">Find Childcare</a>
+          <a href="become-provider.html">Join Our Care Network</a>
+          <a href="care-process.html">Our Care Process</a>
+          <a href="learning.html">At-Home Learning</a>
+        </div>
+        <div class="nav-auth">
+          <a href="parent-dashboard.html" style="display: flex; align-items: center; gap: 6px; color: #06464E; text-decoration: none; font-weight: 600;">Dashboard</a>
+        </div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <header class="hero" style="padding: 64px 16px; background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%);">
+      <div class="container" style="max-width: 900px;">
+        <h1 style="text-align: center; margin-bottom: 12px;">Request Childcare</h1>
+        <p class="lead" style="text-align: center; margin-bottom: 24px;">We found caregivers in your area. Add your child details to complete your request.</p>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 48px 24px; max-width: 900px;">
+      <section id="availabilityCard" style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 style="margin: 0 0 8px 0; color: #06464E;">Caregivers are available near you</h2>
+            <p id="availabilitySubtitle" style="margin: 0; color: #666; font-size: 14px;">Based on your recent search location.</p>
+          </div>
+          <span style="background: #eef7f2; color: #2d6b42; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700;">Available</span>
+        </div>
+      </section>
+
+      <section style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+        <h2 style="margin: 0 0 12px 0; color: #06464E;">Next Step</h2>
+        <p style="margin: 0 0 16px 0; color: #666;">Add your child's details so caregivers can tailor their support.</p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a id="addChildBtn" href="child-demographics.html" class="btn" style="padding: 12px 16px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: 700;">Add Child Details →</a>
+          <a href="find-childcare.html" class="btn" style="padding: 12px 16px; background: white; color: #06464E; border: 2px solid #06464E; border-radius: 10px; font-weight: 700; text-decoration: none;">Browse Caregivers</a>
+        </div>
+        <p id="notAvailableMsg" style="display:none; margin-top: 12px; color: #8b6914; background: #fff9e6; padding: 10px 12px; border-radius: 8px;">Care is not yet confirmed for your area. Please search in <a href="find-childcare.html" style="color:#06464E; font-weight:600; text-decoration:none;">Find Childcare</a>.</p>
+      </section>
+    </main>
+
+    <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      // Guard: require account and available care
+      const userId = parseInt(localStorage.getItem('user_id')) || null;
+      const available = localStorage.getItem('care_available') === 'true';
+      const addChildBtn = document.getElementById('addChildBtn');
+      const notMsg = document.getElementById('notAvailableMsg');
+      const availabilityCard = document.getElementById('availabilityCard');
+
+      if(!userId){
+        // No account
+        addChildBtn.setAttribute('href', 'account-signup.html');
+        addChildBtn.textContent = 'Create Account to Continue';
+      }
+
+      if(!available){
+        notMsg.style.display = 'block';
+        availabilityCard.querySelector('span').textContent = 'Not Confirmed';
+        availabilityCard.querySelector('span').style.background = '#fff9e6';
+        availabilityCard.querySelector('span').style.color = '#8b6914';
+        addChildBtn.setAttribute('href', 'find-childcare.html');
+        addChildBtn.textContent = 'Check Availability';
+      }
+
+      // Optional: show last searched location
+      const lastLocation = localStorage.getItem('last_search_location');
+      if(lastLocation){
+        document.getElementById('availabilitySubtitle').textContent = `Based on your recent search: ${lastLocation}`;
+      }
+    </script>
+  </body>
+</html>

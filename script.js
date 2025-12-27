@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Backend API base URL (set your Render URL here)
+  const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+  async function postJSON(path, body){
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const json = await res.json().catch(()=>({}));
+    if(!res.ok){
+      throw new Error(json.error || `Request failed (${res.status})`);
+    }
+    return json;
+  }
   // GPS location button handler
   const gpsBtn = document.getElementById('gpsBtn');
   const locationInput = document.getElementById('locationInput');
@@ -117,6 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const hasAvailable = Math.random() < 0.7;
+      // Persist availability flag and last searched location
+      localStorage.setItem('care_available', hasAvailable ? 'true' : 'false');
+      localStorage.setItem('last_search_location', location);
       let resultsHTML;
 
       if(hasAvailable){
@@ -160,10 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
         
         createAcctBtn && createAcctBtn.addEventListener('click', ()=>{
-          window.location.href = 'parent-signup.html';
+          localStorage.setItem('care_available', 'true');
+          window.location.href = 'account-signup.html';
         });
         
         loginBtn && loginBtn.addEventListener('click', ()=>{
+          localStorage.setItem('care_available', 'true');
           const loginModal = document.getElementById('loginModal');
           if(loginModal) loginModal.classList.remove('hidden');
         });
@@ -211,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(welcomeModalSignupBtn){
       welcomeModalSignupBtn.addEventListener('click', ()=> {
         welcomeModal.classList.add('hidden');
-        window.location.href = 'create-account.html';
+        window.location.href = 'account-signup.html';
       });
     }
   }
@@ -240,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const signupBtn = document.getElementById('signupBtn');
   const loginModal = document.getElementById('loginModal');
   const signupModal = document.getElementById('signupModal');
+  const signupChoiceModal = document.getElementById('signupChoiceModal');
   const loginClose = document.getElementById('loginClose');
   const signupClose = document.getElementById('signupClose');
 
@@ -250,12 +270,26 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'create-account.html';
     }
   });
-  signupBtn && signupBtn.addEventListener('click', ()=> { window.location.href = 'signup.html'; });
+  signupBtn && signupBtn.addEventListener('click', (e)=> { 
+    e.preventDefault();
+    window.location.href = 'signup.html';
+  });
   loginClose && loginClose.addEventListener('click', ()=> loginModal.classList.add('hidden'));
   signupClose && signupClose.addEventListener('click', ()=> signupModal.classList.add('hidden'));
 
   loginModal && loginModal.addEventListener('click', e=> { if(e.target === loginModal) loginModal.classList.add('hidden'); });
   signupModal && signupModal.addEventListener('click', e=> { if(e.target === signupModal) signupModal.classList.add('hidden'); });
+
+  // Sign up choice modal
+  if(signupChoiceModal){
+    const signupChoiceClose = signupChoiceModal.querySelector('.modal-close');
+    if(signupChoiceClose) signupChoiceClose.addEventListener('click', ()=> signupChoiceModal.classList.add('hidden'));
+    signupChoiceModal.addEventListener('click', e=> { if(e.target === signupChoiceModal) signupChoiceModal.classList.add('hidden'); });
+    const parentBtn = signupChoiceModal.querySelector('#signupAsParentBtn');
+    const caregiverBtn = signupChoiceModal.querySelector('#signupAsCaregiverBtn');
+    if(parentBtn) parentBtn.addEventListener('click', ()=> window.location.href = 'account-signup.html');
+    if(caregiverBtn) caregiverBtn.addEventListener('click', ()=> window.location.href = 'apply.html');
+  }
 
   const loginForm = document.getElementById('loginForm');
   if(loginForm) loginForm.addEventListener('submit', e=> { e.preventDefault(); alert('Login successful!'); loginModal.classList.add('hidden'); loginForm.reset(); });
@@ -517,51 +551,187 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Mission carousel
-  let currentSlide = 0;
-  let missionAutoCirculate = true;
+  // Parent signup -> send basic intake to backend
+  const parentSignupForm = document.getElementById('parentSignupForm');
+  if(parentSignupForm){
+    parentSignupForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const fd = new FormData(parentSignupForm);
+      const name = `${fd.get('firstName') || ''} ${fd.get('lastName') || ''}`.trim();
+      const email = fd.get('email');
+      const phone = fd.get('phone');
+      const password = fd.get('password');
+      const city = fd.get('city');
+      const province = fd.get('province');
+      try{
+        const response = await postJSON('/forms/parent', { name, email, phone, password, city, province });
+        localStorage.setItem('user_id', response.userId);
+        const banner = document.getElementById('parentSuccessBanner');
+        if(banner){
+          parentSignupForm.style.display = 'none';
+          banner.classList.remove('hidden');
+          setTimeout(()=>{ window.location.href = 'find-childcare.html'; }, 2500);
+        } else {
+          alert('Thanks! Your account has been created.');
+          parentSignupForm.reset();
+        }
+      }catch(err){
+        alert('There was a problem creating your account. Please try again.');
+        console.error(err);
+      }
+    });
+  }
+
+  // Provider application -> send intake to backend
+  const applicationForm = document.getElementById('applicationForm');
+  if(applicationForm){
+    applicationForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const fd = new FormData(applicationForm);
+      const name = `${fd.get('firstName') || ''} ${fd.get('lastName') || ''}`.trim();
+      const email = fd.get('email');
+      const phone = fd.get('phone');
+      const experience = fd.get('experience');
+      const city = fd.get('city');
+      const province = fd.get('province');
+      try{
+        await postJSON('/forms/provider', { name, email, phone, password, experience, meta: { city, province } });
+        const successMsg = document.getElementById('successMessage');
+        if(successMsg){
+          applicationForm.style.display = 'none';
+          successMsg.classList.remove('hidden');
+          setTimeout(()=>{ window.location.href = 'become-provider.html'; }, 2500);
+        } else {
+          alert('Application received! We\'ll be in touch soon.');
+          applicationForm.reset();
+        }
+      }catch(err){
+        alert('Submission failed. Please try again.');
+        console.error(err);
+      }
+    });
+  }
+
+  // Child demographics form -> send child info to backend
+  const childDemographicsForm = document.getElementById('childDemographicsForm');
+  if(childDemographicsForm){
+    childDemographicsForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const fd = new FormData(childDemographicsForm);
+      const numChildren = fd.get('numChildren');
+      const frequency = fd.get('frequency');
+      const preferredSchedule = fd.get('preferredSchedule');
+      const specialNeeds = fd.get('specialNeeds');
+      
+      // Get user_id from URL or localStorage (set after parent login)
+      const user_id = parseInt(localStorage.getItem('user_id')) || null;
+      
+      if(!user_id){
+        alert('Please log in to add child profiles.');
+        window.location.href = 'account-signup.html';
+        return;
+      }
+
+      try{
+        const payload = {
+          user_id,
+          numChildren: parseInt(numChildren),
+          frequency,
+          preferredSchedule,
+          specialNeeds
+        };
+        
+        // Add dynamic child age fields
+        for(let i = 1; i <= numChildren; i++){
+          const age = fd.get(`child${i}Age`);
+          if(age) payload[`child${i}Age`] = age;
+        }
+        
+        await postJSON('/forms/children', payload);
+        const banner = document.getElementById('childSuccessBanner');
+        if(banner){
+          childDemographicsForm.style.display = 'none';
+          banner.style.display = 'block';
+          setTimeout(()=>{ window.location.href = 'find-childcare.html'; }, 2500);
+        } else {
+          alert('Child profile created!');
+          childDemographicsForm.reset();
+        }
+      }catch(err){
+        alert('There was a problem saving the child profile. Please try again.');
+        console.error(err);
+      }
+    });
+  }
+
+  // Request childcare quick action guard
+  const requestAction = document.getElementById('requestChildcareAction');
+  if(requestAction){
+    requestAction.addEventListener('click', (e)=>{
+      const hasAccount = !!(parseInt(localStorage.getItem('user_id'))||null);
+      const available = localStorage.getItem('care_available') === 'true';
+      if(!hasAccount){
+        e.preventDefault();
+        alert('Please create an account first.');
+        window.location.href = 'account-signup.html';
+        return;
+      }
+      if(!available){
+        e.preventDefault();
+        alert('Please check caregiver availability in your area first.');
+        window.location.href = 'find-childcare.html';
+      }
+    });
+  }
+
+  // Mission carousel (only runs if carousel elements exist)
   const titleBtns = document.querySelectorAll('.carousel-title-btn');
   const missionCards = document.querySelectorAll('.mission-card');
   const dots = document.querySelectorAll('.carousel-dots .dot');
   
-  function showSlide(index){
-    titleBtns.forEach(b=> b.classList.remove('active'));
-    missionCards.forEach(card=> card.classList.remove('active'));
-    dots.forEach(dot=> dot.classList.remove('active'));
-    titleBtns[index].classList.add('active');
-    missionCards[index].classList.add('active');
-    dots[index].classList.add('active');
-  }
-  
-  titleBtns.forEach((btn, index)=>{
-    btn.addEventListener('click', ()=>{
-      currentSlide = index;
-      showSlide(currentSlide);
-      missionAutoCirculate = false;
-    });
-  });
-  
-  dots.forEach((dot, index)=>{
-    dot.addEventListener('click', ()=>{
-      currentSlide = index;
-      showSlide(currentSlide);
-      missionAutoCirculate = false;
-    });
-  });
-  
-  missionCards.forEach((card, index)=>{
-    card.addEventListener('click', ()=>{
-      currentSlide = index;
-      showSlide(currentSlide);
-      missionAutoCirculate = false;
-    });
-  });
-  
-  // Auto-circulate every 5 seconds
-  setInterval(()=>{
-    if(missionAutoCirculate){
-      currentSlide = (currentSlide + 1) % missionCards.length;
-      showSlide(currentSlide);
+  if(titleBtns.length > 0 && missionCards.length > 0 && dots.length > 0){
+    let currentSlide = 0;
+    let missionAutoCirculate = true;
+    
+    function showSlide(index){
+      titleBtns.forEach(b=> b.classList.remove('active'));
+      missionCards.forEach(card=> card.classList.remove('active'));
+      dots.forEach(dot=> dot.classList.remove('active'));
+      if(titleBtns[index]) titleBtns[index].classList.add('active');
+      if(missionCards[index]) missionCards[index].classList.add('active');
+      if(dots[index]) dots[index].classList.add('active');
     }
-  }, 5000);
+    
+    titleBtns.forEach((btn, index)=>{
+      btn.addEventListener('click', ()=>{
+        currentSlide = index;
+        showSlide(currentSlide);
+        missionAutoCirculate = false;
+      });
+    });
+    
+    dots.forEach((dot, index)=>{
+      dot.addEventListener('click', ()=>{
+        currentSlide = index;
+        showSlide(currentSlide);
+        missionAutoCirculate = false;
+      });
+    });
+    
+    missionCards.forEach((card, index)=>{
+      card.addEventListener('click', ()=>{
+        currentSlide = index;
+        showSlide(currentSlide);
+        missionAutoCirculate = false;
+      });
+    });
+    
+    // Auto-circulate every 5 seconds
+    setInterval(()=>{
+      if(missionAutoCirculate && missionCards.length > 0){
+        currentSlide = (currentSlide + 1) % missionCards.length;
+        showSlide(currentSlide);
+      }
+    }, 5000);
+  }
 });
