@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const loginModal = document.getElementById('loginModal');
       if(loginModal) loginModal.classList.remove('hidden');
     }
-  }, { once: true });
+  });
 
   // Welcome modal on page load
   const welcomeModal = document.getElementById('welcomeModal');
