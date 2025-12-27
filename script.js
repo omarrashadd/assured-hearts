@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
               <p style="color: #333; margin: 0 0 12px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
               <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                <button type="button" id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to browse</button>
+                <button type="button" id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to apply</button>
                 <button type="button" id="heroCreateAccountBtn" class="btn" style="background: white; color: #06464E; border: 2px solid #06464E; font-weight: 600;">Create Account</button>
               </div>
               <div id=\"heroPreview\" style=\"margin-top: 12px;\"></div>
@@ -673,7 +673,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
           <button id="resultsSignup" class="btn btn-large" style="background-color: #06464E; margin-top: 0; padding: 12px 24px; font-size: 16px;">Create an account</button>
-          <button id="resultsLogin" class="btn btn-large" style="background-color: #67B3C2; margin-top: 0; padding: 12px 24px; font-size: 16px;">Sign in to browse</button>
+          <button id="resultsLogin" class="btn btn-large" style="background-color: #67B3C2; margin-top: 0; padding: 12px 24px; font-size: 16px;">Sign in to apply</button>
         </div>
       `;
       
