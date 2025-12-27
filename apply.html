@@ -151,12 +151,18 @@
 
             <label style="display: flex; flex-direction: column; color: #666; font-weight: 600; margin-top: 16px;">
               Password
-              <input type="password" name="password" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
+              <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" name="password" class="passwordInput" required style="padding: 10px; padding-right: 40px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px; flex: 1;">
+                <button type="button" class="togglePassword" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: #999; font-size: 18px; padding: 0; margin-top: 6px;">👁️</button>
+              </div>
             </label>
 
             <label style="display: flex; flex-direction: column; color: #666; font-weight: 600; margin-top: 16px;">
               Confirm Password
-              <input type="password" name="confirmPassword" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
+              <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" name="confirmPassword" class="passwordInput" required style="padding: 10px; padding-right: 40px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px; flex: 1;">
+                <button type="button" class="togglePassword" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: #999; font-size: 18px; padding: 0; margin-top: 6px;">👁️</button>
+              </div>
             </label>
 
             <label style="display: flex; flex-direction: column; color: #666; font-weight: 600; margin-top: 16px;">

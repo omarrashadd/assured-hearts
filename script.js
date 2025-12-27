@@ -870,6 +870,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Password visibility toggles
+  const toggleButtons = document.querySelectorAll('.togglePassword');
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const input = button.previousElementSibling;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      button.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+    });
+  });
+
   // Request childcare quick action guard
   const requestAction = document.getElementById('requestChildcareAction');
   if(requestAction){
