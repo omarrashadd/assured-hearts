@@ -70,8 +70,17 @@
 
       if(!userId){
         // Require login to access this page
-        alert('Please sign in to request childcare.');
-        window.location.href = 'account-signup.html';
+        const showBanner = window.showBanner || function(msg, type){
+          const div = document.createElement('div');
+          div.id = 'globalBanner';
+          const base = 'position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 9999; padding: 12px 16px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); font-weight: 700; min-width: 280px; text-align: center;';
+          const styles = { info: 'background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;' };
+          div.setAttribute('style', base + (styles[type] || styles.info));
+          div.textContent = msg;
+          document.body.appendChild(div);
+        };
+        showBanner('Please sign in to request childcare.', 'info');
+        setTimeout(() => window.location.href = 'account-signup.html', 1500);
       }
 
       if(!available){

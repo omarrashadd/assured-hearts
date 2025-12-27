@@ -109,13 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
               })
               .catch(error => {
                 console.error('Geocoding error:', error);
-                alert('Could not determine city. Please enter manually.');
+                showBanner('Could not determine city. Please enter manually.', 'error');
                 gpsBtn.disabled = false;
                 gpsBtn.style.opacity = '1';
               });
           },
           (error)=>{
-            alert('Unable to get your location. Please enter manually.');
+            showBanner('Unable to get your location. Please enter manually.', 'info');
             gpsBtn.disabled = false;
             gpsBtn.style.opacity = '1';
           }
@@ -157,29 +157,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                   });
                   if(!found){
-                    alert('City "' + city + '" not in our list. Please select from the dropdown.');
+                    showBanner('City "' + city + '" not in our list. Please select from the dropdown.', 'info');
                   }
                 } else {
-                  alert('Could not determine your city. Please select manually.');
+                  showBanner('Could not determine your city. Please select manually.', 'info');
                 }
                 heroFindLocationBtn.disabled = false;
                 heroFindLocationBtn.style.opacity = '1';
               })
               .catch(error => {
                 console.error('Geocoding error:', error);
-                alert('Could not determine location. Please select manually.');
+                showBanner('Could not determine location. Please select manually.', 'error');
                 heroFindLocationBtn.disabled = false;
                 heroFindLocationBtn.style.opacity = '1';
               });
           },
           (error)=>{
-            alert('Location access denied. Please select your city manually.');
+            showBanner('Location access denied. Please select your city manually.', 'info');
             heroFindLocationBtn.disabled = false;
             heroFindLocationBtn.style.opacity = '1';
           }
         );
       } else {
-        alert('Geolocation is not supported by your browser.');
+        showBanner('Geolocation is not supported by your browser.', 'info');
       }
     });
   }
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const location = heroLocationInput.value;
       if(!location){
-        alert('Please enter a location');
+        showBanner('Please enter a location', 'info');
         return;
       }
 
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         waitlistBtn && waitlistBtn.addEventListener('click', ()=>{
           const email = newResultsDiv.querySelector('#heroWaitlistEmail').value;
           if(email){
-            alert(`Thank you! We've added ${email} to the waitlist for ${location}.`);
+            showBanner(`Thank you! We've added ${email} to the waitlist for ${location}.`, 'success');
             newResultsDiv.remove();
             heroFindForm.reset();
           }
@@ -444,17 +444,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const appleBtn = document.getElementById('appleBtn');
 
   googleBtn && googleBtn.addEventListener('click', () => {
-    alert('Redirecting to Google login...');
+    showBanner('Redirecting to Google login...', 'info');
     loginModal.classList.add('hidden');
   });
 
   facebookBtn && facebookBtn.addEventListener('click', () => {
-    alert('Redirecting to Facebook login...');
+    showBanner('Redirecting to Facebook login...', 'info');
     loginModal.classList.add('hidden');
   });
 
   appleBtn && appleBtn.addEventListener('click', () => {
-    alert('Redirecting to Apple login...');
+    showBanner('Redirecting to Apple login...', 'info');
     loginModal.classList.add('hidden');
   });
 
@@ -713,11 +713,11 @@ document.addEventListener('DOMContentLoaded', () => {
           banner.classList.remove('hidden');
           setTimeout(()=>{ window.location.href = 'find-childcare.html'; }, 2500);
         } else {
-          alert('Thanks! Your account has been created.');
+          showBanner('Thanks! Your account has been created.', 'success');
           parentSignupForm.reset();
         }
       }catch(err){
-        alert('There was a problem creating your account. Please try again.');
+        showBanner('There was a problem creating your account. Please try again.', 'error');
         console.error(err);
       }
     });
@@ -743,11 +743,11 @@ document.addEventListener('DOMContentLoaded', () => {
           successMsg.classList.remove('hidden');
           setTimeout(()=>{ window.location.href = 'become-provider.html'; }, 2500);
         } else {
-          alert('Application received! We\'ll be in touch soon.');
+          showBanner('Application received! We\'ll be in touch soon.', 'success');
           applicationForm.reset();
         }
       }catch(err){
-        alert('Submission failed. Please try again.');
+        showBanner('Submission failed. Please try again.', 'error');
         console.error(err);
       }
     });
@@ -768,8 +768,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const user_id = parseInt(localStorage.getItem('user_id')) || null;
       
       if(!user_id){
-        alert('Please log in to add child profiles.');
-        window.location.href = 'account-signup.html';
+        showBanner('Please log in to add child profiles.', 'info');
+        setTimeout(() => window.location.href = 'account-signup.html', 1500);
         return;
       }
 
@@ -795,11 +795,11 @@ document.addEventListener('DOMContentLoaded', () => {
           banner.style.display = 'block';
           setTimeout(()=>{ window.location.href = 'find-childcare.html'; }, 2500);
         } else {
-          alert('Child profile created!');
+          showBanner('Child profile created!', 'success');
           childDemographicsForm.reset();
         }
       }catch(err){
-        alert('There was a problem saving the child profile. Please try again.');
+        showBanner('There was a problem saving the child profile. Please try again.', 'error');
         console.error(err);
       }
     });
