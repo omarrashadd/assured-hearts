@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nameParts = (c.name || '').trim().split(/\s+/);
                 const first = nameParts[0] || 'Caregiver';
                 const lastInitial = nameParts[1] ? nameParts[1][0].toUpperCase() + '.' : '';
-                const displayName = `${first} ${lastInitial}`.trim();
+                const displayName = isSignedIn ? `${first} ${lastInitial}`.trim() : 'Caregiver';
                 const summarySource = (c.experience || '').trim() || (c.certifications || '').trim();
                 const summary = summarySource.length > 90 ? summarySource.slice(0, 90) + '…' : summarySource || 'Experienced, values-aligned caregiver.';
                 return `
@@ -361,8 +361,9 @@ document.addEventListener('DOMContentLoaded', () => {
                   </div>
                 `;
               }).join('');
+              const note = isSignedIn ? `Top caregivers near ${location}` : `Top caregivers near ${location} — sign in to see names`;
               previewDiv.innerHTML = `
-                <p style="font-size:14px; color:#666; margin:0 0 8px 0;">Top caregivers near ${location}</p>
+                <p style="font-size:14px; color:#666; margin:0 0 8px 0;">${note}</p>
                 <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">${cards}</div>
               `;
             }
