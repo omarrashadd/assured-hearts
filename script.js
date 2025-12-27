@@ -273,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div style=\"display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;\">
                 <button type=\"button\" id=\"heroApplyBtn\" class=\"btn\" style=\"background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; font-weight: 600;\">Apply Today</button>
               </div>
+              <div id=\"heroPreview\" style=\"margin-top: 12px;\"></div>
               <button id=\"heroCloseResultsBtn\" type=\"button\" style=\"margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;\">Close</button>
             </div>
           `;
@@ -284,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button type="button" id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to browse</button>
                 <button type="button" id="heroCreateAccountBtn" class="btn" style="background: white; color: #06464E; border: 2px solid #06464E; font-weight: 600;">Create Account</button>
               </div>
+              <div id=\"heroPreview\" style=\"margin-top: 12px;\"></div>
               <button id="heroCloseResultsBtn" type="button" style="margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
             </div>
           `;
@@ -335,6 +337,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const loginModal = document.getElementById('loginModal');
             if(loginModal) loginModal.classList.remove('hidden');
           });
+        }
+        // Fetch caregiver preview list and render cards
+        const previewDiv = newResultsDiv.querySelector('#heroPreview');
+        if(previewDiv){
+          try{
+            const resList = await fetch(`${API_BASE}/search/list?city=${encodeURIComponent(location)}&limit=3`);
+            const dataList = await resList.json();
+            const items = (dataList.caregivers || []).slice(0,3);
+            if(items.length > 0){
+              const cards = items.map(c => {
+                const nameParts = (c.name || '').trim().split(/\s+/);
+                const first = nameParts[0] || 'Caregiver';
+                const lastInitial = nameParts[1] ? nameParts[1][0].toUpperCase() + '.' : '';
+                const displayName = `${first} ${lastInitial}`.trim();
+                const summarySource = (c.experience || '').trim() || (c.certifications || '').trim();
+                const summary = summarySource.length > 90 ? summarySource.slice(0, 90) + '…' : summarySource || 'Experienced, values-aligned caregiver.';
+                return `
+                  <div style="flex:1 1 220px; min-width:220px; background:#fff; border:1px solid #eee; border-radius:10px; padding:12px; text-align:left;">
+                    <div style="font-weight:700; color:#06464E;">${displayName}</div>
+                    <div style="font-size:12px; color:#666;">${c.city || ''}${c.province ? ', ' + c.province : ''}</div>
+                    <div style="font-size:12px; color:#333; margin-top:6px;">${summary}</div>
+                  </div>
+                `;
+              }).join('');
+              previewDiv.innerHTML = `
+                <p style="font-size:14px; color:#666; margin:0 0 8px 0;">Top caregivers near ${location}</p>
+                <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">${cards}</div>
+              `;
+            }
+          }catch(err){
+            console.warn('Caregiver preview failed:', err);
+          }
         }
         closeBtn && closeBtn.addEventListener('click', ()=>{
           newResultsDiv.remove();
