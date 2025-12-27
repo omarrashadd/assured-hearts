@@ -153,14 +153,13 @@
             childrenList.innerHTML = children.map(child => {
               const ages = child.ages ? JSON.parse(child.ages) : [];
               const ageStr = Array.isArray(ages) ? ages.join(', ') : ages;
-              const childName = child.name || 'Child Profile';
-              const initial = childName.charAt(0).toUpperCase();
+              const initial = profile.name.charAt(0).toUpperCase();
               return `
                 <div style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; display: flex; justify-content: space-between; align-items: start;">
                   <div style="display: flex; gap: 12px; flex: 1;">
                     <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0;">${initial}</div>
                     <div style="flex: 1;">
-                      <h3 style="margin: 0 0 4px 0; color: #06464E; font-size: 16px;">${childName}</h3>
+                      <h3 style="margin: 0 0 4px 0; color: #06464E; font-size: 16px;">Child Profile</h3>
                       <p style="margin: 0; color: #666; font-size: 14px;">Age: ${ageStr || 'Not specified'}</p>
                       ${child.frequency ? `<p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Frequency: ${child.frequency}</p>` : ''}
                     </div>
@@ -177,18 +176,17 @@
             learningProgress.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">Add children to track learning progress</p>';
           } else {
             learningProgress.innerHTML = children.map(child => {
-              const childName = child.name || 'Child';
-              const initial = childName.charAt(0).toUpperCase();
+              const initial = profile.name.charAt(0).toUpperCase();
               return `
                 <div style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px;">
                   <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
                     <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700;">${initial}</div>
                     <div>
-                      <h3 style="margin: 0; color: #06464E;">${childName}</h3>
+                      <h3 style="margin: 0; color: #06464E;">Child Profile</h3>
                       <p style="margin: 0; color: #666; font-size: 14px;">Learning in progress</p>
                     </div>
                   </div>
-                  <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">Track ${childName}'s learning journey</p>
+                  <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">Track your child's learning journey</p>
                   <a href="learning.html" style="color: #06464E; font-weight: 600; text-decoration: none; font-size: 14px;">View progress →</a>
                 </div>
               `;
