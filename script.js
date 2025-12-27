@@ -348,14 +348,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if(items.length > 0){
               const cards = items.map(c => {
                 const nameParts = (c.name || '').trim().split(/\s+/);
-                const first = nameParts[0] || 'Caregiver';
+                const first = nameParts[0] || '';
                 const lastInitial = nameParts[1] ? nameParts[1][0].toUpperCase() + '.' : '';
-                const displayName = isSignedIn ? `${first} ${lastInitial}`.trim() : 'Caregiver';
+                const displayName = `${first} ${lastInitial}`.trim();
                 const summarySource = (c.experience || '').trim() || (c.certifications || '').trim();
                 const summary = summarySource.length > 90 ? summarySource.slice(0, 90) + '…' : summarySource || 'Experienced, values-aligned caregiver.';
+                const nameRow = isSignedIn && displayName ? `<div style="font-weight:700; color:#06464E;">${displayName}</div>` : '';
                 return `
                   <div style="flex:1 1 220px; min-width:220px; background:#fff; border:1px solid #eee; border-radius:10px; padding:12px; text-align:left;">
-                    <div style="font-weight:700; color:#06464E;">${displayName}</div>
+                    ${nameRow}
                     <div style="font-size:12px; color:#666;">${c.city || ''}${c.province ? ', ' + c.province : ''}</div>
                     <div style="font-size:12px; color:#333; margin-top:6px;">${summary}</div>
                   </div>
