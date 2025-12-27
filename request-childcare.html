@@ -57,8 +57,55 @@
             </select>
             <button id="newChildBtn" type="button" style="padding: 10px 16px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-size: 14px; font-weight: 600; color: #06464E;">+ New</button>
           </div>
-          <input id="newChildName" type="text" placeholder="Enter child's name" style="display: none; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-          <p style="margin: 8px 0 0 0; color: #999; font-size: 12px;">Select an existing child or create a new one.</p>
+        </div>
+
+        <!-- Child Details Section (Hidden by default, shown when child selected or new clicked) -->
+        <div id="childDetailsSection" style="display: none; margin-bottom: 20px; padding: 16px; background: #f8fbfc; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <h3 style="margin: 0 0 16px 0; color: #06464E; font-size: 16px;" id="childDetailTitle">Child Information</h3>
+          
+          <div style="display: grid; gap: 12px;">
+            <div>
+              <label for="detailChildName" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Child's name *</label>
+              <input id="detailChildName" type="text" placeholder="Enter child's name" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+            </div>
+            
+            <div>
+              <label for="detailNumChildren" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Number of children</label>
+              <select id="detailNumChildren" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                <option value="">Select</option>
+                <option value="1">1 child</option>
+                <option value="2">2 children</option>
+                <option value="3">3 children</option>
+                <option value="4">4 children</option>
+                <option value="5">5+ children</option>
+              </select>
+            </div>
+
+            <div id="childrenAgesContainer" style="display: none;"></div>
+
+            <div>
+              <label for="detailFrequency" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">How often do you need childcare?</label>
+              <select id="detailFrequency" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                <option value="">Select frequency</option>
+                <option value="daily">Daily</option>
+                <option value="few-times-week">A few times a week</option>
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly">Bi-weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="occasional">Occasional/as needed</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="detailSchedule" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Preferred schedule</label>
+              <textarea id="detailSchedule" rows="2" placeholder="E.g., Weekday mornings, Saturday evenings..." style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit;"></textarea>
+            </div>
+
+            <div>
+              <label for="detailSpecialNeeds" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Any special requirements?</label>
+              <textarea id="detailSpecialNeeds" rows="2" placeholder="Dietary needs, allergies, special accommodations..." style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit;"></textarea>
+            </div>
+          </div>
         </div>
         
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -80,10 +127,20 @@
       const submitRequestBtn = document.getElementById('submitRequestBtn');
       const childSelect = document.getElementById('childSelect');
       const newChildBtn = document.getElementById('newChildBtn');
-      const newChildName = document.getElementById('newChildName');
+      const childDetailsSection = document.getElementById('childDetailsSection');
+      const detailChildName = document.getElementById('detailChildName');
+      const detailNumChildren = document.getElementById('detailNumChildren');
+      const childrenAgesContainer = document.getElementById('childrenAgesContainer');
+      const detailFrequency = document.getElementById('detailFrequency');
+      const detailSchedule = document.getElementById('detailSchedule');
+      const detailSpecialNeeds = document.getElementById('detailSpecialNeeds');
+      const childDetailTitle = document.getElementById('childDetailTitle');
       const notMsg = document.getElementById('notAvailableMsg');
       const availabilityCard = document.getElementById('availabilityCard');
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+      
+      let allChildren = [];
+      let isCreatingNew = false;
 
       if(!userId){
         // Require login to access this page
@@ -103,10 +160,10 @@
         fetch(`${API_BASE}/forms/parent/${userId}`)
           .then(res => res.json())
           .then(data => {
-            const children = data.children || [];
-            if(children.length > 0){
+            allChildren = data.children || [];
+            if(allChildren.length > 0){
               childSelect.innerHTML = '<option value="">-- Select a child --</option>' + 
-                children.map((child) => `<option value="${child.id}">${child.name || 'Unnamed Child'}</option>`).join('');
+                allChildren.map((child) => `<option value="${child.id}">${child.name || 'Unnamed Child'}</option>`).join('');
             } else {
               childSelect.innerHTML = '<option value="">No children yet</option>';
             }
@@ -116,23 +173,86 @@
             childSelect.innerHTML = '<option value="">Unable to load children</option>';
           });
 
+        // When child is selected from dropdown
+        childSelect.addEventListener('change', function(e){
+          const selectedId = parseInt(e.target.value);
+          if(selectedId){
+            isCreatingNew = false;
+            const child = allChildren.find(c => c.id === selectedId);
+            if(child){
+              populateChildDetails(child, true);
+            }
+          } else {
+            childDetailsSection.style.display = 'none';
+          }
+        });
+
         // Handle new child button
         newChildBtn.addEventListener('click', function(e){
           e.preventDefault();
-          const isHidden = newChildName.style.display === 'none';
-          if(isHidden){
-            newChildName.style.display = 'block';
-            newChildBtn.textContent = '✓ Done';
-            childSelect.value = '';
-            childSelect.disabled = true;
-            newChildName.focus();
+          isCreatingNew = true;
+          childSelect.value = '';
+          childDetailsSection.style.display = 'block';
+          childDetailTitle.textContent = 'New Child Information';
+          detailChildName.value = '';
+          detailNumChildren.value = '';
+          childrenAgesContainer.innerHTML = '';
+          childrenAgesContainer.style.display = 'none';
+          detailFrequency.value = '';
+          detailSchedule.value = '';
+          detailSpecialNeeds.value = '';
+          detailChildName.focus();
+        });
+
+        // Handle number of children change
+        detailNumChildren.addEventListener('change', function(e){
+          const numChildren = parseInt(e.target.value);
+          if(numChildren > 0){
+            childrenAgesContainer.style.display = 'block';
+            childrenAgesContainer.innerHTML = '';
+            for(let i = 1; i <= numChildren; i++){
+              const div = document.createElement('div');
+              div.style.marginBottom = '12px';
+              div.innerHTML = `
+                <label for="detailChild${i}Age" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Child ${i} age</label>
+                <input id="detailChild${i}Age" type="number" min="0" max="17" placeholder="Age in years" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+              `;
+              childrenAgesContainer.appendChild(div);
+            }
           } else {
-            newChildName.style.display = 'none';
-            newChildBtn.textContent = '+ New';
-            childSelect.disabled = false;
-            newChildName.value = '';
+            childrenAgesContainer.style.display = 'none';
+            childrenAgesContainer.innerHTML = '';
           }
         });
+      }
+
+      function populateChildDetails(child, isExisting){
+        childDetailsSection.style.display = 'block';
+        childDetailTitle.textContent = isExisting ? 'Child Information' : 'New Child Information';
+        detailChildName.value = child.name || '';
+        detailChildName.disabled = isExisting; // Disable name editing for existing children
+        detailFrequency.value = child.frequency || '';
+        detailSchedule.value = child.preferred_schedule || '';
+        detailSpecialNeeds.value = child.special_needs || '';
+        
+        // Populate ages if they exist
+        if(child.ages){
+          const ages = Array.isArray(child.ages) ? child.ages : JSON.parse(child.ages || '[]');
+          detailNumChildren.value = ages.length > 0 ? ages.length : '';
+          if(ages.length > 0){
+            childrenAgesContainer.style.display = 'block';
+            childrenAgesContainer.innerHTML = '';
+            ages.forEach((age, i) => {
+              const div = document.createElement('div');
+              div.style.marginBottom = '12px';
+              div.innerHTML = `
+                <label for="detailChild${i+1}Age" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 13px;">Child ${i+1} age</label>
+                <input id="detailChild${i+1}Age" type="number" min="0" max="17" value="${age}" placeholder="Age in years" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;" ${isExisting ? 'disabled' : ''}>
+              `;
+              childrenAgesContainer.appendChild(div);
+            });
+          }
+        }
       }
 
       if(!available){
@@ -150,7 +270,7 @@
           e.preventDefault();
           const location = localStorage.getItem('last_search_location') || '';
           const childId = childSelect.value;
-          const newName = newChildName.value.trim();
+          const childName = detailChildName.value.trim();
           
           if(!location){
             showBanner('Please search for childcare in your area first.', 'info');
@@ -158,7 +278,12 @@
             return;
           }
 
-          if(newChildName.style.display !== 'none' && !newName){
+          if(!childId && !childName){
+            showBanner('Please select a child or enter a new child\'s name.', 'error');
+            return;
+          }
+
+          if(isCreatingNew && !childName){
             showBanner('Please enter your child\'s name.', 'error');
             return;
           }
@@ -175,7 +300,7 @@
                 child_id: childId ? parseInt(childId) : null, 
                 location, 
                 notes: '',
-                childName: newName || null
+                childName: childName || null
               })
             });
             
