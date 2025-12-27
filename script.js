@@ -312,19 +312,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const loginForm = document.getElementById('loginForm');
-  if(loginForm) loginForm.addEventListener('submit', e=> {
+  if(loginForm) loginForm.addEventListener('submit', async (e)=> {
     e.preventDefault();
-    // Simulate setting a user id on login
-    const fakeUserId = Math.floor(Math.random() * 100000) + 1;
-    localStorage.setItem('user_id', String(fakeUserId));
-    const target = localStorage.getItem('post_login_target');
-    alert('Login successful!');
-    loginModal.classList.add('hidden');
-    loginForm.reset();
-    if(target === 'request-childcare'){
-      window.location.href = 'request-childcare.html';
-    } else {
-      window.location.href = 'parent-dashboard.html';
+    const fd = new FormData(loginForm);
+    const email = fd.get('email');
+    const password = fd.get('password');
+    try{
+      const resp = await postJSON('/forms/login', { email, password });
+      localStorage.setItem('user_id', String(resp.userId));
+      localStorage.setItem('user_type', resp.type || 'parent');
+      alert('Login successful!');
+      loginModal.classList.add('hidden');
+      loginForm.reset();
+      const target = localStorage.getItem('post_login_target');
+      if(target === 'request-childcare'){
+        window.location.href = 'request-childcare.html';
+      } else {
+        window.location.href = 'parent-dashboard.html';
+      }
+    }catch(err){
+      alert('Invalid email or password. Please try again.');
+      console.error(err);
     }
   });
 
