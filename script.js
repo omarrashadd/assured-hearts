@@ -795,8 +795,33 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = fd.get('password');
       const confirmPassword = fd.get('confirmPassword');
       const experience = fd.get('experience');
+      const experience_details = fd.get('experience_details');
+      const has_cpr = !!fd.get('cpr');
+      const islamic_values = !!fd.get('values');
       const city = fd.get('city');
       const province = fd.get('province');
+      const references = fd.get('references') || '';
+      
+      // Collect age groups (checkboxes with name="ageGroup")
+      const ageGroupCheckboxes = applicationForm.querySelectorAll('input[name="ageGroup"]:checked');
+      const age_groups = Array.from(ageGroupCheckboxes).map(cb => cb.value);
+      
+      // Collect availability (day + times)
+      const availability = {};
+      const dayCheckboxes = applicationForm.querySelectorAll('input[type="checkbox"][name^="day"]');
+      dayCheckboxes.forEach(dayCheckbox => {
+        const dayName = dayCheckbox.value;
+        const isSelected = dayCheckbox.checked;
+        if(isSelected) {
+          const daySection = dayCheckbox.closest('div');
+          const fromInput = daySection?.querySelector('input[name$="From"]');
+          const toInput = daySection?.querySelector('input[name$="To"]');
+          availability[dayName] = {
+            from: fromInput?.value || '',
+            to: toInput?.value || ''
+          };
+        }
+      });
       
       // Validate passwords match
       if (password !== confirmPassword) {
@@ -804,8 +829,40 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
+      // Validate required fields
+      if(!experience) {
+        showBanner('Please select your experience level', 'error');
+        return;
+      }
+      if(!experience_details?.trim()) {
+        showBanner('Please describe your childcare experience', 'error');
+        return;
+      }
+      if(age_groups.length === 0) {
+        showBanner('Please select at least one age group', 'error');
+        return;
+      }
+      
       try{
-        await postJSON('/forms/provider', { name, email, phone, password, experience, meta: { city, province } });
+        const payload = { 
+          name, 
+          email, 
+          phone, 
+          password, 
+          experience,
+          experience_details,
+          has_cpr,
+          islamic_values,
+          age_groups,
+          meta: { 
+            city, 
+            province,
+            availability,
+            references
+          }
+        };
+        console.log('Submitting provider application:', payload);
+        await postJSON('/forms/provider', payload);
         const successMsg = document.getElementById('successMessage');
         if(successMsg){
           applicationForm.style.display = 'none';
@@ -817,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }catch(err){
         showBanner('Submission failed. Please try again.', 'error');
-        console.error(err);
+        console.error('Provider application error:', err);
       }
     });
   }
