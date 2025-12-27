@@ -48,11 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const signed = document.createElement('span');
       signed.textContent = `Signed in as ${userName || 'Member'}`;
       signed.style.color = '#06464E';
-      signed.style.fontWeight = '600';
-      signed.style.marginRight = '12px';
+      signed.style.fontWeight = '500';
+      signed.style.fontSize = '12px';
+      signed.style.margin = '0 8px';
       const dashLink = document.createElement('a');
       dashLink.href = userType === 'provider' ? 'caregiver-dashboard.html' : 'parent-dashboard.html';
-      dashLink.textContent = 'Dashboard';
+      dashLink.textContent = 'My Dashboard';
       dashLink.style.display = 'flex';
       dashLink.style.alignItems = 'center';
       dashLink.style.gap = '6px';
@@ -67,8 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
       logoutBtn.style.background = '#f5f5f5';
       logoutBtn.style.color = '#333';
       logoutBtn.style.border = '1px solid #e5e7eb';
-      navAuth.appendChild(signed);
+      logoutBtn.style.marginLeft = '4px';
+      // Order: My Dashboard | Signed in as ... | Log out
       navAuth.appendChild(dashLink);
+      navAuth.appendChild(signed);
       navAuth.appendChild(logoutBtn);
       logoutBtn.addEventListener('click', ()=>{
         localStorage.removeItem('user_id');
@@ -183,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Hero Find Form submission
   if(heroFindForm){
-    heroFindForm.addEventListener('submit', (e)=>{
+    heroFindForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const location = heroLocationInput.value;
       if(!location){
@@ -196,25 +199,44 @@ document.addEventListener('DOMContentLoaded', () => {
       if(existingResults){
         existingResults.remove();
       }
-
-      const hasAvailable = Math.random() < 0.7;
+      let numCaregivers = 0;
+      try{
+        const res = await fetch(`${API_BASE}/search?city=${encodeURIComponent(location)}`);
+        const data = await res.json();
+        numCaregivers = Number(data.caregivers || 0);
+      }catch(err){
+        console.warn('Search API failed, falling back.', err);
+      }
+      const hasAvailable = numCaregivers > 0;
       // Persist availability flag and last searched location
       localStorage.setItem('care_available', hasAvailable ? 'true' : 'false');
       localStorage.setItem('last_search_location', location);
       let resultsHTML;
+      const isSignedIn = !!localStorage.getItem('user_id');
 
       if(hasAvailable){
-        const numCaregivers = Math.floor(Math.random() * 5) + 3;
-        resultsHTML = `
-          <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
-            <p style="color: #333; margin: 0 0 12px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
-            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-              <button type="button" id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to browse</button>
-              <button type="button" id="heroCreateAccountBtn" class="btn" style="background: white; color: #06464E; border: 2px solid #06464E; font-weight: 600;">Create Account</button>
+        if(isSignedIn){
+          resultsHTML = `
+            <div id=\"heroSearchResults\" style=\"text-align: center; margin-top: 16px; padding: 0;\">
+              <p style=\"color: #333; margin: 0 0 12px 0;\"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
+              <div style=\"display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;\">
+                <button type=\"button\" id=\"heroApplyBtn\" class=\"btn\" style=\"background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; font-weight: 600;\">Apply Today</button>
+              </div>
+              <button id=\"heroCloseResultsBtn\" type=\"button\" style=\"margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;\">Close</button>
             </div>
-            <button id="heroCloseResultsBtn" type="button" style="margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
-          </div>
-        `;
+          `;
+        } else {
+          resultsHTML = `
+            <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
+              <p style="color: #333; margin: 0 0 12px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
+              <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button type="button" id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to browse</button>
+                <button type="button" id="heroCreateAccountBtn" class="btn" style="background: white; color: #06464E; border: 2px solid #06464E; font-weight: 600;">Create Account</button>
+              </div>
+              <button id="heroCloseResultsBtn" type="button" style="margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
+            </div>
+          `;
+        }
       } else {
         resultsHTML = `
           <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
@@ -239,25 +261,30 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if(hasAvailable){
-        const createAcctBtn = newResultsDiv.querySelector('#heroCreateAccountBtn');
-        const loginBtn = newResultsDiv.querySelector('#heroLoginBtn');
         const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
-        
-        createAcctBtn && createAcctBtn.addEventListener('click', (e)=>{
-          e.preventDefault();
-          localStorage.setItem('care_available', 'true');
-          window.location.href = 'account-signup.html';
-        });
-        
-        loginBtn && loginBtn.addEventListener('click', (e)=>{
-          e.preventDefault();
-          localStorage.setItem('care_available', 'true');
-          // After login, go to request-childcare confirmation page
-          localStorage.setItem('post_login_target', 'request-childcare');
-          const loginModal = document.getElementById('loginModal');
-          if(loginModal) loginModal.classList.remove('hidden');
-        });
-        
+        if(isSignedIn){
+          const applyBtn = newResultsDiv.querySelector('#heroApplyBtn');
+          applyBtn && applyBtn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            localStorage.setItem('care_available', 'true');
+            window.location.href = 'request-childcare.html';
+          });
+        } else {
+          const createAcctBtn = newResultsDiv.querySelector('#heroCreateAccountBtn');
+          const loginBtn = newResultsDiv.querySelector('#heroLoginBtn');
+          createAcctBtn && createAcctBtn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            localStorage.setItem('care_available', 'true');
+            window.location.href = 'account-signup.html';
+          });
+          loginBtn && loginBtn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            localStorage.setItem('care_available', 'true');
+            localStorage.setItem('post_login_target', 'request-childcare');
+            const loginModal = document.getElementById('loginModal');
+            if(loginModal) loginModal.classList.remove('hidden');
+          });
+        }
         closeBtn && closeBtn.addEventListener('click', ()=>{
           newResultsDiv.remove();
           heroFindForm.reset();
@@ -283,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fallback delegation in case dynamic listeners miss
   document.addEventListener('click', (evt)=>{
-    const target = evt.target.closest('#heroLoginBtn, #heroCreateAccountBtn');
+    const target = evt.target.closest('#heroLoginBtn, #heroCreateAccountBtn, #heroApplyBtn');
     if(!target) return;
     evt.preventDefault();
     if(target.id === 'heroCreateAccountBtn'){
@@ -294,6 +321,9 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('post_login_target', 'request-childcare');
       const loginModal = document.getElementById('loginModal');
       if(loginModal) loginModal.classList.remove('hidden');
+    } else if(target.id === 'heroApplyBtn'){
+      localStorage.setItem('care_available', 'true');
+      window.location.href = 'request-childcare.html';
     }
   });
 

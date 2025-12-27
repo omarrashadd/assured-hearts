@@ -38,7 +38,7 @@
       <section id="availabilityCard" style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <h2 style="margin: 0 0 8px 0; color: #06464E;">Caregivers are available near you</h2>
+            <h2 id="availabilityTitle" style="margin: 0 0 8px 0; color: #06464E;">Caregivers are available near you</h2>
             <p id="availabilitySubtitle" style="margin: 0; color: #666; font-size: 14px;">Based on your recent search location.</p>
           </div>
           <span style="background: #eef7f2; color: #2d6b42; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700;">Available</span>
@@ -85,10 +85,31 @@
         });
       }
 
-      // Optional: show last searched location
+      // Fetch and display caregiver count from API
       const lastLocation = localStorage.getItem('last_search_location');
+      const availabilityTitle = document.getElementById('availabilityTitle');
+      
       if(lastLocation){
         document.getElementById('availabilitySubtitle').textContent = `Based on your recent search: ${lastLocation}`;
+        
+        // Fetch real count from backend
+        const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+        fetch(`${API_BASE}/search?city=${encodeURIComponent(lastLocation)}`)
+          .then(res => res.json())
+          .then(data => {
+            const count = Number(data.caregivers || 0);
+            if(count > 0){
+              availabilityTitle.textContent = `${count} caregiver${count === 1 ? '' : 's'} available near ${lastLocation}`;
+            } else {
+              availabilityTitle.textContent = 'Checking availability...';
+            }
+          })
+          .catch(err => {
+            console.warn('Failed to fetch caregiver count:', err);
+            availabilityTitle.textContent = 'Caregivers are available near you';
+          });
+      } else {
+        availabilityTitle.textContent = 'Caregivers are available near you';
       }
     </script>
   </body>
