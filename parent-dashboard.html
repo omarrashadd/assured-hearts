@@ -48,16 +48,39 @@
 
     <main class="container" style="padding: 24px 16px; max-width: 1200px; margin: 0 auto;">
       
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 24px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px;">
+        <div style="background: white; padding: 14px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 3px solid #67B3C2;">
+          <h3 style="margin: 0 0 6px 0; color: #06464E; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Requests</h3>
+          <p id="statRequests" style="margin: 0; font-size: clamp(20px, 6vw, 24px); font-weight: 700; color: #67B3C2;">0</p>
+        </div>
         <div style="background: white; padding: 14px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 3px solid #06464E;">
-          <h3 style="margin: 0 0 6px 0; color: #06464E; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Bookings</h3>
-          <p style="margin: 0; font-size: clamp(20px, 6vw, 24px); font-weight: 700; color: #06464E;">0</p>
+          <h3 style="margin: 0 0 6px 0; color: #06464E; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Upcoming</h3>
+          <p id="statUpcoming" style="margin: 0; font-size: clamp(20px, 6vw, 24px); font-weight: 700; color: #06464E;">0</p>
         </div>
         <div style="background: white; padding: 14px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 3px solid #67B3C2;">
           <h3 style="margin: 0 0 6px 0; color: #06464E; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Messages</h3>
-          <p style="margin: 0; font-size: clamp(20px, 6vw, 24px); font-weight: 700; color: #67B3C2;">0</p>
+          <p id="statMessages" style="margin: 0; font-size: clamp(20px, 6vw, 24px); font-weight: 700; color: #67B3C2;">0</p>
         </div>
       </div>
+
+      <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+          <h2 style="margin: 0; color: #06464E; font-size: 16px; font-weight: 600;">Your Requests</h2>
+          <a href="request-childcare.html" class="btn" style="padding: 8px 14px; font-size: 12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 6px; white-space: nowrap;">New Request</a>
+        </div>
+        
+        <div id="requestsList" style="display: flex; flex-direction: column; gap: 10px; min-height: 60px;">
+          <p style="color: #999; text-align: center; padding: 20px; margin: 0;">Loading your requests...</p>
+        </div>
+      </section>
+
+      <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px;">
+        <h2 style="margin: 0 0 16px 0; color: #06464E; font-size: 16px; font-weight: 600;">Upcoming Care</h2>
+        
+        <div id="upcomingList" style="display: flex; flex-direction: column; gap: 10px; min-height: 60px;">
+          <p style="color: #999; text-align: center; padding: 20px; margin: 0;">No upcoming sessions scheduled</p>
+        </div>
+      </section>
 
       <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px;">
         
@@ -116,8 +139,9 @@
           const data = await res.json();
           const { profile, children } = data;
 
-          // Update stats
-          document.getElementById('statChildren').textContent = children.length;
+          // Render requests list (placeholder for now)
+          const requestsList = document.getElementById('requestsList');
+          requestsList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No childcare requests yet. <a href="request-childcare.html" style="color: #67B3C2; font-weight: 600;">Submit a request</a></p>';
 
           // Render children list
           const childrenList = document.getElementById('childrenList');
