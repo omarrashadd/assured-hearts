@@ -905,7 +905,12 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         };
         console.log('Submitting provider application:', payload);
-        await postJSON('/forms/provider', payload);
+        const resp = await postJSON('/forms/provider', payload);
+        if(resp?.userId){
+          localStorage.setItem('user_id', resp.userId);
+        }
+        localStorage.setItem('user_type', 'provider');
+        if(name) localStorage.setItem('user_name', name);
         localStorage.setItem('provider_status', 'under_review');
         const successMsg = document.getElementById('successMessage');
         if(successMsg){
