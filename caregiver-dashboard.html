@@ -95,11 +95,11 @@
           <div style="font-size:26px; font-weight:800; color:#06464E; line-height:1;">42</div>
         </div>
         <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
-          <div style="font-size:12px; color:#6b7280;">Total hours</div>
+          <div style="font-size:12px; color:#6b7280;">Total hours this month</div>
           <div style="font-size:26px; font-weight:800; color:#10b981; line-height:1;">68</div>
         </div>
-        <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
-          <div style="font-size:12px; color:#6b7280;">Earnings</div>
+        <div style="background:#fff; padding:14px; border-rradius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:12px; color:#6b7280;">Monthly Earnings</div>
           <div style="font-size:26px; font-weight:800; color:#06464E; line-height:1;">$1,360</div>
         </div>
         <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
@@ -126,7 +126,7 @@
               </div>
               <div style="font-size:12px; color:#6b7280;">Location: Oak Ave · Notes: After-school help</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="review-lock" style="padding: 8px 12px; background: #06464E; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700;">Accept</button>
+                <button class="review-lock pulse-btn" style="padding: 8px 12px; background: #06464E; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700;">Accept</button>
                 <button class="review-lock" style="padding: 8px 12px; background: #f5f5f5; color: #666; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; font-weight: 700;">Decline</button>
                 <button class="review-lock" style="padding: 8px 12px; background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; font-size: 12px; font-weight: 700;">See details</button>
               </div>
@@ -141,7 +141,7 @@
               </div>
               <div style="font-size:12px; color:#6b7280;">Location: Maple St · Notes: Lunch + reading</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="review-lock" style="padding: 8px 12px; background: #06464E; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700;">Accept</button>
+                <button class="review-lock pulse-btn" style="padding: 8px 12px; background: #06464E; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700;">Accept</button>
                 <button class="review-lock" style="padding: 8px 12px; background: #f5f5f5; color: #666; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; font-weight: 700;">Decline</button>
                 <button class="review-lock" style="padding: 8px 12px; background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; font-size: 12px; font-weight: 700;">See details</button>
               </div>
@@ -195,21 +195,13 @@
             <div style="font-size:12px; color:#6b7280;">Tomorrow · 9:00 AM - 1:00 PM · 2 kids (3,5)</div>
             <div style="font-size:12px; color:#6b7280;">📍 123 Maple St · Notes: Lunch + reading</div>
           </div>
-          <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:grid; gap:4px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-              <div style="font-weight:700; color:#06464E;">Rahman Family</div>
-              <span style="background:#fff9e6; color:#8b6914; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700;">Pending</span>
-            </div>
-            <div style="font-size:12px; color:#6b7280;">Jan 4 · 3:00 PM - 6:00 PM · 1 child (7y)</div>
-            <div style="font-size:12px; color:#6b7280;">📍 Oak Ave · Notes: After-school help</div>
-          </div>
         </div>
       </section>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
         
         <section style="background: white; padding: 28px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-          <h2 style="margin: 0 0 16px 0; color: #06464E;">Your Families</h2>
+          <h2 style="margin: 0 0 16px 0; color: #06464E;">My Families</h2>
           
           <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -261,6 +253,33 @@
           </div>
         </section>
 
+        <section style="background: white; padding: 28px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+          <h2 style="margin: 0 0 12px 0; color: #06464E;">My Reviews</h2>
+          <div style="display:grid; gap:10px;">
+            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:flex; gap:10px;">
+              <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">A</div>
+              <div style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div style="font-weight:700; color:#06464E;">Ahmed Family</div>
+                  <div style="color:#f59e0b; font-weight:700; font-size:12px;">★ 4.9</div>
+                </div>
+                <p style="margin:4px 0 0 0; color:#6b7280; font-size:13px;">“Always on time and great with our kids’ routines. Thank you!”</p>
+              </div>
+            </div>
+            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:flex; gap:10px;">
+              <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">R</div>
+              <div style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div style="font-weight:700; color:#06464E;">Rahman Family</div>
+                  <div style="color:#f59e0b; font-weight:700; font-size:12px;">★ 4.8</div>
+                </div>
+                <p style="margin:4px 0 0 0; color:#6b7280; font-size:13px;">“Great communication and our daughter loves story time.”</p>
+              </div>
+            </div>
+            <a href="#" class="review-lock" style="text-align:center; display:block; padding:10px 12px; background:#06464E; color:white; border-radius:8px; text-decoration:none; font-weight:700; font-size:13px;">View all reviews</a>
+          </div>
+        </section>
+
       </div>
 
     </main>
@@ -269,8 +288,36 @@
       <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
     </footer>
 
+    <style>
+      @keyframes pulseDot {
+        0% { box-shadow: 0 0 0 0 rgba(103,179,194,0.5); }
+        70% { box-shadow: 0 0 0 8px rgba(103,179,194,0); }
+        100% { box-shadow: 0 0 0 0 rgba(103,179,194,0); }
+      }
+      @keyframes pulseBtn {
+        0% { box-shadow: 0 0 0 0 rgba(6,70,78,0.35); }
+        70% { box-shadow: 0 0 0 10px rgba(6,70,78,0); }
+        100% { box-shadow: 0 0 0 0 rgba(6,70,78,0); }
+      }
+      .pulse-btn { animation: pulseBtn 1.6s infinite; }
+      /* Override locks for build preview and add hover lift */
+      .review-lock {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .review-lock:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      }
+    </style>
+
     <script src="script.js"></script>
     <script>
+      // For build preview: force approved state so controls are unlocked
+      localStorage.setItem('provider_status', 'approved');
+
       document.getElementById('logoutBtn')?.addEventListener('click', () => {
         if(confirm('Are you sure you want to log out?')) {
           window.location.href = 'index.html';
@@ -278,7 +325,9 @@
       });
 
       (function(){
-        const status = localStorage.getItem('provider_status') || 'under_review';
+        // Build preview: keep approved (unlocked) but still show the status bar for design
+        const previewMode = true;
+        const status = localStorage.getItem('provider_status') || 'approved';
         const notice = document.getElementById('reviewNotice');
         const lockables = document.querySelectorAll('.review-lock');
         const steps = document.querySelectorAll('#reviewTimeline .step');
@@ -286,7 +335,14 @@
         const statusToIndex = { received:0, under_review:1, verifying:2, approved:3 };
         const activeIndex = statusToIndex[status] ?? 1;
 
-        if(status !== 'approved'){
+        if(previewMode){
+          if(notice) notice.style.display = 'block';
+          // Do not lock any buttons in preview; ensure they are enabled
+          lockables.forEach(el => {
+            el.removeAttribute('disabled');
+            el.removeAttribute('aria-disabled');
+          });
+        } else if(status !== 'approved'){
           if(notice) notice.style.display = 'block';
           lockables.forEach(el => {
             el.style.opacity = '0.55';
@@ -298,40 +354,43 @@
               el.setAttribute('aria-disabled', 'true');
             }
           });
-          dots.forEach((dot, idx)=>{
-            if(idx < activeIndex){
-              dot.style.background = '#2d6b42';
-              dot.style.borderColor = '#2d6b42';
-            } else if(idx === activeIndex){
-              dot.style.background = '#67B3C2';
-              dot.style.borderColor = '#67B3C2';
-            }
-          });
-          steps.forEach((step, idx)=>{
-            const label = step.querySelector('.label');
-            const desc = step.querySelector('.desc');
-            if(idx < activeIndex){
-              if(label){ label.style.color = '#2d6b42'; label.style.fontWeight = '700'; }
-              if(desc){ desc.style.color = '#2d6b42'; }
-            } else if(idx === activeIndex){
-              if(label){ label.style.color = '#06464E'; label.style.fontWeight = '700'; }
-              if(desc){ desc.style.color = '#06464E'; }
-            } else {
-              if(label){ label.style.color = '#6b7280'; label.style.fontWeight = '600'; }
-              if(desc){ desc.style.color = '#9ca3af'; }
-              // On mobile, hide descriptions for future steps until tapped
-              if(window.matchMedia('(max-width: 640px)').matches && desc){
-                desc.style.display = 'none';
-                step.style.cursor = 'pointer';
-                step.onclick = ()=>{
-                  desc.style.display = desc.style.display === 'none' ? 'block' : 'none';
-                };
-              }
-            }
-          });
         } else if(notice){
           notice.style.display = 'none';
         }
+
+        // Timeline coloring/pulse regardless (for design)
+        dots.forEach((dot, idx)=>{
+          if(idx < activeIndex){
+            dot.style.background = '#2d6b42';
+            dot.style.borderColor = '#2d6b42';
+          } else if(idx === activeIndex){
+            dot.style.background = '#67B3C2';
+            dot.style.borderColor = '#67B3C2';
+            dot.style.boxShadow = '0 0 0 0 rgba(103,179,194,0.5)';
+            dot.style.animation = 'pulseDot 1.5s infinite';
+          }
+        });
+        steps.forEach((step, idx)=>{
+          const label = step.querySelector('.label');
+          const desc = step.querySelector('.desc');
+          if(idx < activeIndex){
+            if(label){ label.style.color = '#2d6b42'; label.style.fontWeight = '700'; }
+            if(desc){ desc.style.color = '#2d6b42'; }
+          } else if(idx === activeIndex){
+            if(label){ label.style.color = '#06464E'; label.style.fontWeight = '700'; }
+            if(desc){ desc.style.color = '#06464E'; }
+          } else {
+            if(label){ label.style.color = '#6b7280'; label.style.fontWeight = '600'; }
+            if(desc){ desc.style.color = '#9ca3af'; }
+            if(window.matchMedia('(max-width: 640px)').matches && desc){
+              desc.style.display = 'none';
+              step.style.cursor = 'pointer';
+              step.onclick = ()=>{
+                desc.style.display = desc.style.display === 'none' ? 'block' : 'none';
+              };
+            }
+          }
+        });
       })();
     </script>
   </body>
