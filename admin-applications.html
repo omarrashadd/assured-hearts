@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Provider Applications | Assured Hearts</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+    .admin-header {
+      margin-bottom: 2rem;
+    }
+    .applications-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .application-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .application-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+    .application-info h3 {
+      margin: 0 0 0.5rem 0;
+      color: #333;
+    }
+    .application-info p {
+      margin: 0.25rem 0;
+      color: #666;
+    }
+    .application-details {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+    .detail-row {
+      margin: 0.5rem 0;
+    }
+    .detail-label {
+      font-weight: 600;
+      color: #555;
+    }
+    .approve-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .approve-btn:hover {
+      background: #218838;
+    }
+    .approve-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status-approved {
+      background: #d4edda;
+      color: #155724;
+    }
+    .no-applications {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>Provider Applications</h1>
+      <p>Review and approve provider applications</p>
+    </div>
+
+    <div id="error-message"></div>
+    <div id="loading" class="loading">Loading applications...</div>
+    <div id="applications-container" class="applications-list" style="display: none;"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://assured-hearts-backend.onrender.com';
+
+    async function loadApplications() {
+      try {
+        const response = await fetch(`${API_BASE}/forms/admin/applications`);
+        if (!response.ok) throw new Error('Failed to load applications');
+        
+        const data = await response.json();
+        displayApplications(data.applications || []);
+      } catch (error) {
+        console.error('Error loading applications:', error);
+        showError('Failed to load applications. Make sure the backend is running.');
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function displayApplications(applications) {
+      const container = document.getElementById('applications-container');
+      container.style.display = 'block';
+
+      if (applications.length === 0) {
+        container.innerHTML = '<div class="no-applications">No pending applications</div>';
+        return;
+      }
+
+      container.innerHTML = applications.map(app => `
+        <div class="application-card" data-app-id="${app.id}">
+          <div class="application-header">
+            <div class="application-info">
+              <h3>${app.name}</h3>
+              <p><strong>Email:</strong> ${app.email}</p>
+              <p><strong>Phone:</strong> ${app.phone || 'N/A'}</p>
+              <p><strong>Location:</strong> ${app.city || 'N/A'}, ${app.province || 'N/A'}</p>
+            </div>
+            <button class="approve-btn" onclick="approveApplication(${app.id})">
+              Approve
+            </button>
+          </div>
+          
+          <div class="application-details">
+            <div class="detail-row">
+              <span class="detail-label">Experience:</span>
+              <p>${app.experience || 'Not provided'}</p>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Certifications:</span>
+              <p>${app.certifications || 'Not provided'}</p>
+            </div>
+            ${app.age_groups ? `
+            <div class="detail-row">
+              <span class="detail-label">Age Groups:</span>
+              <p>${formatAgeGroups(app.age_groups)}</p>
+            </div>
+            ` : ''}
+            ${app.availability ? `
+            <div class="detail-row">
+              <span class="detail-label">Availability:</span>
+              <p>${formatAvailability(app.availability)}</p>
+            </div>
+            ` : ''}
+            <div class="detail-row">
+              <span class="detail-label">Applied:</span>
+              <p>${new Date(app.created_at).toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function approveApplication(appId) {
+      const button = event.target;
+      button.disabled = true;
+      button.textContent = 'Approving...';
+
+      try {
+        const response = await fetch(`${API_BASE}/forms/admin/applications/${appId}/approve`, {
+          method: 'POST'
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to approve');
+        }
+
+        const data = await response.json();
+        console.log('Approved:', data);
+
+        // Remove the card from the UI
+        const card = document.querySelector(`[data-app-id="${appId}"]`);
+        card.style.background = '#d4edda';
+        card.innerHTML = `
+          <div style="text-align: center; padding: 1rem;">
+            <h3 style="color: #155724; margin: 0;">✓ Application Approved</h3>
+            <p style="margin: 0.5rem 0 0 0;">Provider is now active and will appear in searches</p>
+          </div>
+        `;
+        
+        setTimeout(() => {
+          card.remove();
+          // Check if no more applications
+          const remaining = document.querySelectorAll('.application-card').length;
+          if (remaining === 0) {
+            document.getElementById('applications-container').innerHTML = 
+              '<div class="no-applications">No pending applications</div>';
+          }
+        }, 2000);
+
+      } catch (error) {
+        console.error('Error approving application:', error);
+        alert('Failed to approve application: ' + error.message);
+        button.disabled = false;
+        button.textContent = 'Approve';
+      }
+    }
+
+    function formatAgeGroups(ageGroups) {
+      if (typeof ageGroups === 'string') {
+        try {
+          ageGroups = JSON.parse(ageGroups);
+        } catch (e) {
+          return ageGroups;
+        }
+      }
+      if (!ageGroups || typeof ageGroups !== 'object') return 'Not specified';
+      
+      const groups = [];
+      if (ageGroups.infants) groups.push('Infants (0-1)');
+      if (ageGroups.toddlers) groups.push('Toddlers (1-3)');
+      if (ageGroups.preschool) groups.push('Preschool (3-5)');
+      if (ageGroups.schoolAge) groups.push('School Age (5+)');
+      
+      return groups.length > 0 ? groups.join(', ') : 'Not specified';
+    }
+
+    function formatAvailability(availability) {
+      if (typeof availability === 'string') {
+        try {
+          availability = JSON.parse(availability);
+        } catch (e) {
+          return availability;
+        }
+      }
+      if (!availability || typeof availability !== 'object') return 'Not specified';
+      
+      const days = Object.keys(availability).filter(day => availability[day]);
+      return days.length > 0 ? days.join(', ') : 'Not specified';
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.innerHTML = `<div class="error">${message}</div>`;
+    }
+
+    // Load applications on page load
+    loadApplications();
+  </script>
+</body>
+</html>

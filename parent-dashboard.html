@@ -43,51 +43,80 @@
     <header class="hero" style="padding: 24px 16px; background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%);">
       <div class="container" style="max-width: 1200px;">
         <h1 id="dashboardGreeting" style="margin: 0; font-size: clamp(24px, 5vw, 28px);">Welcome back!</h1>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;">
+          <a href="child-demographics.html" class="btn" style="padding: 10px 16px; font-weight: 700; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; text-decoration: none; border-radius: 8px;">Add Child</a>
+          <a href="request-childcare.html" class="btn secondary" style="padding: 10px 16px; font-weight: 700; border: 2px solid #06464E; background: #fff; color: #06464E; text-decoration: none; border-radius: 8px;">Book Childcare</a>
+          <a href="https://forms.gle" class="btn outline" style="padding: 10px 16px; font-weight: 700; border: 2px solid #67B3C2; background: #fff; color: #06464E; text-decoration: none; border-radius: 8px;">Refer a Friend</a>
+        </div>
       </div>
     </header>
 
     <main class="container" style="padding: 24px 16px; max-width: 1200px; margin: 0 auto;">
       
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px;">
-        <div style="background: white; padding: 14px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 3px solid #67B3C2;">
-          <h3 style="margin: 0 0 6px 0; color: #06464E; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Requests</h3>
-          <p id="statRequests" style="margin: 0; font-size: clamp(20px, 6vw, 24px); font-weight: 700; color: #67B3C2;">0</p>
+      <section style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <div>
+            <h2 style="margin: 0; color: #06464E; font-size: 18px; font-weight: 700;">Recent caregivers</h2>
+            <p id="caregiverLocationHint" style="margin: 4px 0 0 0; color: #6b7280; font-size: 13px;">Based on your last search</p>
+          </div>
         </div>
-        <div style="background: white; padding: 14px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 3px solid #06464E;">
-          <h3 style="margin: 0 0 6px 0; color: #06464E; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Upcoming</h3>
-          <p id="statUpcoming" style="margin: 0; font-size: clamp(20px, 6vw, 24px); font-weight: 700; color: #06464E;">0</p>
+        <div style="position: relative; margin-top: 16px;">
+          <button id="caregiverPrevRecent" aria-label="Previous caregivers" style="position: absolute; left: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">‹</button>
+          <div id="caregiverViewportRecent" style="overflow: hidden;">
+            <div id="caregiverTrackRecent" style="display: flex; gap: 10px; transition: transform 0.2s ease; padding: 2px 2px 2px 6px;">
+            </div>
+          </div>
+          <button id="caregiverNextRecent" aria-label="Next caregivers" style="position: absolute; right: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">›</button>
         </div>
-        <div style="background: white; padding: 14px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 3px solid #67B3C2;">
-          <h3 style="margin: 0 0 6px 0; color: #06464E; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Messages</h3>
-          <p id="statMessages" style="margin: 0; font-size: clamp(20px, 6vw, 24px); font-weight: 700; color: #67B3C2;">0</p>
+        <p id="caregiverRecentEmpty" style="margin: 12px 0 0 0; color: #9ca3af; font-size: 13px; display: none;">Book a caregiver and they’ll appear here for quick re-booking.</p>
+      </section>
+
+      <section style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <div>
+            <h2 style="margin: 0; color: #06464E; font-size: 18px; font-weight: 700;">Explore caregivers in your area</h2>
+            <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 13px;">Swipe to meet more caregivers nearby</p>
+          </div>
+          <a href="find-childcare.html" class="btn secondary" style="padding: 10px 14px; font-size: 13px; border: 1px solid #06464E; background: #fff; color: #06464E; text-decoration: none; border-radius: 8px; font-weight: 700;">Explore others</a>
         </div>
-      </div>
+        <div style="position: relative; margin-top: 16px;">
+          <button id="caregiverPrevOther" aria-label="Previous caregivers" style="position: absolute; left: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">‹</button>
+          <div id="caregiverViewportOther" style="overflow: hidden;">
+            <div id="caregiverTrackOther" style="display: flex; gap: 10px; transition: transform 0.2s ease; padding: 2px 2px 2px 6px;">
+            </div>
+          </div>
+          <button id="caregiverNextOther" aria-label="Next caregivers" style="position: absolute; right: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">›</button>
+        </div>
+      </section>
 
       <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-          <h2 style="margin: 0; color: #06464E; font-size: 16px; font-weight: 600;">Your Requests</h2>
-          <a href="request-childcare.html" class="btn" style="padding: 8px 14px; font-size: 12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 6px; white-space: nowrap;">New Request</a>
+          <h2 style="margin: 0; color: #06464E; font-size: 16px; font-weight: 600;">Manage Bookings</h2>
+          <a href="request-childcare.html" class="btn" style="padding: 8px 14px; font-size: 12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 6px; white-space: nowrap;">Book Childcare</a>
         </div>
         
         <div id="requestsList" style="display: flex; flex-direction: column; gap: 10px; min-height: 60px;">
-          <p style="color: #999; text-align: center; padding: 20px; margin: 0;">Loading your requests...</p>
+          <p style="color: #999; text-align: center; padding: 20px; margin: 0;">Loading your bookings...</p>
         </div>
       </section>
 
-      <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px;">
-        <h2 style="margin: 0 0 16px 0; color: #06464E; font-size: 16px; font-weight: 600;">Upcoming Care</h2>
-        
-        <div id="upcomingList" style="display: flex; flex-direction: column; gap: 10px; min-height: 60px;">
-          <p style="color: #999; text-align: center; padding: 20px; margin: 0;">No upcoming sessions scheduled</p>
-        </div>
-      </section>
 
       <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px;">
         
         <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
             <h2 style="margin: 0; color: #06464E; font-size: 16px; font-weight: 600;">Your Children</h2>
-            <a href="child-demographics.html" class="btn" style="padding: 8px 14px; font-size: 12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 6px; white-space: nowrap;">Add Child</a>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="child-demographics.html" class="btn" style="padding: 8px 14px; font-size: 12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 6px; white-space: nowrap;">Add Child</a>
+              <button id="manageChildrenBtn" class="btn secondary" type="button" style="padding: 8px 14px; font-size: 12px; border: 1px solid #06464E; background: #fff; color: #06464E; text-decoration: none; border-radius: 6px; white-space: nowrap; cursor: pointer;">Manage Children</button>
+            </div>
+          </div>
+          <div id="manageChildrenPicker" style="display: none; margin-bottom: 10px; background: #f8fbfc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <label for="childSelect" style="margin: 0; color: #06464E; font-weight: 600; font-size: 12px;">Choose a child to edit:</label>
+            <select id="childSelect" style="flex: 1; min-width: 180px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;">
+              <option value="">Select child</option>
+            </select>
+            <button id="editChildBtn" class="btn" type="button" style="padding: 8px 12px; font-size: 12px; border-radius: 6px;">Edit</button>
           </div>
           
           <div id="childrenList" style="display: flex; flex-direction: column; gap: 10px; min-height: 60px;">
@@ -115,6 +144,133 @@
     <script>
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
 
+      function baseCaregivers(){
+        return [
+          { id: 'amina-khalid', name: 'Amina Khalid', initials: 'AK', info: '5 yrs • CPR • Islamic stories', quote: 'Love teaching duas and story time after Asr.', rating: 4.9, reviews: 28 },
+          { id: 'sara-malik', name: 'Sara Malik', initials: 'SM', info: '4 yrs • ECE • Crafts', quote: 'Hands-on activities and positive routines are my jam.', rating: 4.8, reviews: 19 },
+          { id: 'nadia-rahman', name: 'Nadia Rahman', initials: 'NR', info: '3 yrs • First Aid • Qur’an basics', quote: 'Gentle approach, reading, and outdoor play whenever possible.', rating: 4.7, reviews: 22 },
+          { id: 'layla-yusuf', name: 'Layla Yusuf', initials: 'LY', info: '6 yrs • Montessori inspired', quote: 'Building confidence through choice-based play and kindness.', rating: 5.0, reviews: 31 },
+          { id: 'fatima-noor', name: 'Fatima Noor', initials: 'FN', info: '4 yrs • Arts & Quran', quote: 'Meet me to talk through routines and expectations.', rating: 4.9, reviews: 17 },
+          { id: 'hana-ali', name: 'Hana Ali', initials: 'HA', info: '5 yrs • Outdoors & STEM', quote: 'Meet for a quick intro call—happy to share references.', rating: 4.8, reviews: 21 }
+        ];
+      }
+
+      function renderCaregiverTrack(trackId, viewportId, prevId, nextId, caregivers, opts={}){
+        const track = document.getElementById(trackId);
+        const viewport = document.getElementById(viewportId);
+        const prevBtn = document.getElementById(prevId);
+        const nextBtn = document.getElementById(nextId);
+        if(!track || !viewport || !prevBtn || !nextBtn) return;
+        const favorites = JSON.parse(localStorage.getItem('favorite_caregivers') || '[]');
+        track.innerHTML = caregivers.map(c => {
+          const isFav = favorites.includes(c.id);
+          const starColor = isFav ? '#f59e0b' : '#d1d5db';
+          const favLabel = isFav ? 'Favorited' : 'Add to favorites';
+          const firstName = c.name.split(' ')[0] || c.name;
+          const sessionCount = opts.sessionCounts ? (opts.sessionCounts[c.id] || 0) : null;
+          const sessionsRow = opts.showSessions ? `<div style="color:#06464E; font-weight:700; font-size:12px;">${sessionCount} sessions</div>` : '';
+          const meetBadge = opts.meet ? `<span style="background:#eef7f2; color:#2d6b42; padding:2px 8px; border-radius: 999px; font-size:11px; font-weight:700; align-self:flex-start;">Meet</span>` : '';
+          return `
+          <div style="flex: 0 0 220px; background: #f9fbfc; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">${c.initials}</div>
+              <div style="flex:1;">
+                <p style="margin: 0; color: #06464E; font-weight: 700; font-size: 13px;">${c.name}</p>
+                <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 11px;">${c.info}</p>
+              </div>
+              <button class="fav-btn" data-caregiver="${c.id}" style="background: none; border: 1px solid #e5e7eb; border-radius: 999px; padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-size: 11px; color: #06464E;">
+                <span class="star" style="color: ${starColor}; font-size: 12px;">★</span>${favLabel}
+              </button>
+            </div>
+            ${meetBadge}
+            ${sessionsRow}
+            <div style="display: flex; align-items: center; gap: 6px; color: #f59e0b; font-weight: 700; font-size: 12px;">
+              ★ ${c.rating.toFixed(1)} <span style="color:#6b7280; font-weight: 500;">(${c.reviews} reviews)</span>
+            </div>
+            <p style="margin: 0; color: #111; font-size: 12px;">“${c.quote}”</p>
+            <div style="display: flex; gap: 6px; margin-top: 2px; flex-wrap: wrap;">
+              <button class="btn secondary message-btn" data-caregiver="${c.id}" style="flex: 1; min-width: 110px; padding: 9px 10px; font-size: 11px; font-weight: 700; border: 1px solid #06464E; background: #fff; color: #06464E; border-radius: 7px;">Message ${firstName}</button>
+              <button class="btn book-btn" data-caregiver="${c.id}" style="flex: 1; min-width: 110px; padding: 9px 10px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; border: none; border-radius: 7px;">Book with ${firstName}</button>
+            </div>
+          </div>
+        `;
+        }).join('');
+        const scrollBy = 280;
+        prevBtn.addEventListener('click', ()=> viewport.scrollBy({ left: -scrollBy, behavior: 'smooth' }));
+        nextBtn.addEventListener('click', ()=> viewport.scrollBy({ left: scrollBy, behavior: 'smooth' }));
+
+        // Favorite toggles
+        track.querySelectorAll('.fav-btn').forEach(btn => {
+          btn.addEventListener('click', ()=>{
+            const id = btn.getAttribute('data-caregiver');
+            if(!id) return;
+            let favs = new Set(JSON.parse(localStorage.getItem('favorite_caregivers') || '[]'));
+            if(favs.has(id)){
+              favs.delete(id);
+            } else {
+              favs.add(id);
+            }
+            localStorage.setItem('favorite_caregivers', JSON.stringify(Array.from(favs)));
+            renderCaregivers();
+          });
+        });
+
+        // Book -> move to recent and increment sessions
+        track.querySelectorAll('.book-btn').forEach(btn => {
+          btn.addEventListener('click', ()=>{
+            const id = btn.getAttribute('data-caregiver');
+            if(!id) return;
+            let recents = new Set(JSON.parse(localStorage.getItem('recent_caregivers') || '[]'));
+            recents.add(id);
+            localStorage.setItem('recent_caregivers', JSON.stringify(Array.from(recents)));
+            const sessions = JSON.parse(localStorage.getItem('caregiver_sessions') || '{}');
+            sessions[id] = (sessions[id] || 0) + 1;
+            localStorage.setItem('caregiver_sessions', JSON.stringify(sessions));
+            showBanner('Booked! Added to your recent caregivers.', 'success');
+            renderCaregivers();
+          });
+        });
+      }
+
+      function renderCaregivers(){
+        const location = localStorage.getItem('last_search_location') || 'your area';
+        const hint = document.getElementById('caregiverLocationHint');
+        if(hint) hint.textContent = `Based on your last search in ${location}`;
+        const recents = new Set(JSON.parse(localStorage.getItem('recent_caregivers') || '[]'));
+        const sessionCounts = JSON.parse(localStorage.getItem('caregiver_sessions') || '{}');
+        const all = baseCaregivers();
+        const recentList = all.filter(c => recents.has(c.id));
+        const otherList = all.filter(c => !recents.has(c.id));
+        const emptyText = document.getElementById('caregiverRecentEmpty');
+        if(emptyText) emptyText.style.display = recentList.length ? 'none' : 'block';
+        renderCaregiverTrack('caregiverTrackRecent','caregiverViewportRecent','caregiverPrevRecent','caregiverNextRecent', recentList.length ? recentList : [], { meet:false, showSessions:true, sessionCounts });
+        renderCaregiverTrack('caregiverTrackOther','caregiverViewportOther','caregiverPrevOther','caregiverNextOther', otherList, { meet:true, showSessions:false, sessionCounts });
+      }
+
+      function initManageChildrenPicker(children){
+        const btn = document.getElementById('manageChildrenBtn');
+        const picker = document.getElementById('manageChildrenPicker');
+        const select = document.getElementById('childSelect');
+        const editBtn = document.getElementById('editChildBtn');
+        if(!btn || !picker || !select || !editBtn) return;
+        btn.onclick = ()=>{
+          picker.style.display = picker.style.display === 'flex' ? 'none' : 'flex';
+        };
+        select.innerHTML = '<option value=\"\">Select child</option>';
+        children.forEach(c=>{
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.name || 'Unnamed Child';
+          select.appendChild(opt);
+        });
+        editBtn.onclick = ()=>{
+          const id = select.value;
+          if(!id) return showBanner('Please select a child to edit', 'info');
+          localStorage.setItem('child_to_edit', id);
+          window.location.href = 'child-demographics.html';
+        };
+      }
+
       async function loadParentDashboard() {
         const userId = localStorage.getItem('user_id');
         const userName = localStorage.getItem('user_name');
@@ -139,16 +295,53 @@
           }
 
           const data = await res.json();
-          const { profile, children, requests, sessions } = data;
+          const userId = parseInt(localStorage.getItem('user_id')) || null;
+          const familyId = localStorage.getItem('family_id') || (userId ? `family_${userId}` : null);
+          const cachedChildren = JSON.parse(localStorage.getItem('child_cache') || '[]').filter(c => !userId || c.parent_id === userId);
 
-          // Update stats
-          document.getElementById('statRequests').textContent = requests.length;
-          document.getElementById('statUpcoming').textContent = sessions.length;
+          const normalizeAges = (agesVal)=>{
+            if(agesVal == null) return [];
+            if(Array.isArray(agesVal)) return agesVal.map(a=> parseInt(a)).filter(n=>!isNaN(n));
+            // Try JSON parse if it's a stringified array/number
+            try{
+              const parsed = typeof agesVal === 'string' ? JSON.parse(agesVal) : agesVal;
+              if(Array.isArray(parsed)) return parsed.map(a=> parseInt(a)).filter(n=>!isNaN(n));
+              const num = parseInt(parsed);
+              return isNaN(num) ? [] : [num];
+            }catch(_err){
+              const num = parseInt(agesVal);
+              return isNaN(num) ? [] : [num];
+            }
+          };
+
+          const normalizeChild = (c)=>({
+            id: c.child_id || c.external_id || c.id || c._id || c.uuid || `child_${Math.random().toString(36).slice(2)}`,
+            name: c.name || 'Unnamed Child',
+            parent_id: c.parent_id || c.user_id || userId || null,
+            family_id: c.family_id || familyId || null,
+            ages: normalizeAges(c.ages),
+            frequency: c.frequency || ''
+          });
+
+          const childSource = Array.isArray(data.children) ? data.children :
+                              Array.isArray(data.child_profiles) ? data.child_profiles :
+                              Array.isArray(data.kids) ? data.kids : [];
+          const normalizedSource = childSource.map(normalizeChild);
+          const normalizedCache = cachedChildren.map(normalizeChild);
+          const mergedChildren = [];
+          const seenKeys = new Set();
+          const keyFor = (c)=> `${c.id || ''}|${c.parent_id || ''}|${c.name || ''}`;
+          [...normalizedSource, ...normalizedCache].forEach(c=>{
+            const k = keyFor(c);
+            if(seenKeys.has(k)) return;
+            seenKeys.add(k);
+            mergedChildren.push(c);
+          });
 
           // Render requests list
           const requestsList = document.getElementById('requestsList');
           if(requests.length === 0) {
-            requestsList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No childcare requests yet. <a href="request-childcare.html" style="color: #67B3C2; font-weight: 600;">Submit a request</a></p>';
+            requestsList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No bookings yet. <a href="request-childcare.html" style="color: #67B3C2; font-weight: 600;">Book childcare</a></p>';
           } else {
             requestsList.innerHTML = requests.map(request => {
               const statusColors = {
@@ -159,6 +352,7 @@
               };
               const status = statusColors[request.status] || statusColors.pending;
               const dateStr = new Date(request.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              const canCancel = request.status === 'pending' || request.status === 'matched';
               return `
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: start; gap: 12px;">
                   <div style="flex: 1; min-width: 0;">
@@ -168,48 +362,57 @@
                     </div>
                     <p style="margin: 0; color: #999; font-size: 12px;">Submitted ${dateStr}</p>
                   </div>
+                  ${canCancel ? `<button class="cancel-request-btn" data-id="${request.id}" style="background: #fff; color: #991b1b; border: 1px solid #991b1b; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">Cancel</button>` : ''}
                 </div>
               `;
             }).join('');
           }
 
-          // Render upcoming sessions
-          const upcomingList = document.getElementById('upcomingList');
-          if(sessions.length === 0) {
-            upcomingList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No upcoming sessions scheduled</p>';
-          } else {
-            upcomingList.innerHTML = sessions.map(session => {
-              const dateStr = new Date(session.session_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-              const startTime = session.start_time ? session.start_time.slice(0, 5) : '';
-              const endTime = session.end_time ? session.end_time.slice(0, 5) : '';
-              return `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px;">
-                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px; gap: 12px;">
-                    <div style="flex: 1; min-width: 0;">
-                      <p style="margin: 0 0 4px 0; color: #06464E; font-weight: 500; font-size: 14px;">${session.provider_name || 'Provider TBD'}</p>
-                      <p style="margin: 0; color: #999; font-size: 12px;">${dateStr}, ${startTime} - ${endTime}</p>
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join('');
-          }
+          // Add cancel button handler
+          requestsList.querySelectorAll('.cancel-request-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+              const id = btn.getAttribute('data-id');
+              if(!id) return;
+              btn.disabled = true;
+              btn.textContent = 'Cancelling...';
+              try {
+                const res = await fetch(`${API_BASE}/forms/request/${id}/cancel`, { method: 'POST' });
+                if(res.ok) {
+                  btn.textContent = 'Cancelled';
+                  btn.style.background = '#fee';
+                  btn.style.color = '#991b1b';
+                  // Optionally reload dashboard
+                  setTimeout(loadParentDashboard, 800);
+                } else {
+                  btn.textContent = 'Failed';
+                  btn.disabled = false;
+                }
+              } catch(e) {
+                btn.textContent = 'Failed';
+                btn.disabled = false;
+              }
+            });
+          });
+
+          // sessions data currently unused; remove upcoming section to reduce clutter
 
           // Render children list
           const childrenList = document.getElementById('childrenList');
-          if(children.length === 0) {
+          if(mergedChildren.length === 0) {
             childrenList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No children added yet. <a href="child-demographics.html" style="color: #67B3C2; font-weight: 600;">Add a child</a></p>';
           } else {
-            childrenList.innerHTML = children.map(child => {
-              const ages = child.ages ? JSON.parse(child.ages) : [];
-              const ageStr = Array.isArray(ages) ? ages.join(', ') : ages;
-              const initial = profile.name.charAt(0).toUpperCase();
+            childrenList.innerHTML = mergedChildren.map(child => {
+              const ages = Array.isArray(child.ages) ? child.ages : [];
+              const ageStr = ages.length > 0 ? ages.join(', ') : '';
+              const childName = child.name || 'Unnamed Child';
+              const initial = childName.charAt(0).toUpperCase();
               return `
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; gap: 12px;">
                   <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 0;">
-                    <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0; font-size: 14px;">${initial}</div>
+                    <div style="width: 28px; height: 28px; background: #111; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 12px; color: #fff;">${initial}</div>
                     <div style="flex: 1; min-width: 0;">
-                      <p style="margin: 0; color: #06464E; font-weight: 500; word-break: break-word;">Age ${ageStr || 'TBD'}</p>
+                      <p style="margin: 0; color: #06464E; font-weight: 500; word-break: break-word;">${childName}</p>
+                      ${ageStr ? `<p style="margin: 2px 0 0 0; color: #999; font-size: 12px; word-break: break-word;">Age: ${ageStr}</p>` : ''}
                       ${child.frequency ? `<p style="margin: 2px 0 0 0; color: #999; font-size: 12px; word-break: break-word;">${child.frequency}</p>` : ''}
                     </div>
                   </div>
@@ -219,17 +422,21 @@
             }).join('');
           }
 
+          // Populate manage children picker
+          initManageChildrenPicker(mergedChildren);
+
           // Render learning progress section (placeholder for now)
           const learningProgress = document.getElementById('learningProgress');
           if(children.length === 0) {
             learningProgress.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">Add children to track learning progress</p>';
           } else {
             learningProgress.innerHTML = children.map(child => {
-              const initial = profile.name.charAt(0).toUpperCase();
+              const childName = child.name || 'Unnamed Child';
+              const initial = childName.charAt(0).toUpperCase();
               return `
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; text-align: center;">
                   <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; margin: 0 auto 8px;">${initial}</div>
-                  <p style="margin: 0 0 4px 0; color: #06464E; font-weight: 500; font-size: 13px;">Child Profile</p>
+                  <p style="margin: 0 0 4px 0; color: #06464E; font-weight: 500; font-size: 13px;">${childName}</p>
                   <p style="margin: 0 0 8px 0; color: #999; font-size: 12px;">Track progress</p>
                   <a href="learning.html" style="color: #06464E; font-weight: 600; text-decoration: none; font-size: 12px; padding: 8px; display: inline-block;">View →</a>
                 </div>
@@ -244,7 +451,10 @@
       }
 
       // Load dashboard on page load
-      window.addEventListener('DOMContentLoaded', loadParentDashboard);
+      window.addEventListener('DOMContentLoaded', ()=> {
+        renderCaregivers();
+        loadParentDashboard();
+      });
 
       // Handle logout
       document.getElementById('logoutBtn')?.addEventListener('click', () => {

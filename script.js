@@ -115,13 +115,13 @@ document.addEventListener('DOMContentLoaded', () => {
           if(typeof closeMobileMenu === 'function') closeMobileMenu();
           const modal = document.getElementById('loginModal');
           if(modal) modal.classList.remove('hidden');
-          else window.location.href = 'create-account.html';
+          else window.location.href = 'signup.html';
         });
 
         const signupEl = document.createElement('a');
         signupEl.className = 'btn-auth signup';
         signupEl.textContent = 'Sign up';
-        signupEl.href = 'account-signup.html';
+        signupEl.href = 'signup.html';
         signupEl.style.textAlign = 'center';
         signupEl.addEventListener('click', ()=>{ if(typeof closeMobileMenu === 'function') closeMobileMenu(); });
 
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
           createAcctBtn && createAcctBtn.addEventListener('click', (e)=>{
             e.preventDefault();
             localStorage.setItem('care_available', 'true');
-            window.location.href = 'account-signup.html';
+            window.location.href = 'signup.html';
           });
           loginBtn && loginBtn.addEventListener('click', (e)=>{
             e.preventDefault();
@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
     evt.preventDefault();
     if(target.id === 'heroCreateAccountBtn'){
       localStorage.setItem('care_available', 'true');
-      window.location.href = 'account-signup.html';
+      window.location.href = 'signup.html';
     } else if(target.id === 'heroLoginBtn'){
       localStorage.setItem('care_available', 'true');
       localStorage.setItem('post_login_target', 'request-childcare');
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(welcomeModalSignupBtn){
       welcomeModalSignupBtn.addEventListener('click', ()=> {
         welcomeModal.classList.add('hidden');
-        window.location.href = 'account-signup.html';
+        window.location.href = 'signup.html';
       });
     }
   }
@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(loginModal){
       loginModal.classList.remove('hidden');
     } else {
-      window.location.href = 'create-account.html';
+      window.location.href = 'signup.html';
     }
   });
   signupBtn && signupBtn.addEventListener('click', (e)=> { 
@@ -468,24 +468,40 @@ document.addEventListener('DOMContentLoaded', () => {
     if(caregiverBtn) caregiverBtn.addEventListener('click', ()=> window.location.href = 'apply.html');
   }
 
-  const loginForm = document.getElementById('loginForm');
-  if(loginForm) loginForm.addEventListener('submit', async (e)=> {
+  async function handleLoginSubmit(e, form){
     e.preventDefault();
-    const fd = new FormData(loginForm);
-    const email = fd.get('email');
+    const fd = new FormData(form);
+    const email = fd.get('email') || fd.get('username');
     const password = fd.get('password');
+    if(!email || !password){
+      showBanner('Please enter your email and password', 'info');
+      return;
+    }
     try{
       const resp = await postJSON('/forms/login', { email, password });
+      const userType = resp.type || 'parent';
       localStorage.setItem('user_id', String(resp.userId));
-      localStorage.setItem('user_type', resp.type || 'parent');
+      localStorage.setItem('user_type', userType);
+      if(userType === 'parent'){
+        const familyId = localStorage.getItem('family_id') || `family_${resp.userId}`;
+        localStorage.setItem('family_id', familyId);
+      }
+      if(userType === 'provider' && !localStorage.getItem('provider_status')){
+        localStorage.setItem('provider_status', 'under_review');
+      }
       if(resp.name) localStorage.setItem('user_name', resp.name);
       localStorage.setItem('flash_message', 'Login successful!');
-      loginModal.classList.add('hidden');
-      loginForm.reset();
-      renderAuthNav();
       const target = localStorage.getItem('post_login_target');
+      // Close any open modals
+      if(loginModal) loginModal.classList.add('hidden');
+      const welcomeModalEl = document.getElementById('welcomeModal');
+      if(welcomeModalEl) welcomeModalEl.classList.add('hidden');
+      form.reset();
+      renderAuthNav();
       if(target === 'request-childcare'){
         window.location.href = 'request-childcare.html';
+      } else if(userType === 'provider'){
+        window.location.href = 'caregiver-dashboard.html';
       } else {
         window.location.href = 'parent-dashboard.html';
       }
@@ -493,10 +509,20 @@ document.addEventListener('DOMContentLoaded', () => {
       showBanner('Invalid email or password. Please try again.', 'error');
       console.error(err);
     }
-  });
+  }
+
+  const loginForm = document.getElementById('loginForm');
+  if(loginForm) loginForm.addEventListener('submit', (e)=> handleLoginSubmit(e, loginForm));
+
+  const welcomeLoginForm = document.getElementById('welcomeLoginForm');
+  if(welcomeLoginForm) welcomeLoginForm.addEventListener('submit', (e)=> handleLoginSubmit(e, welcomeLoginForm));
 
   const signupForm = document.getElementById('signupForm');
-  if(signupForm) signupForm.addEventListener('submit', e=> { e.preventDefault(); const email = new FormData(signupForm).get('email'); alert('Welcome, ' + email + '!'); signupModal.classList.add('hidden'); signupForm.reset(); });
+  if(signupForm) signupForm.addEventListener('submit', e=> { 
+    e.preventDefault();
+    signupModal && signupModal.classList.add('hidden');
+    window.location.href = 'signup.html';
+  });
 
   // Social login buttons
   const googleBtn = document.getElementById('googleBtn');
@@ -767,14 +793,19 @@ document.addEventListener('DOMContentLoaded', () => {
       try{
         const response = await postJSON('/forms/parent', { name, email, phone, password, city, province });
         localStorage.setItem('user_id', response.userId);
+        localStorage.setItem('user_type', 'parent');
+        const familyId = `family_${response.userId}`;
+        localStorage.setItem('family_id', familyId);
+        if(name) localStorage.setItem('user_name', name);
         const banner = document.getElementById('parentSuccessBanner');
         if(banner){
           parentSignupForm.style.display = 'none';
           banner.classList.remove('hidden');
-          setTimeout(()=>{ window.location.href = 'find-childcare.html'; }, 2500);
+          setTimeout(()=>{ window.location.href = 'parent-dashboard.html'; }, 2500);
         } else {
           showBanner('Thanks! Your account has been created.', 'success');
           parentSignupForm.reset();
+          window.location.href = 'parent-dashboard.html';
         }
       }catch(err){
         showBanner('There was a problem creating your account. Please try again.', 'error');
@@ -863,14 +894,16 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         console.log('Submitting provider application:', payload);
         await postJSON('/forms/provider', payload);
+        localStorage.setItem('provider_status', 'under_review');
         const successMsg = document.getElementById('successMessage');
         if(successMsg){
           applicationForm.style.display = 'none';
           successMsg.classList.remove('hidden');
-          setTimeout(()=>{ window.location.href = 'become-provider.html'; }, 2500);
+          setTimeout(()=>{ window.location.href = 'caregiver-dashboard.html'; }, 2500);
         } else {
           showBanner('Application received! We\'ll be in touch soon.', 'success');
           applicationForm.reset();
+          window.location.href = 'caregiver-dashboard.html';
         }
       }catch(err){
         showBanner('Submission failed. Please try again.', 'error');
@@ -879,9 +912,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Child demographics form -> send child info to backend
+  // Child demographics form -> send child info to backend (create or edit)
   const childDemographicsForm = document.getElementById('childDemographicsForm');
+  const childNameInput = document.getElementById('childName');
+  const childAgeInput = document.getElementById('childAge');
+  const frequencyInput = document.getElementById('frequency');
+  const preferredScheduleInput = document.getElementById('preferredSchedule');
+  const specialNeedsInput = document.getElementById('specialNeeds');
+
+  async function populateChildFormForEdit(){
+    const editId = localStorage.getItem('child_to_edit');
+    if(!editId || !childDemographicsForm) return;
+    try{
+      const res = await fetch(`${API_BASE}/forms/child/${editId}`);
+      if(!res.ok) throw new Error('Failed to fetch child');
+      const child = await res.json();
+      if(childNameInput) childNameInput.value = child.name || '';
+      if(childAgeInput){
+        const ageVal = Array.isArray(child.ages) && child.ages.length ? child.ages[0] : '';
+        childAgeInput.value = ageVal || '';
+      }
+      if(frequencyInput) frequencyInput.value = child.frequency || '';
+      if(preferredScheduleInput) preferredScheduleInput.value = child.preferred_schedule || '';
+      if(specialNeedsInput) specialNeedsInput.value = child.special_needs || '';
+    }catch(err){
+      console.error('Populate child edit failed', err);
+      showBanner('Could not load child details for editing.', 'error');
+    }
+  }
+
   if(childDemographicsForm){
+    populateChildFormForEdit();
     childDemographicsForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const fd = new FormData(childDemographicsForm);
@@ -893,6 +954,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Get user_id from URL or localStorage (set after parent login)
       const user_id = parseInt(localStorage.getItem('user_id')) || null;
+      const family_id = localStorage.getItem('family_id') || (user_id ? `family_${user_id}` : null);
+      if(family_id) localStorage.setItem('family_id', family_id);
       
       if(!user_id){
         showBanner('Please log in to add child profiles.', 'info');
@@ -901,7 +964,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try{
+        const childLocalId = `child_${Date.now()}_${Math.floor(Math.random()*1e6)}`;
         const payload = {
+          child_id: childLocalId,
+          parent_id: user_id,
+          family_id,
           user_id,
           name: childName,
           ages: childAge ? [parseInt(childAge)] : [],
@@ -910,16 +977,29 @@ document.addEventListener('DOMContentLoaded', () => {
           specialNeeds
         };
         
-        await postJSON('/forms/children', payload);
+        const editingId = localStorage.getItem('child_to_edit');
+        if(editingId){
+          await postJSON(`/forms/child/${editingId}`, payload);
+        } else {
+          await postJSON('/forms/children', payload);
+        }
+        const cached = JSON.parse(localStorage.getItem('child_cache') || '[]');
+        cached.push({ id: editingId || childLocalId, name: childName, parent_id: user_id, family_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
+        localStorage.setItem('child_cache', JSON.stringify(cached));
         const banner = document.getElementById('childSuccessBanner');
+        const successName = childName || 'your child';
+        localStorage.setItem('flash_message', `Great, we've added ${successName} to your profile.`);
         if(banner){
           childDemographicsForm.style.display = 'none';
           banner.style.display = 'block';
-          setTimeout(()=>{ window.location.href = 'find-childcare.html'; }, 2500);
+          banner.innerHTML = `<strong>Success!</strong> Great, we've added ${successName} to your profile. Redirecting...`;
+          setTimeout(()=>{ window.location.href = 'parent-dashboard.html'; }, 1800);
         } else {
-          showBanner('Child profile created!', 'success');
+          showBanner(`Great, we've added ${successName} to your profile.`, 'success');
           childDemographicsForm.reset();
+          setTimeout(()=>{ window.location.href = 'parent-dashboard.html'; }, 1200);
         }
+        localStorage.removeItem('child_to_edit');
       }catch(err){
         showBanner('There was a problem saving the child profile. Please try again.', 'error');
         console.error(err);
