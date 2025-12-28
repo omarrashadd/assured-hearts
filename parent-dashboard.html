@@ -275,54 +275,90 @@
         const userId = localStorage.getItem('user_id');
         const userName = localStorage.getItem('user_name');
 
-        // Update greeting
         if(userName) {
           document.getElementById('dashboardGreeting').textContent = `Welcome back, ${userName}!`;
         }
-
         if(!userId) {
-          window.location.href = 'index.html';
+          showBanner('Please log in to view your dashboard.', 'info');
+          setTimeout(()=> window.location.href = 'account-signup.html', 1200);
           return;
         }
 
-        try {
-          const url = `${API_BASE}/forms/parent/${userId}`;
-          console.log('Loading dashboard from:', url);
-          const res = await fetch(url);
-          if(!res.ok) {
-            console.error('Failed to load dashboard:', res.status);
+        const userIdNum = parseInt(userId) || null;
+        const familyId = localStorage.getItem('family_id') || (userIdNum ? `family_${userIdNum}` : null);
+        const cachedChildren = JSON.parse(localStorage.getItem('child_cache') || '[]').filter(c => !userIdNum || c.parent_id === userIdNum);
+
+        const normalizeAges = (agesVal)=>{
+          if(agesVal == null) return [];
+          if(Array.isArray(agesVal)) return agesVal.map(a=> parseInt(a)).filter(n=>!isNaN(n));
+          try{
+            const parsed = typeof agesVal === 'string' ? JSON.parse(agesVal) : agesVal;
+            if(Array.isArray(parsed)) return parsed.map(a=> parseInt(a)).filter(n=>!isNaN(n));
+            const num = parseInt(parsed);
+            return isNaN(num) ? [] : [num];
+          }catch(_err){
+            const num = parseInt(agesVal);
+            return isNaN(num) ? [] : [num];
+          }
+        };
+
+        const normalizeChild = (c)=>({
+          id: c.child_id || c.external_id || c.id || c._id || c.uuid || `child_${Math.random().toString(36).slice(2)}`,
+          name: c.name || 'Unnamed Child',
+          parent_id: c.parent_id || c.user_id || userIdNum || null,
+          family_id: c.family_id || familyId || null,
+          ages: normalizeAges(c.ages),
+          frequency: c.frequency || '',
+          preferred_schedule: c.preferred_schedule || '',
+          special_needs: c.special_needs || ''
+        });
+
+        const renderChildrenSection = (childrenListEl, learningEl, kids)=>{
+          if(kids.length === 0) {
+            childrenListEl.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No children added yet. <a href="child-demographics.html" style="color: #67B3C2; font-weight: 600;">Add a child</a></p>';
+            learningEl.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">Add children to track learning progress</p>';
             return;
           }
+          childrenListEl.innerHTML = kids.map(child => {
+            const ages = Array.isArray(child.ages) ? child.ages : [];
+            const ageStr = ages.length > 0 ? ages.join(', ') : '';
+            const childName = child.name || 'Unnamed Child';
+            const initial = childName.charAt(0).toUpperCase();
+            return `
+              <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; gap: 12px;">
+                <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 0;">
+                  <div style="width: 28px; height: 28px; background: #111; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 12px; color: #fff;">${initial}</div>
+                  <div style="flex: 1; min-width: 0;">
+                    <p style="margin: 0; color: #06464E; font-weight: 500; word-break: break-word;">${childName}</p>
+                    ${ageStr ? `<p style="margin: 2px 0 0 0; color: #999; font-size: 12px; word-break: break-word;">Age: ${ageStr}</p>` : ''}
+                    ${child.frequency ? `<p style="margin: 2px 0 0 0; color: #999; font-size: 12px; word-break: break-word;">${child.frequency}</p>` : ''}
+                  </div>
+                </div>
+                <a href="child-demographics.html" style="color: #67B3C2; font-weight: 600; text-decoration: none; font-size: 12px; white-space: nowrap; padding: 8px; margin-left: auto;">Edit</a>
+              </div>
+            `;
+          }).join('');
 
-          const data = await res.json();
-          const userId = parseInt(localStorage.getItem('user_id')) || null;
-          const familyId = localStorage.getItem('family_id') || (userId ? `family_${userId}` : null);
-          const cachedChildren = JSON.parse(localStorage.getItem('child_cache') || '[]').filter(c => !userId || c.parent_id === userId);
+          learningEl.innerHTML = kids.map(child => {
+            const childName = child.name || 'Unnamed Child';
+            const initial = childName.charAt(0).toUpperCase();
+            return `
+              <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; text-align: center;">
+                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; margin: 0 auto 8px;">${initial}</div>
+                <p style="margin: 0 0 4px 0; color: #06464E; font-weight: 500; font-size: 13px;">${childName}</p>
+                <p style="margin: 0 0 8px 0; color: #999; font-size: 12px;">Track progress</p>
+                <a href="learning.html" style="color: #06464E; font-weight: 600; text-decoration: none; font-size: 12px; padding: 8px; display: inline-block;">View →</a>
+              </div>
+            `;
+          }).join('');
+        };
 
-          const normalizeAges = (agesVal)=>{
-            if(agesVal == null) return [];
-            if(Array.isArray(agesVal)) return agesVal.map(a=> parseInt(a)).filter(n=>!isNaN(n));
-            // Try JSON parse if it's a stringified array/number
-            try{
-              const parsed = typeof agesVal === 'string' ? JSON.parse(agesVal) : agesVal;
-              if(Array.isArray(parsed)) return parsed.map(a=> parseInt(a)).filter(n=>!isNaN(n));
-              const num = parseInt(parsed);
-              return isNaN(num) ? [] : [num];
-            }catch(_err){
-              const num = parseInt(agesVal);
-              return isNaN(num) ? [] : [num];
-            }
-          };
+        try{
+          const resp = await fetch(`${API_BASE}/forms/parent/${userId}`);
+          if(!resp.ok) throw new Error('Failed to load dashboard');
+          const data = await resp.json();
 
-          const normalizeChild = (c)=>({
-            id: c.child_id || c.external_id || c.id || c._id || c.uuid || `child_${Math.random().toString(36).slice(2)}`,
-            name: c.name || 'Unnamed Child',
-            parent_id: c.parent_id || c.user_id || userId || null,
-            family_id: c.family_id || familyId || null,
-            ages: normalizeAges(c.ages),
-            frequency: c.frequency || ''
-          });
-
+          const requests = Array.isArray(data.requests) ? data.requests : [];
           const childSource = Array.isArray(data.children) ? data.children :
                               Array.isArray(data.child_profiles) ? data.child_profiles :
                               Array.isArray(data.kids) ? data.kids : [];
@@ -338,7 +374,6 @@
             mergedChildren.push(c);
           });
 
-          // Render requests list
           const requestsList = document.getElementById('requestsList');
           if(requests.length === 0) {
             requestsList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No bookings yet. <a href="request-childcare.html" style="color: #67B3C2; font-weight: 600;">Book childcare</a></p>';
@@ -368,7 +403,6 @@
             }).join('');
           }
 
-          // Add cancel button handler
           requestsList.querySelectorAll('.cancel-request-btn').forEach(btn => {
             btn.addEventListener('click', async function() {
               const id = btn.getAttribute('data-id');
@@ -381,7 +415,6 @@
                   btn.textContent = 'Cancelled';
                   btn.style.background = '#fee';
                   btn.style.color = '#991b1b';
-                  // Optionally reload dashboard
                   setTimeout(loadParentDashboard, 800);
                 } else {
                   btn.textContent = 'Failed';
@@ -394,59 +427,19 @@
             });
           });
 
-          // sessions data currently unused; remove upcoming section to reduce clutter
-
-          // Render children list
           const childrenList = document.getElementById('childrenList');
-          if(mergedChildren.length === 0) {
-            childrenList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No children added yet. <a href="child-demographics.html" style="color: #67B3C2; font-weight: 600;">Add a child</a></p>';
-          } else {
-            childrenList.innerHTML = mergedChildren.map(child => {
-              const ages = Array.isArray(child.ages) ? child.ages : [];
-              const ageStr = ages.length > 0 ? ages.join(', ') : '';
-              const childName = child.name || 'Unnamed Child';
-              const initial = childName.charAt(0).toUpperCase();
-              return `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; gap: 12px;">
-                  <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 0;">
-                    <div style="width: 28px; height: 28px; background: #111; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 12px; color: #fff;">${initial}</div>
-                    <div style="flex: 1; min-width: 0;">
-                      <p style="margin: 0; color: #06464E; font-weight: 500; word-break: break-word;">${childName}</p>
-                      ${ageStr ? `<p style="margin: 2px 0 0 0; color: #999; font-size: 12px; word-break: break-word;">Age: ${ageStr}</p>` : ''}
-                      ${child.frequency ? `<p style="margin: 2px 0 0 0; color: #999; font-size: 12px; word-break: break-word;">${child.frequency}</p>` : ''}
-                    </div>
-                  </div>
-                  <a href="child-demographics.html" style="color: #67B3C2; font-weight: 600; text-decoration: none; font-size: 12px; white-space: nowrap; padding: 8px; margin-left: auto;">Edit</a>
-                </div>
-              `;
-            }).join('');
-          }
-
-          // Populate manage children picker
-          initManageChildrenPicker(mergedChildren);
-
-          // Render learning progress section (placeholder for now)
           const learningProgress = document.getElementById('learningProgress');
-          if(children.length === 0) {
-            learningProgress.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">Add children to track learning progress</p>';
-          } else {
-            learningProgress.innerHTML = children.map(child => {
-              const childName = child.name || 'Unnamed Child';
-              const initial = childName.charAt(0).toUpperCase();
-              return `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; text-align: center;">
-                  <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; margin: 0 auto 8px;">${initial}</div>
-                  <p style="margin: 0 0 4px 0; color: #06464E; font-weight: 500; font-size: 13px;">${childName}</p>
-                  <p style="margin: 0 0 8px 0; color: #999; font-size: 12px;">Track progress</p>
-                  <a href="learning.html" style="color: #06464E; font-weight: 600; text-decoration: none; font-size: 12px; padding: 8px; display: inline-block;">View →</a>
-                </div>
-              `;
-            }).join('');
-          }
+          renderChildrenSection(childrenList, learningProgress, mergedChildren);
+          initManageChildrenPicker(mergedChildren);
 
         } catch(err) {
           console.error('Dashboard error:', err);
           showBanner('Error loading dashboard', 'error');
+          const childrenList = document.getElementById('childrenList');
+          const learningProgress = document.getElementById('learningProgress');
+          const kids = cachedChildren.map(normalizeChild);
+          renderChildrenSection(childrenList, learningProgress, kids);
+          initManageChildrenPicker(kids);
         }
       }
 
