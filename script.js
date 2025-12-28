@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Backend API base URL: prefer injected, otherwise local when on localhost, else Render
-  const LOCAL_API = 'http://localhost:3000';
-  const PROD_API = 'https://assured-hearts-backend.onrender.com';
-  const API_BASE = window.API_BASE || ((location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? LOCAL_API : PROD_API);
+  // Backend API base URL: prefer injected, otherwise default to hosted backend
+  const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
 
   async function postJSON(path, body){
     let res;
@@ -936,8 +934,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const specialNeedsInput = document.getElementById('specialNeeds');
 
   async function populateChildFormForEdit(){
-    const editId = localStorage.getItem('child_to_edit');
-    if(!editId || !childDemographicsForm) return;
+    const editIdRaw = localStorage.getItem('child_to_edit');
+    const editId = editIdRaw ? parseInt(editIdRaw, 10) : NaN;
+    if(!childDemographicsForm || !editId || Number.isNaN(editId)){
+      localStorage.removeItem('child_to_edit');
+      return;
+    }
     try{
       const res = await fetch(`${API_BASE}/forms/child/${editId}`);
       if(!res.ok) throw new Error('Failed to fetch child');
@@ -988,19 +990,22 @@ document.addEventListener('DOMContentLoaded', () => {
           specialNeeds
         };
         
-        const editingId = localStorage.getItem('child_to_edit');
+        const editingIdRaw = localStorage.getItem('child_to_edit');
+        const editingId = editingIdRaw ? parseInt(editingIdRaw, 10) : NaN;
         let savedId = null;
-        if(editingId){
+        if(editingId && !Number.isNaN(editingId)){
           await postJSON(`/forms/child/${editingId}`, backendPayload);
           savedId = editingId;
         } else {
           const resp = await postJSON('/forms/children', backendPayload);
-          savedId = resp?.childId || null;
+          savedId = resp?.childId ? parseInt(resp.childId, 10) : null;
+        }
+        if(!savedId || Number.isNaN(savedId)){
+          throw new Error('Child save did not return a valid id');
         }
         const cached = JSON.parse(localStorage.getItem('child_cache') || '[]')
-          .filter(c => !savedId || c.id !== savedId);
-        const cacheId = savedId || `child_${Date.now()}_${Math.floor(Math.random()*1e6)}`;
-        cached.push({ id: cacheId, first_name: childFirst, last_name: childLast, name: `${childFirst || ''} ${childLast || ''}`.trim() || 'Child', parent_id: user_id, age: childAge ? parseInt(childAge) : null, frequency });
+          .filter(c => c && parseInt(c.id,10) !== savedId);
+        cached.push({ id: savedId, first_name: childFirst, last_name: childLast, name: `${childFirst || ''} ${childLast || ''}`.trim() || 'Child', parent_id: user_id, age: childAge ? parseInt(childAge) : null, frequency });
         localStorage.setItem('child_cache', JSON.stringify(cached));
         const banner = document.getElementById('childSuccessBanner');
         const successName = `${childFirst || ''} ${childLast || ''}`.trim() || 'your child';
