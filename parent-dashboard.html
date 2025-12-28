@@ -304,11 +304,9 @@
 
           const normalizeChild = (c)=>({
           id: c.id || c.child_id || c.external_id || c._id || c.uuid || `child_${Math.random().toString(36).slice(2)}`,
-          external_id: c.external_id || c.child_id || c.id || null,
-          name: c.name || 'Unnamed Child',
+          name: ((c.first_name || '') + (c.last_name ? ` ${c.last_name}` : '')).trim() || c.name || 'Child',
           parent_id: c.parent_id || c.user_id || userIdNum || null,
-          family_id: c.family_id || familyId || null,
-          ages: normalizeAges(c.ages),
+          age: c.age !== undefined ? c.age : (Array.isArray(c.ages) && c.ages.length ? c.ages[0] : null),
           frequency: c.frequency || '',
           preferred_schedule: c.preferred_schedule || '',
           special_needs: c.special_needs || ''
@@ -321,9 +319,8 @@
             return;
           }
           childrenListEl.innerHTML = kids.map(child => {
-            const ages = Array.isArray(child.ages) ? child.ages : [];
-            const ageStr = ages.length > 0 ? ages.join(', ') : '';
-            const childName = child.name || 'Unnamed Child';
+            const ageStr = child.age ? `${child.age} yrs` : '';
+            const childName = child.name || 'Child';
             const initial = childName.charAt(0).toUpperCase();
             return `
               <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; gap: 12px;">

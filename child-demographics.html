@@ -67,14 +67,19 @@
         <h2 style="margin: 0 0 8px 0; color: #06464E;">Child information</h2>
         <p style="margin: 0 0 20px 0; color: #666; font-size: 14px;">Tell us about your child so we can match you with the right caregivers.</p>
         <form id="childDemographicsForm" style="display: grid; gap: 16px;">
-          <div>
-            <label for="childName" style="display: block; margin-bottom: 6px; color: #333;">Child's name</label>
-            <input id="childName" name="childName" type="text" placeholder="Enter your child's name" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
-          </div>
-
-          <div>
-            <label for="childAge" style="display: block; margin-bottom: 6px; color: #333;">Child's age</label>
-            <input id="childAge" name="childAge" type="number" min="0" max="17" placeholder="Age in years" style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 12px;">
+            <div>
+              <label for="childFirstName" style="display: block; margin-bottom: 6px; color: #333;">First name</label>
+              <input id="childFirstName" name="childFirstName" type="text" placeholder="First name" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+            <div>
+              <label for="childLastName" style="display: block; margin-bottom: 6px; color: #333;">Last name</label>
+              <input id="childLastName" name="childLastName" type="text" placeholder="Last name" style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
+            <div>
+              <label for="childAge" style="display: block; margin-bottom: 6px; color: #333;">Child's age</label>
+              <input id="childAge" name="childAge" type="number" min="0" max="17" placeholder="Age in years" style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+            </div>
           </div>
 
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 8px 0;">

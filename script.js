@@ -914,7 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Child demographics form -> send child info to backend (create or edit)
   const childDemographicsForm = document.getElementById('childDemographicsForm');
-  const childNameInput = document.getElementById('childName');
+  const childFirstInput = document.getElementById('childFirstName');
+  const childLastInput = document.getElementById('childLastName');
   const childAgeInput = document.getElementById('childAge');
   const frequencyInput = document.getElementById('frequency');
   const preferredScheduleInput = document.getElementById('preferredSchedule');
@@ -927,10 +928,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch(`${API_BASE}/forms/child/${editId}`);
       if(!res.ok) throw new Error('Failed to fetch child');
       const child = await res.json();
-      if(childNameInput) childNameInput.value = child.name || '';
+      if(childFirstInput) childFirstInput.value = child.first_name || '';
+      if(childLastInput) childLastInput.value = child.last_name || '';
       if(childAgeInput){
-        const ageVal = Array.isArray(child.ages) && child.ages.length ? child.ages[0] : '';
-        childAgeInput.value = ageVal || '';
+        childAgeInput.value = child.age || '';
       }
       if(frequencyInput) frequencyInput.value = child.frequency || '';
       if(preferredScheduleInput) preferredScheduleInput.value = child.preferred_schedule || '';
@@ -946,7 +947,8 @@ document.addEventListener('DOMContentLoaded', () => {
     childDemographicsForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const fd = new FormData(childDemographicsForm);
-      const childName = fd.get('childName');
+      const childFirst = fd.get('childFirstName');
+      const childLast = fd.get('childLastName');
       const childAge = fd.get('childAge');
       const frequency = fd.get('frequency');
       const preferredSchedule = fd.get('preferredSchedule');
@@ -968,13 +970,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const backendPayload = {
           child_id: childLocalId,
           parent_id: user_id,
-          family_id,
           user_id,
-          name: childName,
-          ages: childAge ? [parseInt(childAge)] : [],
+          first_name: childFirst,
+          last_name: childLast,
+          age: childAge ? parseInt(childAge) : null,
           frequency,
-          preferred_schedule: preferredSchedule,
-          special_needs: specialNeeds
+          preferredSchedule,
+          specialNeeds
         };
         
         const editingId = localStorage.getItem('child_to_edit');
@@ -984,14 +986,14 @@ document.addEventListener('DOMContentLoaded', () => {
           savedId = editingId;
         } else {
           const resp = await postJSON('/forms/children', backendPayload);
-          savedId = resp?.childId || resp?.externalId || childLocalId;
+          savedId = resp?.childId || childLocalId;
         }
         const cached = JSON.parse(localStorage.getItem('child_cache') || '[]')
-          .filter(c => c.id !== savedId && c.external_id !== savedId);
-        cached.push({ id: savedId, external_id: savedId, name: childName, parent_id: user_id, family_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
+          .filter(c => c.id !== savedId);
+        cached.push({ id: savedId, name: `${childFirst || ''} ${childLast || ''}`.trim() || 'Child', first_name: childFirst, last_name: childLast, parent_id: user_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
         localStorage.setItem('child_cache', JSON.stringify(cached));
         const banner = document.getElementById('childSuccessBanner');
-        const successName = childName || 'your child';
+        const successName = `${childFirst || ''} ${childLast || ''}`.trim() || 'your child';
         localStorage.setItem('flash_message', `Great, we've added ${successName} to your profile.`);
         if(banner){
           childDemographicsForm.style.display = 'none';
