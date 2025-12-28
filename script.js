@@ -965,7 +965,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try{
         const childLocalId = `child_${Date.now()}_${Math.floor(Math.random()*1e6)}`;
-        const payload = {
+        const backendPayload = {
           child_id: childLocalId,
           parent_id: user_id,
           family_id,
@@ -973,21 +973,22 @@ document.addEventListener('DOMContentLoaded', () => {
           name: childName,
           ages: childAge ? [parseInt(childAge)] : [],
           frequency,
-          preferredSchedule,
-          specialNeeds
+          preferred_schedule: preferredSchedule,
+          special_needs: specialNeeds
         };
         
         const editingId = localStorage.getItem('child_to_edit');
         let externalId = childLocalId;
         if(editingId){
-          await postJSON(`/forms/child/${editingId}`, payload);
+          await postJSON(`/forms/child/${editingId}`, backendPayload);
           externalId = editingId;
         } else {
-          const resp = await postJSON('/forms/children', payload);
-          externalId = resp?.externalId || childLocalId;
+          const resp = await postJSON('/forms/children', backendPayload);
+          externalId = resp?.externalId || resp?.childId || childLocalId;
         }
-        const cached = JSON.parse(localStorage.getItem('child_cache') || '[]');
-        cached.push({ id: externalId, name: childName, parent_id: user_id, family_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
+        const cached = JSON.parse(localStorage.getItem('child_cache') || '[]')
+          .filter(c => c.id !== externalId && c.external_id !== externalId);
+        cached.push({ id: externalId, external_id: externalId, name: childName, parent_id: user_id, family_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
         localStorage.setItem('child_cache', JSON.stringify(cached));
         const banner = document.getElementById('childSuccessBanner');
         const successName = childName || 'your child';
