@@ -102,8 +102,29 @@
       const referralForm = document.getElementById('referralForm');
       const statusEl = document.getElementById('referralStatus');
       const referralCountEl = document.getElementById('referralCount');
-      const storedCount = parseInt(localStorage.getItem('referrals_sent_count') || '0', 10);
-      if(referralCountEl) referralCountEl.textContent = isNaN(storedCount) ? '0' : String(storedCount);
+      const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+
+      // Initialize count from backend if logged in
+      (async ()=>{
+        const userId = parseInt(localStorage.getItem('user_id'), 10);
+        if(!userId || Number.isNaN(userId)) return;
+        try{
+          const resp = await fetch(`${API_BASE}/forms/parent/${userId}`);
+          if(resp.ok){
+            const data = await resp.json();
+            const fromProfile = data?.profile?.referrals_count;
+            if(fromProfile !== undefined && fromProfile !== null){
+              localStorage.setItem('referrals_sent_count', String(fromProfile));
+            }
+          }
+        }catch(_err){
+          // ignore
+        } finally {
+          const stored = parseInt(localStorage.getItem('referrals_sent_count') || '0', 10);
+          if(referralCountEl) referralCountEl.textContent = isNaN(stored) ? '0' : String(stored);
+        }
+      })();
+
       referralForm?.addEventListener('submit', (e)=>{
         e.preventDefault();
         const current = parseInt(localStorage.getItem('referrals_sent_count') || '0', 10) || 0;
@@ -129,7 +150,7 @@
           return;
         }
         // Sync to backend
-        fetch((window.API_BASE || 'https://assured-hearts-backend.onrender.com') + '/forms/referral', {
+        fetch(`${API_BASE}/forms/referral`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: userId })
@@ -138,9 +159,18 @@
           if(res.ok && json.referrals_count !== undefined){
             localStorage.setItem('referrals_sent_count', String(json.referrals_count));
             if(referralCountEl) referralCountEl.textContent = String(json.referrals_count);
+          } else if(statusEl){
+            statusEl.style.display = 'block';
+            statusEl.style.color = '#b91c1c';
+            statusEl.textContent = json.error || 'Failed to record referral. Please try again.';
           }
           submitSuccess();
         }).catch(()=>{
+          if(statusEl){
+            statusEl.style.display = 'block';
+            statusEl.style.color = '#b91c1c';
+            statusEl.textContent = 'Network error saving referral.';
+          }
           submitSuccess();
         });
       });
