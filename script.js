@@ -936,11 +936,12 @@ document.addEventListener('DOMContentLoaded', () => {
   async function populateChildFormForEdit(){
     const editIdRaw = localStorage.getItem('child_to_edit');
     const editId = editIdRaw && /^\d+$/.test(editIdRaw) ? parseInt(editIdRaw, 10) : null;
-    if(!childDemographicsForm || !editId){
+    if(!childDemographicsForm || !editId || !Number.isFinite(editId)){
       localStorage.removeItem('child_to_edit');
       return;
     }
     try{
+      console.log('[child edit] Loading child id', editId, 'from', API_BASE);
       const res = await fetch(`${API_BASE}/forms/child/${editId}`);
       if(!res.ok) throw new Error('Failed to fetch child');
       const child = await res.json();

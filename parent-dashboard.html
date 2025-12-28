@@ -289,15 +289,20 @@
         const familyId = localStorage.getItem('family_id') || (userIdNum ? `family_${userIdNum}` : null);
         const cachedChildren = JSON.parse(localStorage.getItem('child_cache') || '[]').filter(c => !userIdNum || c.parent_id === userIdNum);
 
-        const normalizeChild = (c)=>({
-          id: c.id || c.child_id || `child_${Math.random().toString(36).slice(2)}`,
-          name: ((c.first_name || '') + (c.last_name ? ` ${c.last_name}` : '')).trim() || c.name || 'Child',
-          parent_id: c.parent_id || c.user_id || userIdNum || null,
-          age: c.age !== undefined && c.age !== null ? c.age : null,
-          frequency: c.frequency || '',
-          preferred_schedule: c.preferred_schedule || '',
-          special_needs: c.special_needs || ''
-        });
+        const normalizeChild = (c)=>{
+          const rawId = c.id ?? c.child_id;
+          const parsedId = rawId !== undefined && rawId !== null && !Number.isNaN(parseInt(rawId)) ? parseInt(rawId) : null;
+          if(!parsedId) return null;
+          return {
+            id: parsedId,
+            name: ((c.first_name || '') + (c.last_name ? ` ${c.last_name}` : '')).trim() || c.name || 'Child',
+            parent_id: c.parent_id || c.user_id || userIdNum || null,
+            age: c.age !== undefined && c.age !== null ? c.age : null,
+            frequency: c.frequency || '',
+            preferred_schedule: c.preferred_schedule || '',
+            special_needs: c.special_needs || ''
+          };
+        };
 
         const renderChildrenSection = (childrenListEl, learningEl, kids)=>{
           if(kids.length === 0) {
@@ -348,8 +353,8 @@
           const childSource = Array.isArray(data.children) ? data.children :
                               Array.isArray(data.child_profiles) ? data.child_profiles :
                               Array.isArray(data.kids) ? data.kids : [];
-          const normalizedSource = childSource.map(normalizeChild);
-          const normalizedCache = cachedChildren.map(normalizeChild);
+          const normalizedSource = childSource.map(normalizeChild).filter(Boolean);
+          const normalizedCache = cachedChildren.map(normalizeChild).filter(Boolean);
           const mergedChildren = [];
           const seenKeys = new Set();
           const keyFor = (c)=> `${c.id || ''}|${c.parent_id || ''}`;
