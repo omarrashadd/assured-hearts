@@ -978,17 +978,17 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         const editingId = localStorage.getItem('child_to_edit');
-        let externalId = childLocalId;
+        let savedId = childLocalId;
         if(editingId){
           await postJSON(`/forms/child/${editingId}`, backendPayload);
-          externalId = editingId;
+          savedId = editingId;
         } else {
           const resp = await postJSON('/forms/children', backendPayload);
-          externalId = resp?.externalId || resp?.childId || childLocalId;
+          savedId = resp?.childId || resp?.externalId || childLocalId;
         }
         const cached = JSON.parse(localStorage.getItem('child_cache') || '[]')
-          .filter(c => c.id !== externalId && c.external_id !== externalId);
-        cached.push({ id: externalId, external_id: externalId, name: childName, parent_id: user_id, family_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
+          .filter(c => c.id !== savedId && c.external_id !== savedId);
+        cached.push({ id: savedId, external_id: savedId, name: childName, parent_id: user_id, family_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
         localStorage.setItem('child_cache', JSON.stringify(cached));
         const banner = document.getElementById('childSuccessBanner');
         const successName = childName || 'your child';
