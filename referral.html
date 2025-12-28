@@ -107,15 +107,44 @@
       referralForm?.addEventListener('submit', (e)=>{
         e.preventDefault();
         const current = parseInt(localStorage.getItem('referrals_sent_count') || '0', 10) || 0;
-        const next = current + 1;
-        localStorage.setItem('referrals_sent_count', String(next));
-        if(referralCountEl) referralCountEl.textContent = String(next);
-        if(statusEl){
-          statusEl.style.display = 'block';
-          statusEl.style.color = '#155724';
-          statusEl.textContent = 'Invite sent! We’ll email your friend with your message.';
+        const nextLocal = current + 1;
+        const userId = parseInt(localStorage.getItem('user_id'), 10);
+        const submitSuccess = ()=>{
+          localStorage.setItem('referrals_sent_count', String(nextLocal));
+          if(referralCountEl) referralCountEl.textContent = String(nextLocal);
+          if(statusEl){
+            statusEl.style.display = 'block';
+            statusEl.style.color = '#155724';
+            statusEl.textContent = 'Invite sent! We’ll email your friend with your message.';
+          }
+          referralForm.reset();
+        };
+        if(!userId || Number.isNaN(userId)){
+          if(statusEl){
+            statusEl.style.display = 'block';
+            statusEl.style.color = '#b45309';
+            statusEl.textContent = 'Please sign in so we can save your referral.';
+          }
+          submitSuccess();
+          return;
         }
-        referralForm.reset();
+        // Sync to backend
+        fetch((window.API_BASE || 'https://assured-hearts-backend.onrender.com') + '/forms/referral', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userId })
+        }).then(async res => {
+          const json = await res.json().catch(()=>({}));
+          if(res.ok && json.referrals_count !== undefined){
+            localStorage.setItem('referrals_sent_count', String(json.referrals_count));
+            if(referralCountEl) referralCountEl.textContent = String(json.referrals_count);
+          } else {
+            submitSuccess();
+          }
+          submitSuccess();
+        }).catch(()=>{
+          submitSuccess();
+        });
       });
 
       // Copy link

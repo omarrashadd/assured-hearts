@@ -422,6 +422,15 @@
           const learningProgress = document.getElementById('learningProgress');
           renderChildrenSection(childrenList, learningProgress, mergedChildren);
           initManageChildrenPicker(mergedChildren);
+          // Update referral badge from backend profile if present
+          const badge = document.getElementById('referralCountBadge');
+          if(badge){
+            const fromProfile = data.profile?.referrals_count;
+            if(fromProfile !== undefined && fromProfile !== null){
+              badge.textContent = String(fromProfile);
+              localStorage.setItem('referrals_sent_count', String(fromProfile));
+            }
+          }
 
         } catch(err) {
           console.error('Dashboard error:', err);
