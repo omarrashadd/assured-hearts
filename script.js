@@ -956,9 +956,6 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Get user_id from URL or localStorage (set after parent login)
       const user_id = parseInt(localStorage.getItem('user_id')) || null;
-      const family_id = localStorage.getItem('family_id') || (user_id ? `family_${user_id}` : null);
-      if(family_id) localStorage.setItem('family_id', family_id);
-      
       if(!user_id){
         showBanner('Please log in to add child profiles.', 'info');
         setTimeout(() => window.location.href = 'account-signup.html', 1500);
@@ -966,9 +963,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try{
-        const childLocalId = `child_${Date.now()}_${Math.floor(Math.random()*1e6)}`;
         const backendPayload = {
-          child_id: childLocalId,
           parent_id: user_id,
           user_id,
           first_name: childFirst,
@@ -980,17 +975,18 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         const editingId = localStorage.getItem('child_to_edit');
-        let savedId = childLocalId;
+        let savedId = null;
         if(editingId){
           await postJSON(`/forms/child/${editingId}`, backendPayload);
           savedId = editingId;
         } else {
           const resp = await postJSON('/forms/children', backendPayload);
-          savedId = resp?.childId || childLocalId;
+          savedId = resp?.childId || null;
         }
         const cached = JSON.parse(localStorage.getItem('child_cache') || '[]')
-          .filter(c => c.id !== savedId);
-        cached.push({ id: savedId, name: `${childFirst || ''} ${childLast || ''}`.trim() || 'Child', first_name: childFirst, last_name: childLast, parent_id: user_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
+          .filter(c => !savedId || c.id !== savedId);
+        const cacheId = savedId || `child_${Date.now()}_${Math.floor(Math.random()*1e6)}`;
+        cached.push({ id: cacheId, first_name: childFirst, last_name: childLast, name: `${childFirst || ''} ${childLast || ''}`.trim() || 'Child', parent_id: user_id, age: childAge ? parseInt(childAge) : null, frequency });
         localStorage.setItem('child_cache', JSON.stringify(cached));
         const banner = document.getElementById('childSuccessBanner');
         const successName = `${childFirst || ''} ${childLast || ''}`.trim() || 'your child';

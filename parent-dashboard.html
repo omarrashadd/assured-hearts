@@ -258,8 +258,9 @@
         };
         select.innerHTML = '<option value=\"\">Select child</option>';
         children.forEach(c=>{
+          if(!c.id) return;
           const opt = document.createElement('option');
-          opt.value = c.id || c.external_id;
+          opt.value = c.id;
           opt.textContent = c.name || 'Unnamed Child';
           select.appendChild(opt);
         });
@@ -288,25 +289,11 @@
         const familyId = localStorage.getItem('family_id') || (userIdNum ? `family_${userIdNum}` : null);
         const cachedChildren = JSON.parse(localStorage.getItem('child_cache') || '[]').filter(c => !userIdNum || c.parent_id === userIdNum);
 
-        const normalizeAges = (agesVal)=>{
-          if(agesVal == null) return [];
-          if(Array.isArray(agesVal)) return agesVal.map(a=> parseInt(a)).filter(n=>!isNaN(n));
-          try{
-            const parsed = typeof agesVal === 'string' ? JSON.parse(agesVal) : agesVal;
-            if(Array.isArray(parsed)) return parsed.map(a=> parseInt(a)).filter(n=>!isNaN(n));
-            const num = parseInt(parsed);
-            return isNaN(num) ? [] : [num];
-          }catch(_err){
-            const num = parseInt(agesVal);
-            return isNaN(num) ? [] : [num];
-          }
-        };
-
-          const normalizeChild = (c)=>({
-          id: c.id || c.child_id || c.external_id || c._id || c.uuid || `child_${Math.random().toString(36).slice(2)}`,
+        const normalizeChild = (c)=>({
+          id: c.id || c.child_id || `child_${Math.random().toString(36).slice(2)}`,
           name: ((c.first_name || '') + (c.last_name ? ` ${c.last_name}` : '')).trim() || c.name || 'Child',
           parent_id: c.parent_id || c.user_id || userIdNum || null,
-          age: c.age !== undefined ? c.age : (Array.isArray(c.ages) && c.ages.length ? c.ages[0] : null),
+          age: c.age !== undefined && c.age !== null ? c.age : null,
           frequency: c.frequency || '',
           preferred_schedule: c.preferred_schedule || '',
           special_needs: c.special_needs || ''
@@ -319,7 +306,8 @@
             return;
           }
           childrenListEl.innerHTML = kids.map(child => {
-            const ageStr = child.age ? `${child.age} yrs` : '';
+            const ageNum = child.age !== undefined && child.age !== null ? Number(child.age) : NaN;
+            const ageStr = Number.isFinite(ageNum) ? `${ageNum} yrs` : '';
             const childName = child.name || 'Child';
             const initial = childName.charAt(0).toUpperCase();
             return `
@@ -364,7 +352,7 @@
           const normalizedCache = cachedChildren.map(normalizeChild);
           const mergedChildren = [];
           const seenKeys = new Set();
-          const keyFor = (c)=> `${c.external_id || c.id || ''}|${c.parent_id || ''}`;
+          const keyFor = (c)=> `${c.id || ''}|${c.parent_id || ''}`;
           [...normalizedSource, ...normalizedCache].forEach(c=>{
             const k = keyFor(c);
             if(seenKeys.has(k)) return;
