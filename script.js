@@ -1,17 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Backend API base URL (set your Render URL here)
-  const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+  // Backend API base URL (prefers injected window.API_BASE, falls back to Render)
+  const API_BASE = window.API_BASE || (location.hostname === '127.0.0.1' || location.hostname === 'localhost'
+    ? 'https://assured-hearts-backend.onrender.com'
+    : 'https://assured-hearts-backend.onrender.com');
+
   async function postJSON(path, body){
     const res = await fetch(`${API_BASE}${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    const json = await res.json().catch(()=>({}));
-    if(!res.ok){
-      throw new Error(json.error || `Request failed (${res.status})`);
+    let json = {};
+    try{
+      json = await res.json();
+    }catch(_err){
+      // non-JSON response
     }
-    return json;
+    if(!res.ok){
+      const msg = json.error || json.message || `Request failed (${res.status})`;
+      throw new Error(msg);
+    }
+    return json || {};
   }
   // Banner helper
   function showBanner(message, type='success'){
