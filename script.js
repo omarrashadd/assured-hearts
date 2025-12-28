@@ -935,8 +935,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function populateChildFormForEdit(){
     const editIdRaw = localStorage.getItem('child_to_edit');
-    const editId = editIdRaw ? parseInt(editIdRaw, 10) : NaN;
-    if(!childDemographicsForm || !editId || Number.isNaN(editId)){
+    const editId = editIdRaw && /^\d+$/.test(editIdRaw) ? parseInt(editIdRaw, 10) : null;
+    if(!childDemographicsForm || !editId){
       localStorage.removeItem('child_to_edit');
       return;
     }
@@ -954,7 +954,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if(specialNeedsInput) specialNeedsInput.value = child.special_needs || '';
     }catch(err){
       console.error('Populate child edit failed', err);
-      showBanner('Could not load child details for editing.', 'error');
+      localStorage.removeItem('child_to_edit');
+      showBanner('Could not load child details. Please select the child again.', 'error');
+      setTimeout(()=> window.location.href = 'parent-dashboard.html', 1200);
     }
   }
 
@@ -991,9 +993,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         const editingIdRaw = localStorage.getItem('child_to_edit');
-        const editingId = editingIdRaw ? parseInt(editingIdRaw, 10) : NaN;
+        const editingId = editingIdRaw && /^\d+$/.test(editingIdRaw) ? parseInt(editingIdRaw, 10) : null;
         let savedId = null;
-        if(editingId && !Number.isNaN(editingId)){
+        if(editingId){
           await postJSON(`/forms/child/${editingId}`, backendPayload);
           savedId = editingId;
         } else {
