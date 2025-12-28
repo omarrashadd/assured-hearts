@@ -978,13 +978,16 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         const editingId = localStorage.getItem('child_to_edit');
+        let externalId = childLocalId;
         if(editingId){
           await postJSON(`/forms/child/${editingId}`, payload);
+          externalId = editingId;
         } else {
-          await postJSON('/forms/children', payload);
+          const resp = await postJSON('/forms/children', payload);
+          externalId = resp?.externalId || childLocalId;
         }
         const cached = JSON.parse(localStorage.getItem('child_cache') || '[]');
-        cached.push({ id: editingId || childLocalId, name: childName, parent_id: user_id, family_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
+        cached.push({ id: externalId, name: childName, parent_id: user_id, family_id, ages: childAge ? [parseInt(childAge)] : [], frequency });
         localStorage.setItem('child_cache', JSON.stringify(cached));
         const banner = document.getElementById('childSuccessBanner');
         const successName = childName || 'your child';

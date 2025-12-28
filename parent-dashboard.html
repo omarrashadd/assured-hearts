@@ -303,12 +303,12 @@
         };
 
           const normalizeChild = (c)=>({
-            id: c.id || c.child_id || c.external_id || c._id || c.uuid || `child_${Math.random().toString(36).slice(2)}`,
-            name: c.name || 'Unnamed Child',
-            parent_id: c.parent_id || c.user_id || userIdNum || null,
-            family_id: c.family_id || familyId || null,
-            ages: normalizeAges(c.ages),
-            frequency: c.frequency || '',
+          id: c.id || c.child_id || c.external_id || c._id || c.uuid || `child_${Math.random().toString(36).slice(2)}`,
+          name: c.name || 'Unnamed Child',
+          parent_id: c.parent_id || c.user_id || userIdNum || null,
+          family_id: c.family_id || familyId || null,
+          ages: normalizeAges(c.ages),
+          frequency: c.frequency || '',
           preferred_schedule: c.preferred_schedule || '',
           special_needs: c.special_needs || ''
         });
