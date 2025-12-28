@@ -503,6 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if(resp.name) localStorage.setItem('user_name', resp.name);
       localStorage.setItem('flash_message', 'Login successful!');
+      localStorage.removeItem('post_login_target');
       const target = localStorage.getItem('post_login_target');
       // Close any open modals
       if(loginModal) loginModal.classList.add('hidden');
@@ -510,10 +511,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if(welcomeModalEl) welcomeModalEl.classList.add('hidden');
       form.reset();
       renderAuthNav();
-      if(target === 'request-childcare'){
-        window.location.href = 'request-childcare.html';
-      } else if(userType === 'provider'){
+      // Redirect by role; ignore request-childcare target for providers
+      if(userType === 'provider'){
         window.location.href = 'caregiver-dashboard.html';
+      } else if(target === 'request-childcare'){
+        window.location.href = 'request-childcare.html';
       } else {
         window.location.href = 'parent-dashboard.html';
       }
