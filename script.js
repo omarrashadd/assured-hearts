@@ -1,15 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Backend API base URL (prefers injected window.API_BASE, falls back to Render)
-  const API_BASE = window.API_BASE || (location.hostname === '127.0.0.1' || location.hostname === 'localhost'
-    ? 'https://assured-hearts-backend.onrender.com'
-    : 'https://assured-hearts-backend.onrender.com');
+  // Backend API base URL: prefer injected, otherwise local when on localhost, else Render
+  const LOCAL_API = 'http://localhost:3000';
+  const PROD_API = 'https://assured-hearts-backend.onrender.com';
+  const API_BASE = window.API_BASE || ((location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? LOCAL_API : PROD_API);
 
   async function postJSON(path, body){
-    const res = await fetch(`${API_BASE}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    let res;
+    try{
+      res = await fetch(`${API_BASE}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }catch(err){
+      throw new Error(`Network error contacting API at ${API_BASE}. Is the backend running?`);
+    }
     let json = {};
     try{
       json = await res.json();
