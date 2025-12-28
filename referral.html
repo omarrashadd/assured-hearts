@@ -138,8 +138,6 @@
           if(res.ok && json.referrals_count !== undefined){
             localStorage.setItem('referrals_sent_count', String(json.referrals_count));
             if(referralCountEl) referralCountEl.textContent = String(json.referrals_count);
-          } else {
-            submitSuccess();
           }
           submitSuccess();
         }).catch(()=>{
