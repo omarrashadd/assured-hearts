@@ -450,6 +450,7 @@
           }
           box.innerHTML = confirmed.map(s => {
             const label = (s.status || '').toLowerCase() === 'pending' ? 'background:#fff9e6; color:#8b6914;' : 'background:#eef7f2; color:#2d6b42;';
+            const otherId = s.parent_id || s.parentId || s.parent_user_id || s.parent;
             return `
               <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:grid; gap:4px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -458,7 +459,7 @@
                 </div>
                 <div style="font-size:12px; color:#6b7280;">${s.session_date || ''} · ${s.start_time || ''} - ${s.end_time || ''}</div>
                 <div style="font-size:12px; color:#6b7280;">📍 ${s.parent_city || 'TBD'}</div>
-                ${s.parent_id ? `<button class="btn small message-btn" data-other="${s.parent_id}" style="justify-self:start; padding:8px 10px; background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:8px; font-weight:700; font-size:12px;">Message family</button>` : ''}
+                ${otherId ? `<button class="btn small message-btn" data-other="${otherId}" style="justify-self:start; padding:8px 10px; background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:8px; font-weight:700; font-size:12px;">Message family</button>` : ''}
               </div>
             `;
           }).join('');
