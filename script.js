@@ -558,6 +558,80 @@ document.addEventListener('DOMContentLoaded', () => {
     loginModal.classList.add('hidden');
   });
 
+  // Provider profile page handling
+  const providerProfileForm = document.getElementById('providerProfileForm');
+  if(providerProfileForm){
+    const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+    const provStatusEl = document.getElementById('provStatus');
+    const userId = parseInt(localStorage.getItem('user_id'), 10);
+    if(!userId || localStorage.getItem('user_type') !== 'provider'){
+      if(provStatusEl){
+        provStatusEl.style.color = '#b91c1c';
+        provStatusEl.textContent = 'Please log in as a caregiver to edit your profile.';
+      }
+    } else {
+      (async ()=>{
+        try{
+          const res = await fetch(`${API_BASE}/forms/provider/${userId}`);
+          if(res.ok){
+            const data = await res.json();
+            const p = data.profile || {};
+            document.getElementById('provName').value = p.name || '';
+            document.getElementById('provEmail').value = p.email || '';
+            document.getElementById('provPhone').value = p.phone || '';
+            document.getElementById('provCity').value = p.city || '';
+            document.getElementById('provProvince').value = p.province || '';
+            document.getElementById('provAddr1').value = p.address_line1 || '';
+            document.getElementById('provAddr2').value = p.address_line2 || '';
+            document.getElementById('provPostal').value = p.postal_code || '';
+            document.getElementById('provRate').value = p.rate || '';
+            document.getElementById('provPayoutMethod').value = p.payout_method || '';
+            document.getElementById('provPayoutDetails').value = p.payout_details || '';
+            document.getElementById('provBio').value = p.bio || '';
+            document.getElementById('prov2FA').checked = !!p.two_factor_enabled;
+            document.getElementById('provPaused').checked = !!p.paused;
+          }
+        }catch(_err){}
+      })();
+    }
+
+    providerProfileForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!userId){
+        showBanner('Please log in to update your profile.', 'info');
+        return;
+      }
+      const fd = new FormData(providerProfileForm);
+      const payload = Object.fromEntries(fd.entries());
+      payload.two_factor_enabled = document.getElementById('prov2FA').checked;
+      payload.paused = document.getElementById('provPaused').checked;
+      try{
+        const res = await fetch(`${API_BASE}/forms/provider/${userId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error('Save failed');
+        showBanner('Profile saved', 'success');
+        if(provStatusEl){
+          provStatusEl.style.color = '#2d6b42';
+          provStatusEl.textContent = 'Saved';
+        }
+      }catch(err){
+        showBanner('Could not save profile', 'error');
+        if(provStatusEl){
+          provStatusEl.style.color = '#b91c1c';
+          provStatusEl.textContent = 'Save failed. Try again.';
+        }
+      }
+    });
+
+    const delBtn = document.getElementById('provDelete');
+    delBtn?.addEventListener('click', ()=>{
+      alert('Account deletion coming soon. Contact support to delete now.');
+    });
+  }
+
   const findBtn = document.getElementById('findBtn');
   const becomeBtn = document.getElementById('becomeBtn');
   const findSection = document.getElementById('find');
