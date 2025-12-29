@@ -584,7 +584,7 @@
           if(hoursScheduled === 0){
             hoursScheduled = hoursFromAcceptedRequests();
           }
-          
+
           const activeCount = Math.max(
             upcomingSessions.length,
             combinedSessions.length,
@@ -593,8 +593,8 @@
           );
           setText('metricActive', activeCount.toString());
           setText('metricPending', (pendingCount || stats.pending || 0).toString());
-          setText('metricHoursScheduled', roundHours(hoursScheduled || stats.hours_scheduled || 0));
-          setText('metricHoursTotal', roundHours(hoursCompletedMonth || stats.hours_month || 0));
+          setText('metricHoursScheduled', roundHours(hoursScheduled));
+          setText('metricHoursTotal', roundHours(hoursCompletedMonth));
           setText('metricEarnings', stats.earnings ? `$${stats.earnings}` : '$0');
           setText('metricTips', stats.tips ? `$${stats.tips}` : '$0');
           const pendingPill = document.getElementById('pendingPill');
