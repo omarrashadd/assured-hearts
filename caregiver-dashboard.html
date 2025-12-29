@@ -87,10 +87,6 @@
           <div id="metricActive" style="font-size:26px; font-weight:800; color:#06464E; line-height:1;">0</div>
         </div>
         <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
-          <div style="font-size:12px; color:#6b7280;">Pending bookings</div>
-          <div id="metricPending" style="font-size:26px; font-weight:800; color:#92400e; line-height:1;">0</div>
-        </div>
-        <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
           <div style="font-size:12px; color:#6b7280;">Hours scheduled</div>
           <div id="metricHoursScheduled" style="font-size:26px; font-weight:800; color:#06464E; line-height:1;">0</div>
         </div>
@@ -344,7 +340,12 @@
             box.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No incoming requests yet.</p>';
             return;
           }
-          box.innerHTML = requests.map(req => {
+          const pendingOnly = requests.filter(r => (r.status||'').toLowerCase() === 'pending');
+          if(pendingOnly.length === 0){
+            box.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No pending requests.</p>';
+            return;
+          }
+          box.innerHTML = pendingOnly.map(req => {
             const statusKey = (req.status || '').toLowerCase();
             const isPending = statusKey === 'pending';
             const statusLabel = isPending ? 'Pending' : (statusKey === 'accepted' ? 'Accepted' : (statusKey === 'declined' ? 'Declined' : 'Needs info'));
@@ -498,24 +499,49 @@
           const stats = data.stats || {};
           const requests = data.requests || [];
           const sessions = data.sessions || [];
+          const acceptedRequests = requests.filter(r => (r.status||'').toLowerCase() === 'accepted');
+          const syntheticSessions = acceptedRequests.map(r => {
+            const startDate = r.start_at ? new Date(r.start_at) : null;
+            const endDate = r.end_at ? new Date(r.end_at) : null;
+            const fallbackDate = new Date();
+            return {
+              id: `req-${r.id}`,
+              parent_name: r.parent_name || 'Family',
+              parent_city: r.location || '',
+              status: 'accepted',
+              session_date: startDate ? startDate.toISOString().slice(0,10) : fallbackDate.toISOString().slice(0,10),
+              start_time: startDate ? startDate.toTimeString().slice(0,8) : '',
+              end_time: endDate ? endDate.toTimeString().slice(0,8) : '',
+            };
+          });
+          const combinedSessions = [...sessions, ...syntheticSessions];
           
           const pendingCount = requests.filter(r => (r.status||'').toLowerCase() === 'pending').length;
           const acceptedCount = requests.filter(r => (r.status||'').toLowerCase() === 'accepted').length;
           
           const today = new Date();
           const todayStr = today.toISOString().slice(0,10);
-          const toDate = (d)=> d ? new Date(d) : null;
-          const upcomingSessions = sessions.filter(s => {
+          const toDate = (d)=> {
+            if(!d) return null;
+            const nd = new Date(d);
+            return isNaN(nd.getTime()) ? null : nd;
+          };
+          const upcomingSessions = combinedSessions.filter(s => {
             if((s.status||'').toLowerCase() === 'cancelled') return false;
             const d = toDate(s.session_date);
             return !d || d >= today;
           });
-          const completedThisMonth = sessions.filter(s => {
+          const completedThisMonth = combinedSessions.filter(s => {
             const d = toDate(s.session_date);
             const isPast = d && d < today;
             return ((s.status||'').toLowerCase() === 'completed') || (isPast && d.toISOString().slice(0,7) === todayStr.slice(0,7));
           });
           
+          const roundHours = (val)=>{
+            const quarters = Math.round(val * 2); // 0.5 hr increments
+            return (quarters / 2).toFixed(1).replace(/\.0$/,'');
+          };
+
           const hoursFromSessions = (list)=>{
             return list.reduce((sum, s)=>{
               // Prefer explicit start/end_time from sessions
@@ -558,10 +584,11 @@
             hoursScheduled = hoursFromAcceptedRequests();
           }
           
-          setText('metricActive', (upcomingSessions.length || acceptedCount || stats.active || 0).toString());
+          const activeCount = (upcomingSessions.length || combinedSessions.length || acceptedCount || stats.active || 0);
+          setText('metricActive', activeCount.toString());
           setText('metricPending', (pendingCount || stats.pending || 0).toString());
-          setText('metricHoursScheduled', (hoursScheduled || stats.hours_scheduled || 0).toString());
-          setText('metricHoursTotal', (hoursCompletedMonth || stats.hours_month || 0).toString());
+          setText('metricHoursScheduled', roundHours(hoursScheduled || stats.hours_scheduled || 0));
+          setText('metricHoursTotal', roundHours(hoursCompletedMonth || stats.hours_month || 0));
           setText('metricEarnings', stats.earnings ? `$${stats.earnings}` : '$0');
           setText('metricTips', stats.tips ? `$${stats.tips}` : '$0');
           const pendingPill = document.getElementById('pendingPill');
@@ -570,7 +597,7 @@
           }
           renderRequests(requests);
           renderMessages(data.messages);
-          renderAppointments(sessions);
+          renderAppointments(combinedSessions);
           renderReviews(data.reviews);
         }catch(err){
           console.error('Provider dashboard load failed', err);
