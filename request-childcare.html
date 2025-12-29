@@ -126,7 +126,10 @@
           </div>
           <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
             Location
-            <input type="text" id="bookingLocation" placeholder="Address or area" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px;">
+            <select id="locationSelect" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+              <option value="">Select location</option>
+            </select>
+            <input type="text" id="otherLocation" placeholder="Enter other address" style="margin-top:8px; padding:10px 12px; border:1px solid #ddd; border-radius:8px; display:none;">
           </label>
           <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
             Notes to caregiver (optional)
@@ -169,7 +172,8 @@
       const providerSummary = document.getElementById('providerSummary');
       const providerSummaryText = document.getElementById('providerSummaryText');
       const bookingDate = document.getElementById('bookingDate');
-      const bookingLocation = document.getElementById('bookingLocation');
+      const locationSelect = document.getElementById('locationSelect');
+      const otherLocation = document.getElementById('otherLocation');
       const requestNotes = document.getElementById('requestNotes');
       const favoriteProvidersList = document.getElementById('favoriteProvidersList');
       const otherProvidersList = document.getElementById('otherProvidersList');
@@ -183,6 +187,7 @@
       
       let allChildren = [];
       let isCreatingNew = false;
+      let homeAddress = '';
       function populateTimeSelect(selectEl){
         if(!selectEl) return;
         const times = [];
@@ -328,6 +333,31 @@
           .then(res => res.json())
           .then(data => {
             allChildren = data.children || [];
+            const profile = data.profile || {};
+            if(profile.city || profile.province){
+              homeAddress = [profile.city, profile.province].filter(Boolean).join(', ');
+            }
+            const savedLocations = JSON.parse(localStorage.getItem('saved_locations') || '[]');
+            const options = [''];
+            if(homeAddress) options.push('home');
+            savedLocations.forEach(loc => options.push(loc));
+            options.push('other');
+            if(locationSelect){
+              locationSelect.innerHTML = options.map(opt=>{
+                if(opt === '') return '<option value="">Select location</option>';
+                if(opt === 'home') return `<option value="home">Home (${homeAddress})</option>`;
+                if(opt === 'other') return '<option value="other">Other (add new)</option>';
+                return `<option value="${opt}">${opt}</option>`;
+              }).join('');
+              locationSelect.addEventListener('change', ()=>{
+                if(locationSelect.value === 'other'){
+                  otherLocation.style.display = 'block';
+                  otherLocation.focus();
+                } else {
+                  otherLocation.style.display = 'none';
+                }
+              });
+            }
             if(allChildren.length > 0){
               childSelect.innerHTML = '<option value="">-- Select a child --</option>' + 
                 allChildren.map((child) => `<option value="${child.id}">${child.first_name || child.name || 'Unnamed Child'}</option>`).join('');
@@ -412,7 +442,22 @@
         submitRequestBtn.addEventListener('click', async function(e){
           e.preventDefault();
           const baseLocation = localStorage.getItem('last_search_location') || '';
-          const finalLocation = bookingLocation && bookingLocation.value ? bookingLocation.value : baseLocation;
+          let finalLocation = '';
+          if(locationSelect){
+            if(locationSelect.value === 'home' && homeAddress){
+              finalLocation = homeAddress;
+            }else if(locationSelect.value && locationSelect.value !== 'other'){
+              finalLocation = locationSelect.value;
+            }else if(locationSelect.value === 'other'){
+              finalLocation = otherLocation.value.trim();
+              if(finalLocation){
+                const saved = new Set(JSON.parse(localStorage.getItem('saved_locations') || '[]'));
+                saved.add(finalLocation);
+                localStorage.setItem('saved_locations', JSON.stringify(Array.from(saved)));
+              }
+            }
+          }
+          if(!finalLocation) finalLocation = baseLocation;
           const childId = childSelect.value ? parseInt(childSelect.value) : null;
           const childName = isCreatingNew ? detailChildName.value.trim() : null;
           const dateVal = bookingDate.value;
