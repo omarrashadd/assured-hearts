@@ -56,7 +56,7 @@
       <section style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
           <div>
-            <h2 style="margin: 0; color: #06464E; font-size: 18px; font-weight: 700;">Recent caregivers</h2>
+            <h2 style="margin: 0; color: #06464E; font-size: 18px; font-weight: 700;">Caregivers in your area</h2>
             <p id="caregiverLocationHint" style="margin: 4px 0 0 0; color: #6b7280; font-size: 13px;">Based on your last search</p>
           </div>
         </div>
@@ -69,24 +69,6 @@
           <button id="caregiverNextRecent" aria-label="Next caregivers" style="position: absolute; right: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">›</button>
         </div>
         <p id="caregiverRecentEmpty" style="margin: 12px 0 0 0; color: #9ca3af; font-size: 13px; display: none;">Book a caregiver and they’ll appear here for quick re-booking.</p>
-      </section>
-
-      <section style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-          <div>
-            <h2 style="margin: 0; color: #06464E; font-size: 18px; font-weight: 700;">Explore Muslim caregivers in your area</h2>
-            <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 13px;">Swipe to meet more caregivers nearby</p>
-          </div>
-          <a href="find-childcare.html" class="btn secondary" style="padding: 10px 14px; font-size: 13px; border: 1px solid #06464E; background: #fff; color: #06464E; text-decoration: none; border-radius: 8px; font-weight: 700;">Explore others</a>
-        </div>
-        <div style="position: relative; margin-top: 16px;">
-          <button id="caregiverPrevOther" aria-label="Previous caregivers" style="position: absolute; left: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">‹</button>
-          <div id="caregiverViewportOther" style="overflow: hidden;">
-            <div id="caregiverTrackOther" style="display: flex; gap: 10px; transition: transform 0.2s ease; padding: 2px 2px 2px 6px;">
-            </div>
-          </div>
-          <button id="caregiverNextOther" aria-label="Next caregivers" style="position: absolute; right: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">›</button>
-        </div>
       </section>
 
       <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px;">
@@ -273,10 +255,6 @@
         const hint = document.getElementById('caregiverLocationHint');
         if(hint) hint.textContent = `Based on your last search in ${location}`;
 
-        const recentsRaw = JSON.parse(localStorage.getItem('recent_caregivers') || '[]').map(String);
-        const recents = new Set(recentsRaw);
-        const sessionCounts = JSON.parse(localStorage.getItem('caregiver_sessions') || '{}');
-
         async function loadProviders(){
           try{
             const resp = await fetch(`${API_BASE}/forms/providers`);
@@ -308,12 +286,22 @@
           all = baseCaregivers();
         }
 
-        const recentList = all.filter(c => recents.has(String(c.id)));
-        const otherList = all.filter(c => !recents.has(String(c.id)));
+        const sessionCounts = JSON.parse(localStorage.getItem('caregiver_sessions') || '{}');
+        const favorites = JSON.parse(localStorage.getItem('favorite_caregivers') || '[]').map(String);
+
+        // Sort: favorites first, then by rating desc
+        all.sort((a,b)=>{
+          const aFav = favorites.includes(String(a.id)) ? 1 : 0;
+          const bFav = favorites.includes(String(b.id)) ? 1 : 0;
+          if(aFav !== bFav) return bFav - aFav;
+          const ar = Number(a.rating || 0);
+          const br = Number(b.rating || 0);
+          return br - ar;
+        });
+
         const emptyText = document.getElementById('caregiverRecentEmpty');
-        if(emptyText) emptyText.style.display = recentList.length ? 'none' : 'block';
-        renderCaregiverTrack('caregiverTrackRecent','caregiverViewportRecent','caregiverPrevRecent','caregiverNextRecent', recentList.length ? recentList : [], { meet:false, showSessions:true, sessionCounts });
-        renderCaregiverTrack('caregiverTrackOther','caregiverViewportOther','caregiverPrevOther','caregiverNextOther', otherList, { meet:true, showSessions:false, sessionCounts });
+        if(emptyText) emptyText.style.display = all.length ? 'none' : 'block';
+        renderCaregiverTrack('caregiverTrackRecent','caregiverViewportRecent','caregiverPrevRecent','caregiverNextRecent', all, { meet:false, showSessions:true, sessionCounts });
       }
 
       function initManageChildrenPicker(children){
