@@ -102,11 +102,15 @@
             </label>
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
               Start time
-              <input type="time" id="bookingStart" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px;">
+              <select id="bookingStart" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+                <option value="">Select start time</option>
+              </select>
             </label>
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
               End time
-              <input type="time" id="bookingEnd" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px;">
+              <select id="bookingEnd" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+                <option value="">Select end time</option>
+              </select>
             </label>
           </div>
           <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
@@ -161,6 +165,25 @@
       
       let allChildren = [];
       let isCreatingNew = false;
+      const bookingStart = document.getElementById('bookingStart');
+      const bookingEnd = document.getElementById('bookingEnd');
+
+      function populateTimeSelect(selectEl){
+        if(!selectEl) return;
+        const times = [];
+        for(let h=6; h<=23; h++){
+          for(let m=0; m<60; m+=30){
+            const hr = h.toString().padStart(2,'0');
+            const min = m.toString().padStart(2,'0');
+            const labelHr = (h % 12 === 0 ? 12 : h % 12);
+            const ampm = h < 12 ? 'AM' : 'PM';
+            times.push({ value: `${hr}:${min}`, label: `${labelHr}:${min} ${ampm}` });
+          }
+        }
+        selectEl.innerHTML = '<option value="">Select time</option>' + times.map(t=> `<option value="${t.value}">${t.label}</option>`).join('');
+      }
+      populateTimeSelect(bookingStart);
+      populateTimeSelect(bookingEnd);
 
       // Define showBanner function
       const showBanner = window.showBanner || function(msg, type){
