@@ -326,25 +326,53 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if(hasAvailable){
-        // Show available caregivers (placeholder names)
-        const caregiversHTML = Array.from({length: numCaregivers}).map((_, idx)=>`
-          <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px;">
-            <div style="font-weight:700; color:#06464E;">Caregiver ${idx+1}</div>
-            <p style="margin:4px 0; color:#6b7280; font-size:13px;">Available in ${location}</p>
-            <button class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px;" onclick="window.location.href='request-childcare.html'">Book this caregiver</button>
-          </div>
-        `).join('');
-        newResultsDiv.innerHTML = `
-          <div style="text-align:left;">
-            <p style="color:#333; margin:0 0 8px 0;"><strong>${numCaregivers} caregiver(s) available in ${location}</strong></p>
-            ${caregiversHTML}
-            <button id="heroCloseResultsBtn" type="button" style="margin-top: 8px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
-          </div>`;
-        const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
-        closeBtn && closeBtn.addEventListener('click', ()=>{
-          newResultsDiv.remove();
-          heroFindForm.reset();
-        });
+        // Fetch actual providers and show cards
+        try{
+          const resp = await fetch(`${API_BASE}/forms/providers`);
+          let providers = [];
+          if(resp.ok){
+            const data = await resp.json();
+            providers = Array.isArray(data.providers) ? data.providers : [];
+          }
+          if(providers.length === 0){
+            providers = baseCaregivers(); // fallback sample
+          }
+          const caregiversHTML = providers.map((p, idx)=> {
+            const initials = p.name ? p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : 'CG';
+            const bio = p.bio || 'Trusted caregiver in your area.';
+            const rate = p.rate ? `$${p.rate}/hr` : '';
+            const city = p.city || location;
+            return `
+              <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px; display:grid; gap:6px;">
+                <div style="display:flex; gap:10px; align-items:center;">
+                  <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initials}</div>
+                  <div>
+                    <div style="font-weight:700; color:#06464E;">${p.name || 'Caregiver ' + (idx+1)}</div>
+                    <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
+                  </div>
+                </div>
+                <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px;" onclick="window.location.href='request-childcare.html'">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
+                  <button class="btn secondary" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px;" onclick="window.location.href='request-childcare.html'">Message</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+          newResultsDiv.innerHTML = `
+            <div style="text-align:left;">
+              <p style="color:#333; margin:0 0 8px 0;"><strong>${providers.length} caregiver(s) available in ${location}</strong></p>
+              ${caregiversHTML}
+              <button id="heroCloseResultsBtn" type="button" style="margin-top: 8px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
+            </div>`;
+          const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
+          closeBtn && closeBtn.addEventListener('click', ()=>{
+            newResultsDiv.remove();
+            heroFindForm.reset();
+          });
+        }catch(err){
+          console.error('Provider fetch failed', err);
+        }
       } else {
         const waitlistBtn = newResultsDiv.querySelector('#heroJoinWaitlistBtn');
         const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
