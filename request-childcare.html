@@ -49,6 +49,10 @@
         <h2 style="margin: 0 0 12px 0; color: #06464E;">Next Step</h2>
         <p style="margin: 0 0 20px 0; color: #666;">Submit your childcare request and we'll match you with available caregivers in your area.</p>
         
+        <div id="providerSummary" style="display:none; margin-bottom:16px; padding:12px; border:1px solid #e5e7eb; border-radius:10px; background:#f8fbfc;">
+          <p id="providerSummaryText" style="margin:0; color:#06464E; font-weight:700; font-size:14px;"></p>
+        </div>
+        
         <div style="margin-bottom: 20px;">
           <label for="childSelect" style="display: block; margin-bottom: 8px; color: #06464E; font-weight: 600; font-size: 14px;">Which child is this request for?</label>
           <div style="display: flex; gap: 8px;">
@@ -98,6 +102,31 @@
             </div>
           </div>
         </div>
+
+        <div style="display:grid; gap:12px; margin-bottom:16px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:12px;">
+            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+              Date
+              <input type="date" id="bookingDate" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px;">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+              Start time
+              <input type="time" id="bookingStart" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px;">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+              End time
+              <input type="time" id="bookingEnd" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px;">
+            </label>
+          </div>
+          <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+            Location
+            <input type="text" id="bookingLocation" placeholder="Address or area" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+            Notes to caregiver (optional)
+            <textarea id="requestNotes" rows="2" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-family:inherit;" placeholder="Anything they should know?"></textarea>
+          </label>
+        </div>
         
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
           <button id="submitRequestBtn" class="btn" style="padding: 12px 16px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; border: none; cursor: pointer; border-radius: 10px; font-weight: 700; font-size: 14px;">Submit Request →</button>
@@ -115,6 +144,9 @@
       // Guard: require account and available care
       const userId = parseInt(localStorage.getItem('user_id')) || null;
       const available = localStorage.getItem('care_available') === 'true';
+      const params = new URLSearchParams(window.location.search);
+      const providerIdParam = params.get('provider_id');
+      const providerNameParam = params.get('provider_name');
       const submitRequestBtn = document.getElementById('submitRequestBtn');
       const childSelect = document.getElementById('childSelect');
       const newChildBtn = document.getElementById('newChildBtn');
@@ -128,6 +160,13 @@
       const notMsg = document.getElementById('notAvailableMsg');
       const availabilityCard = document.getElementById('availabilityCard');
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+      const providerSummary = document.getElementById('providerSummary');
+      const providerSummaryText = document.getElementById('providerSummaryText');
+      const bookingDate = document.getElementById('bookingDate');
+      const bookingStart = document.getElementById('bookingStart');
+      const bookingEnd = document.getElementById('bookingEnd');
+      const bookingLocation = document.getElementById('bookingLocation');
+      const requestNotes = document.getElementById('requestNotes');
       
       let allChildren = [];
       let isCreatingNew = false;
@@ -235,11 +274,17 @@
         // Handle request submission
         submitRequestBtn.addEventListener('click', async function(e){
           e.preventDefault();
-          const location = localStorage.getItem('last_search_location') || '';
+          const baseLocation = localStorage.getItem('last_search_location') || '';
+          const finalLocation = bookingLocation && bookingLocation.value ? bookingLocation.value : baseLocation;
           const childId = childSelect.value ? parseInt(childSelect.value) : null;
           const childName = isCreatingNew ? detailChildName.value.trim() : null;
+          const dateVal = bookingDate.value;
+          const startVal = bookingStart.value;
+          const endVal = bookingEnd.value;
+          const start_at = dateVal && startVal ? `${dateVal}T${startVal}` : null;
+          const end_at = dateVal && endVal ? `${dateVal}T${endVal}` : null;
           
-          if(!location){
+          if(!finalLocation){
             showBanner('Please search for childcare in your area first.', 'info');
             setTimeout(() => window.location.href = 'find-childcare.html', 1500);
             return;
@@ -250,20 +295,24 @@
             return;
           }
 
-          submitRequestBtn.disabled = true;
-          submitRequestBtn.textContent = 'Submitting...';
+            submitRequestBtn.disabled = true;
+            submitRequestBtn.textContent = 'Submitting...';
 
-          try {
-            const payload = { 
-              user_id: userId, 
-              child_id: childId, 
-              location, 
-              notes: ''
-            };
-            // Only include childName if creating a new child
-            if(childName) {
-              payload.childName = childName;
-            }
+            try {
+              const payload = { 
+                user_id: userId, 
+                child_id: childId, 
+                location: finalLocation, 
+                notes: requestNotes.value || '',
+                start_at,
+                end_at,
+                rate: null,
+                provider_id: providerIdParam ? parseInt(providerIdParam,10) : null
+              };
+              // Only include childName if creating a new child
+              if(childName) {
+                payload.childName = childName;
+              }
             console.log('Submitting request with payload:', payload);
             const res = await fetch(`${API_BASE}/forms/request`, {
               method: 'POST',
@@ -316,6 +365,12 @@
       } else {
         availabilityTitle.textContent = 'Caregivers are available near you';
       }
+      
+      if(providerIdParam && providerSummary){
+        providerSummary.style.display = 'block';
+        providerSummaryText.textContent = `Booking request will be sent to ${providerNameParam || 'your selected caregiver'}`;
+      }
+      if(lastLocation && bookingLocation) bookingLocation.value = lastLocation;
     </script>
   </body>
 </html>
