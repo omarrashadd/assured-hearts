@@ -1278,6 +1278,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
   modal.querySelector('#chatCloseBtn').addEventListener('click', ()=> modal.style.display = 'none');
 
+  // Expose opener so other buttons can launch a thread
+  window.openChatThread = (otherId)=>{
+    if(!otherId) return;
+    activeThread = parseInt(otherId,10);
+    modal.style.display = 'block';
+    if(!threads[activeThread]){
+      threads[activeThread] = { other_id: activeThread, other_name: 'User', messages: [] };
+    }
+    renderThreads();
+    renderHistory(activeThread);
+    markRead(activeThread);
+  };
+
   async function fetchMessages(){
     try{
       const res = await fetch(`${API_BASE}/forms/messages/${userId}`);
