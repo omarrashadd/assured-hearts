@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
           availabilityText = 'Available in the next 24 hours';
         }
         const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
-        const profileLink = pid ? `provider-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
+        const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
         const certs = [];
         if(p.has_cpr) certs.push('CPR certified');
         if(p.islamic_values) certs.push('Values aligned');
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
           availabilityText = 'Available in the next 24 hours';
         }
         const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
-        const profileLink = pid ? `provider-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
+        const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
         return `
           <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
             <div style="display:flex; gap:12px; align-items:center;">
@@ -808,6 +808,86 @@ document.addEventListener('DOMContentLoaded', () => {
     delBtn?.addEventListener('click', ()=>{
       alert('Account deletion coming soon. Contact support to delete now.');
     });
+  }
+
+  // Public caregiver profile page (read-only resume-style)
+  const cgProfileShell = document.getElementById('cgProfileShell');
+  if(cgProfileShell){
+    const params = new URLSearchParams(window.location.search);
+    const providerId = params.get('provider_id');
+    const cgNameEl = document.getElementById('cgName');
+    const cgMetaEl = document.getElementById('cgMeta');
+    const cgBioEl = document.getElementById('cgBio');
+    const cgExpEl = document.getElementById('cgExperience');
+    const cgCertsEl = document.getElementById('cgCerts');
+    const cgAvailText = document.getElementById('cgAvailText');
+    const cgAvailNotes = document.getElementById('cgAvailNotes');
+    const cgAvatar = document.getElementById('cgAvatar');
+    const cgBookBtn = document.getElementById('cgBookBtn');
+    const cgMessageBtn = document.getElementById('cgMessageBtn');
+    const cgContact = document.getElementById('cgContact');
+    const cgHours = document.getElementById('cgHours');
+    const cgValues = document.getElementById('cgValues');
+
+    const isSignedIn = !!localStorage.getItem('user_id');
+    const userId = localStorage.getItem('user_id');
+
+    async function loadCaregiverProfile(){
+      if(!providerId){
+        cgBioEl.textContent = 'No caregiver selected.';
+        return;
+      }
+      try{
+        const res = await fetch(`${API_BASE}/forms/provider/${providerId}`);
+        if(!res.ok) throw new Error('Profile not found');
+        const data = await res.json();
+        const p = data.profile || {};
+        cgNameEl.textContent = p.name || 'Caregiver';
+        const city = p.city || '';
+        const province = p.province || '';
+        const rate = p.rate ? `$${p.rate}/hr` : '';
+        cgMetaEl.textContent = [city, province, rate].filter(Boolean).join(' · ') || 'Trusted caregiver';
+        cgBioEl.textContent = p.bio || 'Biography coming soon.';
+        cgExpEl.textContent = p.experience_details || 'Experience details coming soon.';
+        const initials = (p.name || 'CG').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        cgAvatar.textContent = initials;
+        const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
+        let availLabel = 'Availability not provided';
+        if(availability.status === 'immediate') availLabel = 'Available immediately';
+        if(availability.status === 'next24') availLabel = 'Available in the next 24 hours';
+        if(availability.status === 'week') availLabel = 'Available this week';
+        cgAvailText.textContent = availLabel;
+        cgAvailNotes.textContent = availability.notes || '';
+        const certs = [];
+        if(p.has_cpr) certs.push('CPR certified');
+        if(p.islamic_values) certs.push('Values aligned');
+        if(certs.length === 0) certs.push('Certifications pending');
+        cgCertsEl.innerHTML = certs.map(c=> `<li>${c}</li>`).join('');
+        cgContact.innerHTML = `
+          <div>${p.email || 'Email on file'}</div>
+          <div>${p.phone || ''}</div>
+        `;
+        cgHours.textContent = p.weekly_hours ? `${p.weekly_hours} hrs / week goal` : 'Not specified';
+        cgValues.textContent = p.islamic_values ? 'Faith-aligned' : 'Values not provided';
+        const bookHref = `request-childcare.html?provider_id=${encodeURIComponent(providerId)}&provider_name=${encodeURIComponent(p.name || '')}`;
+        cgBookBtn.href = bookHref;
+        cgMessageBtn.addEventListener('click', (ev)=>{
+          ev.preventDefault();
+          if(!isSignedIn){
+            const loginModal = document.getElementById('loginModal');
+            if(loginModal) loginModal.classList.remove('hidden');
+            return;
+          }
+          if(window.showChatWidget){
+            window.showChatWidget(providerId, p.name || 'Caregiver');
+          }
+        });
+      }catch(err){
+        cgBioEl.textContent = 'Unable to load caregiver profile.';
+        console.error(err);
+      }
+    }
+    loadCaregiverProfile();
   }
 
   const findBtn = document.getElementById('findBtn');
