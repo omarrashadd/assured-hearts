@@ -392,7 +392,7 @@
                     <p style="margin: 0; color: #999; font-size: 12px;">Submitted ${dateStr}</p>
                   </div>
                   <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                    ${otherId ? `<button class="message-caregiver-btn" data-other="${otherId}" style="background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer;">Message caregiver</button>` : ''}
+                    ${otherId ? `<button class="message-caregiver-btn" data-other="${otherId}" style="background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer;">Message ${request.provider_name || 'caregiver'}</button>` : ''}
                     ${canCancel ? `<button class="cancel-request-btn" data-id="${request.id}" style="background: #fff; color: #991b1b; border: 1px solid #991b1b; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">Cancel</button>` : ''}
                   </div>
                 </div>
