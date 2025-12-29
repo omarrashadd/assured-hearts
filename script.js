@@ -67,6 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const userId = localStorage.getItem('user_id');
     const userType = localStorage.getItem('user_type');
     const userName = localStorage.getItem('user_name');
+    // Hide marketing signup block on homepage when a user is signed in (especially parents)
+    const signupSection = document.querySelector('.signup-section');
+    if(signupSection && userId && userType === 'parent'){
+      signupSection.style.display = 'none';
+    }
 
     function renderAuth(container, variant){
       if(!container) return;
