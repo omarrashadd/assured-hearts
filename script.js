@@ -278,30 +278,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const isSignedIn = !!localStorage.getItem('user_id');
 
       if(hasAvailable){
-        if(isSignedIn){
-          resultsHTML = `
-            <div id=\"heroSearchResults\" style=\"text-align: center; margin-top: 16px; padding: 0;\">
-              <p style=\"color: #333; margin: 0 0 12px 0;\"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
-              <div style=\"display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;\">
-                <button type=\"button\" id=\"heroApplyBtn\" class=\"btn\" style=\"background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; font-weight: 600;\">Apply Today</button>
-              </div>
-              <div id=\"heroPreview\" style=\"margin-top: 12px;\"></div>
-              <button id=\"heroCloseResultsBtn\" type=\"button\" style=\"margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;\">Close</button>
-            </div>
-          `;
-        } else {
-          resultsHTML = `
-            <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
-              <p style="color: #333; margin: 0 0 12px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
-              <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        resultsHTML = `
+          <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
+            <p style="color: #333; margin: 0 0 12px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
+            <div id="heroPreview" style="margin-top: 12px;"></div>
+            ${!isSignedIn ? `
+              <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top:12px;">
                 <button type="button" id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to apply</button>
                 <button type="button" id="heroCreateAccountBtn" class="btn" style="background: white; color: #06464E; border: 2px solid #06464E; font-weight: 600;">Create Account</button>
-              </div>
-              <div id=\"heroPreview\" style=\"margin-top: 12px;\"></div>
-              <button id="heroCloseResultsBtn" type="button" style="margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
-            </div>
-          `;
-        }
+              </div>` : ''}
+            <button id="heroCloseResultsBtn" type="button" style="margin-top: 12px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
+          </div>
+        `;
       } else {
         resultsHTML = `
           <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
@@ -343,6 +331,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const rate = p.rate ? `$${p.rate}/hr` : '';
             const city = p.city || location;
             const pid = p.id || p.user_id || '';
+            const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
+            let availabilityTag = '';
+            if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
+            if(availability.status === 'next24') availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
             const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
             return `
               <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px; display:grid; gap:6px;">
@@ -353,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
                   </div>
                 </div>
+                ${availabilityTag}
                 <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
                   <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
