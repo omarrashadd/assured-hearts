@@ -373,12 +373,14 @@
               const statusColors = {
                 pending: { bg: '#fff9e6', color: '#8b6914', text: 'Pending' },
                 matched: { bg: '#eef7f2', color: '#2d6b42', text: 'Matched' },
+                accepted: { bg: '#eef7f2', color: '#2d6b42', text: 'Accepted' },
                 confirmed: { bg: '#eef7f2', color: '#2d6b42', text: 'Confirmed' },
                 cancelled: { bg: '#fee', color: '#991b1b', text: 'Cancelled' }
               };
-              const status = statusColors[request.status] || statusColors.pending;
+              const statusKey = (request.status || '').toLowerCase();
+              const status = statusColors[statusKey] || statusColors.pending;
               const dateStr = new Date(request.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-              const canCancel = request.status === 'pending' || request.status === 'matched';
+              const canCancel = statusKey === 'pending' || statusKey === 'matched';
               return `
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: start; gap: 12px;">
                   <div style="flex: 1; min-width: 0;">
