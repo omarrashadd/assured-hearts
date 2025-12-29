@@ -342,6 +342,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const bio = p.bio || 'Trusted caregiver in your area.';
             const rate = p.rate ? `$${p.rate}/hr` : '';
             const city = p.city || location;
+            const pid = p.id || p.user_id || '';
+            const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
             return `
               <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px; display:grid; gap:6px;">
                 <div style="display:flex; gap:10px; align-items:center;">
@@ -353,8 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                  <button class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px;" onclick="window.location.href='request-childcare.html'">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
-                  <button class="btn secondary" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px;" onclick="window.location.href='request-childcare.html'">Message</button>
+                  <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
+                  <a class="btn secondary" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Message</a>
                 </div>
               </div>
             `;
