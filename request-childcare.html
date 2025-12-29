@@ -45,14 +45,12 @@
         </div>
 
         <div id="providerPicker" style="margin-bottom:20px;">
-          <h3 style="margin:0 0 10px 0; color:#06464E; font-size:16px;">Select a caregiver</h3>
-          <p style="margin:0 0 12px 0; color:#6b7280; font-size:13px;">Choose from your favorites or other caregivers in your area.</p>
+          <h3 style="margin:0 0 10px 0; color:#06464E; font-size:16px;">Selected caregiver</h3>
           <div id="favoriteProviders" style="margin-bottom:12px; display:none;">
-            <h4 style="margin:0 0 8px 0; color:#06464E; font-size:14px;">Favorites</h4>
             <div id="favoriteProvidersList" style="display:grid; gap:8px;"></div>
           </div>
-          <div>
-            <h4 style="margin:0 0 8px 0; color:#06464E; font-size:14px;">Other caregivers in your area</h4>
+          <div id="otherProvidersWrap" style="display:none;">
+            <h4 style="margin:0 0 8px 0; color:#06464E; font-size:14px;">Other caregivers</h4>
             <div id="otherProvidersList" style="display:grid; gap:8px;"></div>
           </div>
         </div>
@@ -176,6 +174,7 @@
       const favoriteProvidersList = document.getElementById('favoriteProvidersList');
       const otherProvidersList = document.getElementById('otherProvidersList');
       const favoriteProvidersWrap = document.getElementById('favoriteProviders');
+      const otherProvidersWrap = document.getElementById('otherProvidersWrap');
       const bookingStart = document.getElementById('bookingStart');
       const bookingEnd = document.getElementById('bookingEnd');
       let selectedProviderId = providerIdParam ? parseInt(providerIdParam,10) : null;
@@ -257,6 +256,7 @@
         window.__providerList = list;
         const favorites = list.filter(p => favoriteIds.has(String(p.id)));
         const others = list.filter(p => !favoriteIds.has(String(p.id)));
+        const hideOthers = !!selectedProviderId;
         if(favoriteProvidersWrap){
           favoriteProvidersWrap.style.display = favorites.length ? 'block' : 'none';
         }
@@ -264,7 +264,10 @@
           favoriteProvidersList.innerHTML = favorites.length ? favorites.map(renderProviderCard).join('') : '';
         }
         if(otherProvidersList){
-          otherProvidersList.innerHTML = others.length ? others.map(renderProviderCard).join('') : '<p style="margin:0; color:#6b7280; font-size:13px;">No caregivers found.</p>';
+          otherProvidersList.innerHTML = hideOthers ? '' : (others.length ? others.map(renderProviderCard).join('') : '<p style="margin:0; color:#6b7280; font-size:13px;">No caregivers found.</p>');
+        }
+        if(otherProvidersWrap){
+          otherProvidersWrap.style.display = hideOthers ? 'none' : (others.length ? 'block' : 'none');
         }
         attachProviderEvents();
       }
