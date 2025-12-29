@@ -135,6 +135,32 @@
             Notes to caregiver (optional)
             <textarea id="requestNotes" rows="2" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-family:inherit;" placeholder="Anything they should know?"></textarea>
           </label>
+          <div id="recurringBlock" style="display:none; margin-top:4px; padding:12px; border:1px solid #e5e7eb; border-radius:8px; background:#f8fbfc;">
+            <label style="display:flex; align-items:center; gap:8px; color:#06464E; font-weight:700; font-size:14px;">
+              <input type="checkbox" id="recurringToggle"> Make this a recurring appointment
+            </label>
+            <div id="recurringFields" style="display:none; margin-top:8px; display:grid; gap:10px;">
+              <label style="display:flex; flex-direction:column; gap:6px; color:#374151; font-size:13px;">
+                Recurrence
+                <select id="recurringCadence" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+                  <option value="weekly">Weekly</option>
+                  <option value="biweekly">Bi-weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </label>
+              <div style="display:flex; flex-direction:column; gap:6px; color:#374151; font-size:13px;">
+                Days of week
+                <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                  ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d,i)=>`<label style="display:flex; align-items:center; gap:4px; background:#fff; border:1px solid #e5e7eb; border-radius:6px; padding:6px 8px; font-size:12px;"><input type="checkbox" class="recurring-day" value="${i}">${d}</label>`).join('')}
+                </div>
+              </div>
+              <label style="display:flex; flex-direction:column; gap:6px; color:#374151; font-size:13px;">
+                Start date
+                <input type="date" id="recurringStart" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px;">
+              </label>
+            </div>
+            <p style="margin:6px 0 0 0; color:#6b7280; font-size:12px;">Available after two completed sessions. Set it once and keep your schedule locked in.</p>
+          </div>
         </div>
         
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -181,6 +207,12 @@
       const otherProvidersWrap = document.getElementById('otherProvidersWrap');
       const bookingStart = document.getElementById('bookingStart');
       const bookingEnd = document.getElementById('bookingEnd');
+      const recurringBlock = document.getElementById('recurringBlock');
+      const recurringToggle = document.getElementById('recurringToggle');
+      const recurringFields = document.getElementById('recurringFields');
+      const recurringCadence = document.getElementById('recurringCadence');
+      const recurringStart = document.getElementById('recurringStart');
+      const recurringDayInputs = ()=> Array.from(document.querySelectorAll('.recurring-day'));
       let selectedProviderId = providerIdParam ? parseInt(providerIdParam,10) : null;
       let selectedProviderName = providerNameParam || '';
       const favoriteIds = new Set(JSON.parse(localStorage.getItem('favorite_caregivers') || '[]').map(String));
@@ -188,6 +220,14 @@
       let allChildren = [];
       let isCreatingNew = false;
       let homeAddress = '';
+      // Show recurring if parent has at least 2 sessions
+      const totalSessions = Object.values(JSON.parse(localStorage.getItem('caregiver_sessions') || '{}')).reduce((a,b)=> a + Number(b||0), 0);
+      if(recurringBlock){
+        recurringBlock.style.display = totalSessions >= 2 ? 'block' : 'none';
+        recurringToggle?.addEventListener('change', ()=>{
+          recurringFields.style.display = recurringToggle.checked ? 'grid' : 'none';
+        });
+      }
       function populateTimeSelect(selectEl){
         if(!selectEl) return;
         const times = [];
@@ -482,6 +522,11 @@
             return;
           }
 
+          const totalSessions = Object.values(JSON.parse(localStorage.getItem('caregiver_sessions') || '{}')).reduce((a,b)=> a + Number(b||0), 0);
+          const allowRecurring = totalSessions >= 2;
+          const wantsRecurring = allowRecurring && recurringToggle && recurringToggle.checked;
+          const selectedDays = recurringDayInputs().filter(cb=>cb.checked).map(cb=> parseInt(cb.value,10));
+
             submitRequestBtn.disabled = true;
             submitRequestBtn.textContent = 'Submitting...';
 
@@ -499,6 +544,13 @@
             // Only include childName if creating a new child
             if(childName) {
               payload.childName = childName;
+            }
+            if(wantsRecurring){
+              payload.recurring = {
+                cadence: recurringCadence.value || 'weekly',
+                days: selectedDays,
+                start_date: recurringStart.value || dateVal || null
+              };
             }
             console.log('Submitting request with payload:', payload);
             const res = await fetch(`${API_BASE}/forms/request`, {
