@@ -1291,6 +1291,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
     markRead(activeThread);
   };
 
+  // Allow dashboards to open the chat widget
+  window.showChatWidget = (otherId)=>{
+    modal.style.display = 'block';
+    if(otherId){
+      activeThread = parseInt(otherId,10);
+      if(!threads[activeThread]) threads[activeThread] = { other_id: activeThread, other_name: 'User', messages: [] };
+      renderThreads();
+      renderHistory(activeThread);
+      markRead(activeThread);
+    }
+  };
+
   async function fetchMessages(){
     try{
       const res = await fetch(`${API_BASE}/forms/messages/${userId}`);
@@ -1306,6 +1318,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
       renderThreads();
       updateBadge();
       if(activeThread) renderHistory(activeThread);
+      const evt = new CustomEvent('chat-updated', { detail: { threads, unread: (function(){
+        return Object.values(threads).reduce((sum, t)=> sum + t.messages.filter(m => m.receiver_id === userId && !m.read_at).length, 0);
+      })() } });
+      window.latestThreads = threads;
+      window.latestUnread = evt.detail.unread;
+      window.dispatchEvent(evt);
     }catch(err){
       console.error(err);
     }

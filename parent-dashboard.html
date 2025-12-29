@@ -104,6 +104,17 @@
       <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px;">
         
         <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h2 style="margin:0; color:#06464E; font-size:16px; font-weight:600;">Messages</h2>
+            <span id="parentMessagesUnread" style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700; display:none;">0 unread</span>
+          </div>
+          <div id="parentMessagesList" style="display:grid; gap:8px; min-height:40px; margin-bottom:10px;">
+            <p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">Loading messages...</p>
+          </div>
+          <button id="parentMessagesOpenBtn" class="btn" style="padding: 10px 14px; font-size: 13px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 8px; width:100%;">Open messages</button>
+        </section>
+        
+        <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
             <h2 style="margin: 0; color: #06464E; font-size: 16px; font-weight: 600;">Your Children</h2>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -445,16 +456,55 @@
             }
           }
 
-        } catch(err) {
-          console.error('Dashboard error:', err);
-          showBanner('Error loading dashboard', 'error');
-          const childrenList = document.getElementById('childrenList');
-          const learningProgress = document.getElementById('learningProgress');
-          const kids = cachedChildren.map(normalizeChild);
-          renderChildrenSection(childrenList, learningProgress, kids);
-          initManageChildrenPicker(kids);
-        }
+      } catch(err) {
+        console.error('Dashboard error:', err);
+        showBanner('Error loading dashboard', 'error');
+        const childrenList = document.getElementById('childrenList');
+        const learningProgress = document.getElementById('learningProgress');
+        const kids = cachedChildren.map(normalizeChild);
+        renderChildrenSection(childrenList, learningProgress, kids);
+        initManageChildrenPicker(kids);
       }
+    }
+
+      // Messages card hookup
+      (function(){
+        const listEl = document.getElementById('parentMessagesList');
+        const unreadEl = document.getElementById('parentMessagesUnread');
+        const openBtn = document.getElementById('parentMessagesOpenBtn');
+        const apply = ()=>{
+          const threads = window.latestThreads || {};
+          const unread = window.latestUnread || 0;
+          if(unreadEl){
+            unreadEl.style.display = unread > 0 ? 'inline-block' : 'none';
+            unreadEl.textContent = `${unread} unread`;
+          }
+          if(listEl){
+            const arr = Object.values(threads);
+            if(arr.length === 0){
+              listEl.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No messages yet.</p>';
+            } else {
+              const lastTwo = arr.slice(-2);
+              listEl.innerHTML = lastTwo.map(t=>{
+                const last = t.messages[t.messages.length-1];
+                return `
+                  <div style="padding:8px 0; border-bottom:1px solid #e5e7eb;">
+                    <div style="font-weight:700; color:#06464E;">${t.other_name || 'User'}</div>
+                    <div style="font-size:12px; color:#6b7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${last ? last.body : ''}</div>
+                  </div>
+                `;
+              }).join('');
+            }
+          }
+        };
+        apply();
+        window.addEventListener('chat-updated', apply);
+        if(openBtn){
+          openBtn.addEventListener('click', ()=>{
+            if(window.showChatWidget) window.showChatWidget();
+          });
+        }
+      })();
 
       // Load dashboard on page load
       window.addEventListener('DOMContentLoaded', ()=> {
