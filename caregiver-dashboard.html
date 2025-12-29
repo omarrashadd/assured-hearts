@@ -450,7 +450,7 @@
           }
           box.innerHTML = confirmed.map(s => {
             const label = (s.status || '').toLowerCase() === 'pending' ? 'background:#fff9e6; color:#8b6914;' : 'background:#eef7f2; color:#2d6b42;';
-            const otherId = s.parent_id || s.parentId || s.parent_user_id || s.parent;
+            const otherId = s.parent_id || s.parentId || s.parent_user_id || s.parent || s.parent_user || s.user_id;
             return `
               <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:grid; gap:4px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -506,7 +506,23 @@
           }
           const stats = data.stats || {};
           const requests = data.requests || [];
-          const sessions = data.sessions || [];
+          const sessionsBase = data.sessions || [];
+          const acceptedAsSessions = (requests || []).filter(r => (r.status||'').toLowerCase() === 'accepted').map(r => {
+            const startDate = r.start_at ? new Date(r.start_at) : null;
+            const endDate = r.end_at ? new Date(r.end_at) : null;
+            const fallback = new Date();
+            return {
+              id: `req-${r.id}`,
+              parent_id: r.parent_id || r.user_id,
+              parent_name: r.parent_name || 'Family',
+              parent_city: r.location || '',
+              session_date: startDate ? startDate.toISOString().slice(0,10) : fallback.toISOString().slice(0,10),
+              start_time: startDate ? startDate.toTimeString().slice(0,8) : '',
+              end_time: endDate ? endDate.toTimeString().slice(0,8) : '',
+              status: 'accepted'
+            };
+          });
+          const sessions = [...sessionsBase, ...acceptedAsSessions];
           const acceptedRequests = requests.filter(r => (r.status||'').toLowerCase() === 'accepted');
           const syntheticSessions = acceptedRequests.map(r => {
             const startDate = r.start_at ? new Date(r.start_at) : null;
