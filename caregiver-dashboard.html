@@ -574,7 +574,8 @@
                 const dur = Math.max(0, (en - st) / (1000*60*60));
                 return sum + dur;
               }
-              return sum;
+              // Default 1 hour if no times provided, so accepted work isn't zeroed out
+              return sum + 1;
             }, 0);
           };
           
@@ -584,7 +585,12 @@
             hoursScheduled = hoursFromAcceptedRequests();
           }
           
-          const activeCount = (upcomingSessions.length || combinedSessions.length || acceptedCount || stats.active || 0);
+          const activeCount = Math.max(
+            upcomingSessions.length,
+            combinedSessions.length,
+            acceptedCount,
+            stats.active || 0
+          );
           setText('metricActive', activeCount.toString());
           setText('metricPending', (pendingCount || stats.pending || 0).toString());
           setText('metricHoursScheduled', roundHours(hoursScheduled || stats.hours_scheduled || 0));
