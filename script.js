@@ -396,6 +396,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Caregiver dashboard: allow updating child logs from appointments
+  const cgAppointmentsList = document.getElementById('appointmentsList');
+  if(cgAppointmentsList){
+    const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+    // Attach a delegated handler after appointments render (handlers attached when list updates)
+    const attachLogButtons = ()=>{
+      cgAppointmentsList.querySelectorAll('.update-log-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const childId = btn.getAttribute('data-child');
+          if(childId){
+            window.location.href = `child-profile.html?child_id=${encodeURIComponent(childId)}`;
+          }
+        });
+      });
+    };
+    // simple observer: re-attach after mutations (appointments render elsewhere in script)
+    const obs = new MutationObserver(()=> attachLogButtons());
+    obs.observe(cgAppointmentsList, { childList:true, subtree:true });
+  }
+
   // Hero Find Caregiver form
   const heroLocationInput = document.getElementById('heroLocationInput');
   const heroFindLocationBtn = document.getElementById('heroFindLocationBtn');
