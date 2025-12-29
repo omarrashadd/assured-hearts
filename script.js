@@ -1253,13 +1253,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
         <div id="chatHistory" style="flex:1; padding:10px; overflow-y:auto; background:#f9fafb;"></div>
         <div style="padding:10px; border-top:1px solid #e5e7eb;">
           <textarea id="chatInput" rows="2" style="width:100%; resize:none; padding:8px; border:1px solid #e5e7eb; border-radius:8px;" placeholder="Type a message..."></textarea>
-          <div style="display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap;">
-            <label style="font-size:12px; color:#06464E; display:flex; align-items:center; gap:6px; cursor:pointer;">
-              📎 Attach
-              <input type="file" id="chatFile" style="display:none;" accept="image/*,video/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx">
-            </label>
-            <span id="chatAttachmentName" style="font-size:11px; color:#6b7280;"></span>
-            <span id="chatStatus" style="font-size:11px; color:#6b7280; margin-left:auto;"></span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+            <span id="chatStatus" style="font-size:11px; color:#6b7280;"></span>
             <button id="chatSendBtn" style="background:#06464E; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-weight:700;">Send</button>
           </div>
         </div>
@@ -1387,23 +1382,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
     historyEl.innerHTML = thread.messages.map(m=>{
       const mine = m.sender_id === userId;
       const readText = mine ? (m.read_at ? 'Read' : 'Sent') : '';
-      let attachmentBlock = '';
-      if(m.attachment_url){
-        const isImage = m.attachment_type && m.attachment_type.startsWith('image/');
-        const isVideo = m.attachment_type && m.attachment_type.startsWith('video/');
-        if(isImage){
-          attachmentBlock = `<div style="margin-top:6px;"><img src="${m.attachment_url}" alt="${m.attachment_name || 'attachment'}" style="max-width:200px; border-radius:8px; display:block;"></div>`;
-        } else if(isVideo){
-          attachmentBlock = `<div style="margin-top:6px;"><video controls style="max-width:220px; border-radius:8px;"><source src="${m.attachment_url}" type="${m.attachment_type}">Your browser does not support video.</video></div>`;
-        } else {
-          attachmentBlock = `<div style="margin-top:6px;"><a href="${m.attachment_url}" download="${m.attachment_name || 'attachment'}" style="color:${mine?'#d1fae5':'#06464E'}; font-weight:700; font-size:12px; text-decoration:underline;">${m.attachment_name || 'Download attachment'}</a></div>`;
-        }
-      }
       return `
         <div style="margin-bottom:8px; display:flex; ${mine?'justify-content:flex-end;':''}">
           <div style="max-width:80%; background:${mine?'#06464E':'#e5e7eb'}; color:${mine?'#fff':'#111'}; padding:8px 10px; border-radius:10px; font-size:13px;">
             <div>${m.body}</div>
-            ${attachmentBlock}
             <div style="font-size:10px; color:${mine?'#d1fae5':'#6b7280'}; text-align:right;">${readText}</div>
           </div>
         </div>
@@ -1414,32 +1396,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   async function sendMessage(){
     const text = (inputEl.value || '').trim();
-    if(!text && !fileInput.files.length) return;
+    if(!text) return;
     if(!activeThread) return;
     sendBtn.disabled = true;
     statusEl.textContent = 'Sending...';
-    let attachment_url = null, attachment_name = null, attachment_type = null;
-    if(fileInput.files.length){
-      const f = fileInput.files[0];
-      attachment_name = f.name;
-      attachment_type = f.type || '';
-      const dataUrl = await new Promise((resolve, reject)=>{
-        const reader = new FileReader();
-        reader.onload = ()=> resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(f);
-      });
-      attachment_url = dataUrl;
-    }
     try{
       await fetch(`${API_BASE}/forms/messages`, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ sender_id:userId, receiver_id: activeThread, body: text, attachment_url, attachment_name, attachment_type })
+        body: JSON.stringify({ sender_id:userId, receiver_id: activeThread, body: text })
       });
       inputEl.value = '';
-      fileInput.value = '';
-      attachmentNameEl.textContent = '';
       await fetchMessages();
       statusEl.textContent = 'Sent';
       markRead(activeThread);
@@ -1467,15 +1434,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
 
   sendBtn.addEventListener('click', sendMessage);
-    inputEl.addEventListener('keydown', (e)=> {
-      if(e.key === 'Enter' && !e.shiftKey){
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-  fileInput.addEventListener('change', ()=>{
-    const f = fileInput.files[0];
-    attachmentNameEl.textContent = f ? f.name : '';
+  inputEl.addEventListener('keydown', (e)=> {
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      sendMessage();
+    }
   });
 
   fetchMessages();
