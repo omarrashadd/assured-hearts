@@ -181,6 +181,11 @@
           const sessionCount = opts.sessionCounts ? (opts.sessionCounts[c.id] || 0) : null;
           const sessionsRow = opts.showSessions ? `<div style="color:#06464E; font-weight:700; font-size:12px;">${sessionCount} sessions</div>` : '';
           const meetBadge = opts.meet ? `<span style="background:#eef7f2; color:#2d6b42; padding:2px 8px; border-radius: 999px; font-size:11px; font-weight:700; align-self:flex-start;">Meet</span>` : '';
+          const availability = c.availability ? (typeof c.availability === 'string' ? JSON.parse(c.availability) : c.availability) : {};
+          let availabilityTag = '';
+          if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius: 999px; font-size:11px; font-weight:700; align-self:flex-start;">Available immediately</span>';
+          if(availability.status === 'next24') availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius: 999px; font-size:11px; font-weight:700; align-self:flex-start;">Available in next 24h</span>';
+          const availabilityDetail = availabilityTag ? availabilityTag : '';
           return `
           <div style="flex: 0 0 220px; background: #f9fbfc; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -194,6 +199,7 @@
               </button>
             </div>
             ${meetBadge}
+            ${availabilityDetail}
             ${sessionsRow}
             <div style="display: flex; align-items: center; gap: 6px; color: #f59e0b; font-weight: 700; font-size: 12px;">
               ★ ${c.rating.toFixed(1)} <span style="color:#6b7280; font-weight: 500;">(${c.reviews} reviews)</span>
@@ -202,6 +208,7 @@
             <div style="display: flex; gap: 6px; margin-top: 2px; flex-wrap: wrap;">
               <button class="btn secondary message-btn" data-caregiver="${c.id}" style="flex: 1; min-width: 110px; padding: 9px 10px; font-size: 11px; font-weight: 700; border: 1px solid #06464E; background: #fff; color: #06464E; border-radius: 7px;">Message ${firstName}</button>
               <button class="btn book-btn" data-caregiver="${c.id}" style="flex: 1; min-width: 110px; padding: 9px 10px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; border: none; border-radius: 7px;">Book with ${firstName}</button>
+              <button class="btn secondary availability-btn" data-caregiver="${c.id}" data-name="${c.name}" data-availability='${JSON.stringify(availability)}' style="flex:1; min-width:110px; padding:9px 10px; font-size:11px; font-weight:700; border:1px solid #e5e7eb; background:#fff; color:#06464E; border-radius:7px;">See ${firstName}'s availability</button>
             </div>
           </div>
         `;
@@ -241,6 +248,21 @@
             renderCaregivers();
           });
         });
+
+        track.querySelectorAll('.availability-btn').forEach(btn=>{
+          btn.addEventListener('click', ()=>{
+            const name = btn.dataset.name || 'Caregiver';
+            const avail = btn.dataset.availability ? JSON.parse(btn.dataset.availability || '{}') : {};
+            let msg = `${name}'s availability:\n`;
+            if(avail.status === 'immediate') msg += 'Available immediately\n';
+            else if(avail.status === 'next24') msg += 'Available in the next 24 hours\n';
+            else if(avail.status === 'week') msg += 'Available this week\n';
+            else msg += 'Availability: please ask for details\n';
+            if(avail.notes) msg += `Notes: ${avail.notes}\n`;
+            if(c.weekly_hours) msg += `Looking to book ~${c.weekly_hours} hrs this week.\n`;
+            alert(msg);
+          });
+        });
       }
 
       async function renderCaregivers(){
@@ -260,7 +282,8 @@
             return (data.providers || []).map(p=>({
               id: String(p.user_id || p.id),
               name: p.name || 'Caregiver',
-              title: p.city || '',
+              initials: (p.name || 'CG').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase(),
+              info: p.city || '',
               rating: p.rating || 4.8,
               reviews: p.reviews || 12,
               sessions: p.sessions || 0,
@@ -268,6 +291,8 @@
               quote: p.bio || 'Trusted caregiver in your area.',
               interest: p.city || location,
               rate: p.rate || '',
+              availability: p.availability || null,
+              weekly_hours: p.weekly_hours || null
             }));
           }catch(err){
             console.warn('Provider fetch failed, using fallback', err);

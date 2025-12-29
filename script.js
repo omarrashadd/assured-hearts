@@ -610,6 +610,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('provBio').value = p.bio || '';
             document.getElementById('prov2FA').checked = !!p.two_factor_enabled;
             document.getElementById('provPaused').checked = !!p.paused;
+            const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
+            document.getElementById('provAvailabilityStatus').value = availability.status || '';
+            document.getElementById('provAvailabilityNotes').value = availability.notes || '';
+            document.getElementById('provWeeklyHours').value = p.weekly_hours ?? '';
           }
         }catch(_err){}
       })();
@@ -625,6 +629,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const payload = Object.fromEntries(fd.entries());
       payload.two_factor_enabled = document.getElementById('prov2FA').checked;
       payload.paused = document.getElementById('provPaused').checked;
+      const availability = {
+        status: document.getElementById('provAvailabilityStatus').value || null,
+        notes: document.getElementById('provAvailabilityNotes').value || null
+      };
+      payload.availability = availability;
+      payload.weekly_hours = payload.weekly_hours ? Number(payload.weekly_hours) : null;
       try{
         const res = await fetch(`${API_BASE}/forms/provider/${userId}`, {
           method: 'PUT',
