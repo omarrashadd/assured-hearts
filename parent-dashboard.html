@@ -243,15 +243,45 @@
         });
       }
 
-      function renderCaregivers(){
+      async function renderCaregivers(){
         const location = localStorage.getItem('last_search_location') || 'your area';
         const hint = document.getElementById('caregiverLocationHint');
         if(hint) hint.textContent = `Based on your last search in ${location}`;
-        const recents = new Set(JSON.parse(localStorage.getItem('recent_caregivers') || '[]'));
+
+        const recentsRaw = JSON.parse(localStorage.getItem('recent_caregivers') || '[]').map(String);
+        const recents = new Set(recentsRaw);
         const sessionCounts = JSON.parse(localStorage.getItem('caregiver_sessions') || '{}');
-        const all = baseCaregivers();
-        const recentList = all.filter(c => recents.has(c.id));
-        const otherList = all.filter(c => !recents.has(c.id));
+
+        async function loadProviders(){
+          try{
+            const resp = await fetch(`${API_BASE}/forms/providers`);
+            if(!resp.ok) return [];
+            const data = await resp.json();
+            return (data.providers || []).map(p=>({
+              id: String(p.user_id || p.id),
+              name: p.name || 'Caregiver',
+              title: p.city || '',
+              rating: p.rating || 4.8,
+              reviews: p.reviews || 12,
+              sessions: p.sessions || 0,
+              bio: p.bio || 'Trusted caregiver in your area.',
+              quote: p.bio || 'Trusted caregiver in your area.',
+              interest: p.city || location,
+              rate: p.rate || '',
+            }));
+          }catch(err){
+            console.warn('Provider fetch failed, using fallback', err);
+            return [];
+          }
+        }
+
+        let all = await loadProviders();
+        if(!all || all.length === 0){
+          all = baseCaregivers();
+        }
+
+        const recentList = all.filter(c => recents.has(String(c.id)));
+        const otherList = all.filter(c => !recents.has(String(c.id)));
         const emptyText = document.getElementById('caregiverRecentEmpty');
         if(emptyText) emptyText.style.display = recentList.length ? 'none' : 'block';
         renderCaregiverTrack('caregiverTrackRecent','caregiverViewportRecent','caregiverPrevRecent','caregiverNextRecent', recentList.length ? recentList : [], { meet:false, showSessions:true, sessionCounts });
