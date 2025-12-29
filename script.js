@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsHTML = `
           <div id="heroSearchResults" style="text-align: center; margin-top: 16px; padding: 0;">
             <p style="color: #333; margin: 0 0 12px 0;"><strong>${numCaregivers} caregivers available near ${location}</strong></p>
-            <div id="heroPreview" style="margin-top: 12px;"></div>
+            <div id="heroPreview" style="margin-top: 12px;">Loading caregivers...</div>
             ${!isSignedIn ? `
               <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top:12px;">
                 <button type="button" id="heroLoginBtn" class="btn" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 8px; justify-content: center;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign in to apply</button>
@@ -325,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if(providers.length === 0){
             providers = baseCaregivers(); // fallback sample
           }
+          // Render full cards for logged-in users and guests
           const caregiversHTML = providers.map((p, idx)=> {
             const initials = p.name ? p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : 'CG';
             const bio = p.bio || 'Trusted caregiver in your area.';
