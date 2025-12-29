@@ -381,6 +381,7 @@
               const status = statusColors[statusKey] || statusColors.pending;
               const dateStr = new Date(request.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
               const canCancel = statusKey === 'pending' || statusKey === 'matched';
+              const otherId = request.provider_user_id || request.provider_id || request.provider;
               return `
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: start; gap: 12px;">
                   <div style="flex: 1; min-width: 0;">
@@ -390,7 +391,10 @@
                     </div>
                     <p style="margin: 0; color: #999; font-size: 12px;">Submitted ${dateStr}</p>
                   </div>
-                  ${canCancel ? `<button class="cancel-request-btn" data-id="${request.id}" style="background: #fff; color: #991b1b; border: 1px solid #991b1b; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">Cancel</button>` : ''}
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    ${otherId ? `<button class="message-caregiver-btn" data-other="${otherId}" style="background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer;">Message caregiver</button>` : ''}
+                    ${canCancel ? `<button class="cancel-request-btn" data-id="${request.id}" style="background: #fff; color: #991b1b; border: 1px solid #991b1b; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">Cancel</button>` : ''}
+                  </div>
                 </div>
               `;
             }).join('');
@@ -417,6 +421,13 @@
                 btn.textContent = 'Failed';
                 btn.disabled = false;
               }
+            });
+          });
+
+          requestsList.querySelectorAll('.message-caregiver-btn').forEach(btn=>{
+            btn.addEventListener('click', ()=>{
+              const other = parseInt(btn.dataset.other,10);
+              if(window.openChatThread && other) window.openChatThread(other);
             });
           });
 
