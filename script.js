@@ -1307,7 +1307,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
   async function fetchMessages(){
     try{
       const res = await fetch(`${API_BASE}/forms/messages/${userId}`);
-      if(!res.ok) throw new Error('Failed to load messages');
+      if(!res.ok){
+        const errText = await res.text();
+        console.error('Failed to load messages', res.status, errText);
+        // Reset to empty state instead of throwing
+        threads = {};
+        updateBadge();
+        window.dispatchEvent(new CustomEvent('chat-updated', { detail:{threads:{}, unread:0} }));
+        return;
+      }
       const data = await res.json();
       threads = {};
       const msgs = data.messages || [];
@@ -1402,11 +1410,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
     sendBtn.disabled = true;
     statusEl.textContent = 'Sending...';
     try{
-      await fetch(`${API_BASE}/forms/messages`, {
+      const res = await fetch(`${API_BASE}/forms/messages`, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ sender_id:userId, receiver_id: activeThread, body: text })
       });
+      if(!res.ok){
+        const errTxt = await res.text();
+        throw new Error(errTxt || 'Failed to send');
+      }
       inputEl.value = '';
       await fetchMessages();
       statusEl.textContent = 'Sent';
