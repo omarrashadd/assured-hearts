@@ -117,7 +117,7 @@
         <section style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <h2 style="margin: 0; color: #06464E;">My Requests</h2>
-            <span style="background:#eef2ff; color:#4338ca; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700;">3 new</span>
+            <span id="pendingPill" style="background:#eef2ff; color:#4338ca; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700;">0 pending</span>
           </div>
           <div style="display: grid; gap: 10px;">
             <div id="requestsList" style="display:grid; gap:10px;">
@@ -564,6 +564,10 @@
           setText('metricHoursTotal', (hoursCompletedMonth || stats.hours_month || 0).toString());
           setText('metricEarnings', stats.earnings ? `$${stats.earnings}` : '$0');
           setText('metricTips', stats.tips ? `$${stats.tips}` : '$0');
+          const pendingPill = document.getElementById('pendingPill');
+          if(pendingPill){
+            pendingPill.textContent = `${pendingCount} pending`;
+          }
           renderRequests(requests);
           renderMessages(data.messages);
           renderAppointments(sessions);
