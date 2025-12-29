@@ -345,10 +345,14 @@
             return;
           }
           box.innerHTML = requests.map(req => {
-            const statusLabel = req.status || 'Pending';
-            const badge = statusLabel.toLowerCase() === 'pending'
+            const statusKey = (req.status || '').toLowerCase();
+            const isPending = statusKey === 'pending';
+            const statusLabel = isPending ? 'Pending' : (statusKey === 'accepted' ? 'Accepted' : (statusKey === 'declined' ? 'Declined' : 'Needs info'));
+            const badge = isPending
               ? 'background:#fff9e6; color:#8b6914;'
-              : 'background:#eef7f2; color:#2d6b42;';
+              : (statusKey === 'declined'
+                  ? 'background:#fee; color:#991b1b;'
+                  : 'background:#eef7f2; color:#2d6b42;');
             const start = req.start_at ? new Date(req.start_at).toLocaleString() : (req.time || '');
             return `
               <div style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; display: grid; gap: 6px;">
@@ -360,30 +364,52 @@
                   <span style="${badge} padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700;">${statusLabel}</span>
                 </div>
                 <div style="font-size:12px; color:#6b7280;">Location: ${req.location || 'TBD'} · Notes: ${req.notes || '—'}</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                  <button class="pulse-btn" data-id="${req.id}" style="padding: 8px 12px; background: #06464E; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700;">Accept</button>
-                  <button data-id="${req.id}" style="padding: 8px 12px; background: #f5f5f5; color: #666; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; font-weight: 700;">Decline</button>
-                  <button style="padding: 8px 12px; background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; font-size: 12px; font-weight: 700;">See details</button>
-                </div>
+                ${isPending ? `
+                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="pulse-btn" data-id="${req.id}" data-action="accept" style="padding: 8px 12px; background: #06464E; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700;">Accept</button>
+                    <button data-id="${req.id}" data-action="decline" style="padding: 8px 12px; background: #f5f5f5; color: #666; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; font-weight: 700;">Decline</button>
+                    <button style="padding: 8px 12px; background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; font-size: 12px; font-weight: 700;">See details</button>
+                  </div>
+                ` : ''}
               </div>
             `;
           }).join('');
           box.querySelectorAll('button[data-id]').forEach(btn=>{
             btn.addEventListener('click', async ()=>{
               const rid = btn.getAttribute('data-id');
-              const action = btn.textContent.toLowerCase().includes('accept') ? 'accept' : 'decline';
+              const action = btn.dataset.action || (btn.textContent.toLowerCase().includes('accept') ? 'accept' : 'decline');
               btn.disabled = true;
+              btn.textContent = 'Updating...';
               try{
-                await fetch(`${API_BASE}/forms/request/${rid}/respond`, {
+                const res = await fetch(`${API_BASE}/forms/request/${rid}/respond`, {
                   method:'POST',
                   headers:{'Content-Type':'application/json'},
                   body: JSON.stringify({ action, provider_id: resolvedProviderId })
                 });
+                if(!res.ok) throw new Error('Failed');
                 showBanner(`Request ${action}ed`, 'success');
-                location.reload();
+                // Update UI without full reload
+                const card = btn.closest('div[style*="border: 1px solid"]');
+                if(card){
+                  const badge = card.querySelector('span');
+                  if(badge){
+                    if(action === 'accept'){
+                      badge.textContent = 'Accepted';
+                      badge.style.background = '#eef7f2';
+                      badge.style.color = '#2d6b42';
+                    } else {
+                      badge.textContent = 'Declined';
+                      badge.style.background = '#fee';
+                      badge.style.color = '#991b1b';
+                    }
+                  }
+                  const btnRow = card.querySelector('div[style*=\"flex; gap\"]');
+                  if(btnRow) btnRow.remove();
+                }
               }catch(_err){
                 showBanner('Failed to update request', 'error');
                 btn.disabled = false;
+                btn.textContent = action === 'accept' ? 'Accept' : 'Decline';
               }
             });
           });
