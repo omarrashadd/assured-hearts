@@ -427,7 +427,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await resp.json();
         const families = Array.isArray(data.families) ? data.families : [];
         if(families.length === 0){
-          familyList.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No families yet.</p>';
+          familyList.innerHTML = `
+            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:grid; gap:6px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:34px; height:34px; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); border-radius:8px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">F</div>
+                <div>
+                  <div style="font-weight:700; color:#06464E; font-size:14px;">Your families will appear here</div>
+                  <div style="color:#6b7280; font-size:12px;">Children in confirmed bookings show with an Update log button.</div>
+                </div>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; background:#f9fbfc; font-size:12px; color:#06464E;">
+                  <span style="font-weight:700;">Sample Child</span>
+                  <button class="btn secondary btn-sm" style="padding:6px 8px; font-size:11px; border:1px solid #e5e7eb; color:#06464E; background:#fff; border-radius:6px; cursor:not-allowed;" disabled>Update log</button>
+                </div>
+              </div>
+            </div>
+          `;
           return;
         }
         familyList.innerHTML = families.map(fam=>{
