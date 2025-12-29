@@ -459,14 +459,15 @@
                 </div>
                 <div style="font-size:12px; color:#6b7280;">${s.session_date || ''} · ${s.start_time || ''} - ${s.end_time || ''}</div>
                 <div style="font-size:12px; color:#6b7280;">📍 ${s.parent_city || 'TBD'}</div>
-                ${otherId ? `<button class="btn small message-btn" data-other="${otherId}" style="justify-self:start; padding:8px 10px; background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:8px; font-weight:700; font-size:12px;">Message ${s.parent_name || 'family'}</button>` : ''}
+                ${otherId ? `<button class="btn small message-btn" data-other="${otherId}" data-name="${s.parent_name || 'Family'}" style="justify-self:start; padding:8px 10px; background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:8px; font-weight:700; font-size:12px;">Message ${s.parent_name || 'family'}</button>` : ''}
               </div>
             `;
           }).join('');
           box.querySelectorAll('.message-btn').forEach(btn=>{
             btn.addEventListener('click', ()=>{
               const other = parseInt(btn.dataset.other,10);
-              if(window.openChatThread && other) window.openChatThread(other);
+              const otherName = btn.dataset.name || 'User';
+              if(window.openChatThread && other) window.openChatThread(other, otherName);
             });
           });
         };

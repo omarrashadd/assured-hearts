@@ -1292,11 +1292,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   };
 
   // Allow dashboards to open the chat widget
-  window.showChatWidget = (otherId)=>{
+  window.showChatWidget = (otherId, otherName)=>{
     modal.style.display = 'block';
     if(otherId){
       activeThread = parseInt(otherId,10);
-      if(!threads[activeThread]) threads[activeThread] = { other_id: activeThread, other_name: 'User', messages: [] };
+      if(!threads[activeThread]) threads[activeThread] = { other_id: activeThread, other_name: otherName || 'User', messages: [] };
+      if(otherName && threads[activeThread]) threads[activeThread].other_name = otherName;
       renderThreads();
       renderHistory(activeThread);
       markRead(activeThread);
