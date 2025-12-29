@@ -347,6 +347,7 @@
             isCreatingNew = false;
             const child = allChildren.find(c => c.id === selectedId);
             if(child){
+              childDetailsSection.style.display = 'none';
               populateChildDetails(child, true);
             }
           } else {
@@ -390,6 +391,11 @@
         detailFrequency.value = child.frequency || '';
         detailSchedule.value = child.preferred_schedule || '';
         detailSpecialNeeds.value = child.special_needs || '';
+
+        // If existing child, hide form after prefill to keep UI clean
+        if(isExisting){
+          childDetailsSection.style.display = 'none';
+        }
       }
 
       if(!available){
