@@ -76,11 +76,12 @@
       </div>
     </div>
 
-    <header class="hero" style="padding: 64px 16px; background: linear-gradient(135deg, #fff 0%, #fff7f7 100%);">
-      <div class="container">
-        <h1 style="text-align: center; margin-bottom: 16px;">Find Childcare</h1>
-        <p class="lead" style="text-align: center; margin-bottom: 32px;">Connect with trusted, vetted caregivers in your area.</p>
-        <form id="heroFindForm" style="margin: 12px 0 0 0; display: flex; justify-content: center;">
+    <!-- Hero duplicated to match homepage -->
+    <header class="hero">
+      <div class="container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <h1>Childcare Designed for Muslim Families</h1>
+        <p class="lead">Caring Hands, Shared Islamic Values, Peace of Mind.</p>
+        <form id="heroFindForm" style="margin: 12px 0 -20px 0; display: flex; justify-content: center;">
           <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
             <p style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Find a Caregiver</p>
             <div style="display: flex; align-items: center; background: white; border-radius: 50px; padding: 8px 16px; border: 2px solid #06464E; gap: 12px; width: 100%; max-width: 700px; box-shadow: 0 2px 8px rgba(6, 70, 78, 0.1);">
@@ -89,43 +90,45 @@
               </button>
               <select name="location" id="heroLocationInput" style="flex: 1; border: none; outline: none; padding: 8px; font-size: 14px; background: transparent; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
                 <option value="">Enter your location</option>
-                <option value="St. John's">St. John's, NL</option>
-                <option value="Halifax">Halifax, NS</option>
-                <option value="Saint John">Saint John, NB</option>
-                <option value="Charlottetown">Charlottetown, PE</option>
-                <option value="Quebec City">Quebec City, QC</option>
-                <option value="Montreal">Montreal, QC</option>
-                <option value="Toronto">Toronto, ON</option>
-                <option value="Ottawa">Ottawa, ON</option>
-                <option value="Hamilton">Hamilton, ON</option>
-                <option value="London">London, ON</option>
-                <option value="Winnipeg">Winnipeg, MB</option>
-                <option value="Calgary">Calgary, AB</option>
-                <option value="Edmonton">Edmonton, AB</option>
-                <option value="Red Deer">Red Deer, AB</option>
-                <option value="Lethbridge">Lethbridge, AB</option>
-                <option value="Regina">Regina, SK</option>
-                <option value="Saskatoon">Saskatoon, SK</option>
-                <option value="Prince Albert">Prince Albert, SK</option>
-                <option value="Moose Jaw">Moose Jaw, SK</option>
-                <option value="Yorkton">Yorkton, SK</option>
-                <option value="Swift Current">Swift Current, SK</option>
-                <option value="Vancouver">Vancouver, BC</option>
-                <option value="Victoria">Victoria, BC</option>
-                <option value="Surrey">Surrey, BC</option>
-                <option value="Burnaby">Burnaby, BC</option>
-                <option value="Kelowna">Kelowna, BC</option>
-                <option value="Whitehorse">Whitehorse, YT</option>
-                <option value="Yellowknife">Yellowknife, NT</option>
-                <option value="Iqaluit">Iqaluit, NU</option>
-              </select>
-              <button type="submit" style="background: #06464E; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(6,70,78,0.3)'; this.style.filter='brightness(1.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.filter='brightness(1)'">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 8h14M8 1l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
+              <option value="St. John's">St. John's, NL</option>
+              <option value="Halifax">Halifax, NS</option>
+              <option value="Saint John">Saint John, NB</option>
+              <option value="Charlottetown">Charlottetown, PE</option>
+              <option value="Quebec City">Quebec City, QC</option>
+              <option value="Montreal">Montreal, QC</option>
+              <option value="Toronto">Toronto, ON</option>
+              <option value="Ottawa">Ottawa, ON</option>
+              <option value="Hamilton">Hamilton, ON</option>
+              <option value="London">London, ON</option>
+              <option value="Winnipeg">Winnipeg, MB</option>
+              <option value="Calgary">Calgary, AB</option>
+              <option value="Edmonton">Edmonton, AB</option>
+              <option value="Red Deer">Red Deer, AB</option>
+              <option value="Lethbridge">Lethbridge, AB</option>
+              <option value="Regina">Regina, SK</option>
+              <option value="Saskatoon">Saskatoon, SK</option>
+              <option value="Prince Albert">Prince Albert, SK</option>
+              <option value="Moose Jaw">Moose Jaw, SK</option>
+              <option value="Yorkton">Yorkton, SK</option>
+              <option value="Swift Current">Swift Current, SK</option>
+              <option value="Vancouver">Vancouver, BC</option>
+              <option value="Victoria">Victoria, BC</option>
+              <option value="Surrey">Surrey, BC</option>
+              <option value="Burnaby">Burnaby, BC</option>
+              <option value="Kelowna">Kelowna, BC</option>
+              <option value="Whitehorse">Whitehorse, YT</option>
+              <option value="Yellowknife">Yellowknife, NT</option>
+              <option value="Iqaluit">Iqaluit, NU</option>
+            </select>
+            <button type="submit" style="background: #06464E; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(6,70,78,0.3)'; this.style.filter='brightness(1.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.filter='brightness(1)'">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 8h14M8 1l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
             </div>
             <p style="margin: 8px 0 8px 0; color: #666; font-size: 12px;">Check availability</p>
+            <p style="margin: 8px 0 8px 0; color: #999; font-size: 12px;">or</p>
+            <a href="become-provider.html" class="btn outline" style="padding: 14px 32px; font-size: 16px; font-weight: 700; border: 2px solid #06464E; color: #06464E; background: white; text-decoration: none; display: inline-block; transition: all 0.2s ease; border-radius: 8px;" onmouseover="this.style.background='#06464E'; this.style.color='white'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(6,70,78,0.3)'" onmouseout="this.style.background='white'; this.style.color='#06464E'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">Become a Childcare Provider</a>
           </div>
         </form>
       </div>
