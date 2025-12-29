@@ -416,6 +416,59 @@ document.addEventListener('DOMContentLoaded', () => {
     obs.observe(cgAppointmentsList, { childList:true, subtree:true });
   }
 
+  // Caregiver dashboard: My Families list with update log links
+  const familyList = document.getElementById('familyList');
+  if(familyList){
+    const userId = localStorage.getItem('user_id');
+    (async ()=>{
+      try{
+        const resp = await fetch(`${API_BASE}/forms/provider/${userId}`);
+        if(!resp.ok) throw new Error('Families not found');
+        const data = await resp.json();
+        const families = Array.isArray(data.families) ? data.families : [];
+        if(families.length === 0){
+          familyList.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No families yet.</p>';
+          return;
+        }
+        familyList.innerHTML = families.map(fam=>{
+          const name = fam.family_name || fam.parent_name || 'Family';
+          const children = Array.isArray(fam.children) ? fam.children : [];
+          const childChips = children.map(c=>{
+            const label = `${c.last_name || ''} ${c.first_name || ''}`.trim() || 'Child';
+            const childId = c.child_id || c.id || '';
+            return `
+              <div style="display:flex; gap:8px; align-items:center; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; background:#f9fbfc; font-size:12px; color:#06464E;">
+                <span style="font-weight:700;">${label}</span>
+                ${childId ? `<button class="btn secondary btn-sm update-log-btn" data-child="${childId}" style="padding:6px 8px; font-size:11px; border:1px solid #e5e7eb; color:#06464E; background:#fff; border-radius:6px;">Update log</button>` : ''}
+              </div>
+            `;
+          }).join('');
+          return `
+            <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:grid; gap:6px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:34px; height:34px; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); border-radius:8px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${(name.charAt(0) || 'F').toUpperCase()}</div>
+                <div>
+                  <div style="font-weight:700; color:#06464E; font-size:14px;">${name}</div>
+                  <div style="color:#6b7280; font-size:12px;">${children.length} child${children.length === 1 ? '' : 'ren'}</div>
+                </div>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">${childChips || '<span style="color:#9ca3af; font-size:12px;">No children linked yet.</span>'}</div>
+            </div>
+          `;
+        }).join('');
+        // Attach update log links
+        familyList.querySelectorAll('.update-log-btn').forEach(btn=>{
+          btn.addEventListener('click', ()=>{
+            const childId = btn.getAttribute('data-child');
+            if(childId) window.location.href = `child-profile.html?child_id=${encodeURIComponent(childId)}`;
+          });
+        });
+      }catch(err){
+        familyList.innerHTML = '<p style="margin:0; padding:8px; color:#b91c1c; font-size:13px;">Unable to load families.</p>';
+      }
+    })();
+  }
+
   // Hero Find Caregiver form
   const heroLocationInput = document.getElementById('heroLocationInput');
   const heroFindLocationBtn = document.getElementById('heroFindLocationBtn');
