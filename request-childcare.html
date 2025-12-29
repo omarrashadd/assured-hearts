@@ -27,23 +27,14 @@
       </div>
     </nav>
 
-    <header class="hero" style="padding: 64px 16px; background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%);">
+    <header class="hero" style="padding: 48px 16px; background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%); text-align:center;">
       <div class="container" style="max-width: 900px;">
-        <h1 style="text-align: center; margin-bottom: 12px;">Request Childcare</h1>
-        <p class="lead" style="text-align: center; margin-bottom: 24px;">We found caregivers in your area. Add your child details to complete your request.</p>
+        <h1 id="heroTitle" style="margin: 0 0 12px 0; color:#06464E;">Request Childcare</h1>
+        <p id="heroSubtitle" class="lead" style="margin: 0; color:#4b5563;">Select your caregiver and complete your request.</p>
       </div>
     </header>
 
-    <main class="container" style="padding: 48px 24px; max-width: 900px;">
-      <section id="availabilityCard" style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h2 id="availabilityTitle" style="margin: 0 0 8px 0; color: #06464E;">Caregivers are available near you</h2>
-            <p id="availabilitySubtitle" style="margin: 0; color: #666; font-size: 14px;">Based on your recent search location.</p>
-          </div>
-          <span style="background: #eef7f2; color: #2d6b42; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700;">Available</span>
-        </div>
-      </section>
+    <main class="container" style="padding: 32px 24px 48px 24px; max-width: 900px;">
 
       <section style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
         <h2 style="margin: 0 0 12px 0; color: #06464E;">Next Step</h2>
@@ -340,37 +331,15 @@
         });
       }
 
-      // Fetch and display caregiver count from API
-      const lastLocation = localStorage.getItem('last_search_location');
-      const availabilityTitle = document.getElementById('availabilityTitle');
-      
-      if(lastLocation){
-        document.getElementById('availabilitySubtitle').textContent = `Based on your recent search: ${lastLocation}`;
-        
-        // Fetch real count from backend
-        fetch(`${API_BASE}/search?city=${encodeURIComponent(lastLocation)}`)
-          .then(res => res.json())
-          .then(data => {
-            const count = Number(data.caregivers || 0);
-            if(count > 0){
-              availabilityTitle.textContent = `${count} caregiver${count === 1 ? '' : 's'} available near ${lastLocation}`;
-            } else {
-              availabilityTitle.textContent = 'Checking availability...';
-            }
-          })
-          .catch(err => {
-            console.warn('Failed to fetch caregiver count:', err);
-            availabilityTitle.textContent = 'Caregivers are available near you';
-          });
-      } else {
-        availabilityTitle.textContent = 'Caregivers are available near you';
-      }
-      
       if(providerIdParam && providerSummary){
         providerSummary.style.display = 'block';
         providerSummaryText.textContent = `Booking request will be sent to ${providerNameParam || 'your selected caregiver'}`;
+        const heroTitle = document.getElementById('heroTitle');
+        const heroSubtitle = document.getElementById('heroSubtitle');
+        if(heroTitle) heroTitle.textContent = `Booking with ${providerNameParam || 'your caregiver'}`;
+        if(heroSubtitle) heroSubtitle.textContent = 'Confirm details to send your request.';
       }
-      if(lastLocation && bookingLocation) bookingLocation.value = lastLocation;
+      if(localStorage.getItem('last_search_location') && bookingLocation) bookingLocation.value = localStorage.getItem('last_search_location');
     </script>
   </body>
 </html>
