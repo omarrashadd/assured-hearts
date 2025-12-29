@@ -43,6 +43,19 @@
         <div id="providerSummary" style="display:none; margin-bottom:16px; padding:12px; border:1px solid #e5e7eb; border-radius:10px; background:#f8fbfc;">
           <p id="providerSummaryText" style="margin:0; color:#06464E; font-weight:700; font-size:14px;"></p>
         </div>
+
+        <div id="providerPicker" style="margin-bottom:20px;">
+          <h3 style="margin:0 0 10px 0; color:#06464E; font-size:16px;">Select a caregiver</h3>
+          <p style="margin:0 0 12px 0; color:#6b7280; font-size:13px;">Choose from your favorites or other caregivers in your area.</p>
+          <div id="favoriteProviders" style="margin-bottom:12px; display:none;">
+            <h4 style="margin:0 0 8px 0; color:#06464E; font-size:14px;">Favorites</h4>
+            <div id="favoriteProvidersList" style="display:grid; gap:8px;"></div>
+          </div>
+          <div>
+            <h4 style="margin:0 0 8px 0; color:#06464E; font-size:14px;">Other caregivers in your area</h4>
+            <div id="otherProvidersList" style="display:grid; gap:8px;"></div>
+          </div>
+        </div>
         
         <div style="margin-bottom: 20px;">
           <label for="childSelect" style="display: block; margin-bottom: 8px; color: #06464E; font-weight: 600; font-size: 14px;">Which child is this request for?</label>
@@ -160,6 +173,14 @@
       const bookingDate = document.getElementById('bookingDate');
       const bookingLocation = document.getElementById('bookingLocation');
       const requestNotes = document.getElementById('requestNotes');
+      const favoriteProvidersList = document.getElementById('favoriteProvidersList');
+      const otherProvidersList = document.getElementById('otherProvidersList');
+      const favoriteProvidersWrap = document.getElementById('favoriteProviders');
+      const bookingStart = document.getElementById('bookingStart');
+      const bookingEnd = document.getElementById('bookingEnd');
+      let selectedProviderId = providerIdParam ? parseInt(providerIdParam,10) : null;
+      let selectedProviderName = providerNameParam || '';
+      const favoriteIds = new Set(JSON.parse(localStorage.getItem('favorite_caregivers') || '[]').map(String));
       
       let allChildren = [];
       let isCreatingNew = false;
@@ -179,6 +200,99 @@
       }
       populateTimeSelect(bookingStart);
       populateTimeSelect(bookingEnd);
+
+      function renderProviderCard(p){
+        const initial = (p.name || 'Caregiver').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+        const city = p.city || p.province || '';
+        const bio = p.bio || p.interest || 'Trusted caregiver in your area.';
+        const isSelected = selectedProviderId && String(selectedProviderId) === String(p.id);
+        const isFav = favoriteIds.has(String(p.id));
+        return `
+          <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; display:grid; gap:6px; background:${isSelected?'#f0f9ff':'#fff'};">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initial}</div>
+              <div>
+                <div style="font-weight:700; color:#06464E;">${p.name || 'Caregiver'}</div>
+                <div style="font-size:12px; color:#6b7280;">${city}</div>
+              </div>
+            </div>
+            <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="select-provider-btn" data-id="${p.id}" data-name="${p.name || 'Caregiver'}" style="padding:8px 10px; border-radius:8px; border:1px solid #06464E; background:${isSelected?'#06464E':'#fff'}; color:${isSelected?'#fff':'#06464E'}; font-weight:700; font-size:12px;">${isSelected?'Selected':'Select'}</button>
+              <button class="fav-toggle-btn" data-id="${p.id}" style="padding:8px 10px; border-radius:8px; border:1px solid #e5e7eb; background:#fff; color:#6b7280; font-weight:700; font-size:12px;">${isFav?'★ Remove favorite':'☆ Add favorite'}</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function attachProviderEvents(){
+        document.querySelectorAll('.select-provider-btn').forEach(btn=>{
+          btn.addEventListener('click', ()=>{
+            selectedProviderId = parseInt(btn.dataset.id,10);
+            selectedProviderName = btn.dataset.name || 'Caregiver';
+            if(providerSummary){
+              providerSummary.style.display = 'block';
+              providerSummaryText.textContent = `Booking request will be sent to ${selectedProviderName}`;
+            }
+            renderProvidersUI(window.__providerList || []);
+          });
+        });
+        document.querySelectorAll('.fav-toggle-btn').forEach(btn=>{
+          btn.addEventListener('click', ()=>{
+            const id = btn.dataset.id;
+            if(!id) return;
+            if(favoriteIds.has(id)) favoriteIds.delete(id); else favoriteIds.add(id);
+            localStorage.setItem('favorite_caregivers', JSON.stringify(Array.from(favoriteIds)));
+            renderProvidersUI(window.__providerList || []);
+          });
+        });
+      }
+
+      function renderProvidersUI(list){
+        window.__providerList = list;
+        const favorites = list.filter(p => favoriteIds.has(String(p.id)));
+        const others = list.filter(p => !favoriteIds.has(String(p.id)));
+        if(favoriteProvidersWrap){
+          favoriteProvidersWrap.style.display = favorites.length ? 'block' : 'none';
+        }
+        if(favoriteProvidersList){
+          favoriteProvidersList.innerHTML = favorites.length ? favorites.map(renderProviderCard).join('') : '';
+        }
+        if(otherProvidersList){
+          otherProvidersList.innerHTML = others.length ? others.map(renderProviderCard).join('') : '<p style="margin:0; color:#6b7280; font-size:13px;">No caregivers found.</p>';
+        }
+        attachProviderEvents();
+      }
+
+      async function loadProviders(){
+        try{
+          const resp = await fetch(`${API_BASE}/forms/providers`);
+          if(!resp.ok) throw new Error('Failed providers');
+          const data = await resp.json();
+          const providers = (data.providers || []).map(p=>({
+            id: String(p.user_id || p.id),
+            name: p.name || 'Caregiver',
+            city: p.city || '',
+            province: p.province || '',
+            bio: p.bio || '',
+            rate: p.rate || ''
+          }));
+          if(providers.length){
+            renderProvidersUI(providers);
+            return;
+          }
+        }catch(err){
+          console.warn('Provider fetch failed, using fallback', err);
+        }
+        const fallback = [
+          { id:'101', name:'Amina Khalid', city:'Calgary', bio:'5 yrs exp · CPR · Islamic stories' },
+          { id:'102', name:'Sara Malik', city:'Calgary', bio:'ECCE · Crafts' },
+          { id:'103', name:'Nadia Rahman', city:'Calgary', bio:'ECE · Outdoor play' }
+        ];
+        renderProvidersUI(fallback);
+      }
+
+      loadProviders();
 
       // Define showBanner function
       const showBanner = window.showBanner || function(msg, type){
@@ -293,6 +407,11 @@
           const start_at = dateVal && startVal ? `${dateVal}T${startVal}` : null;
           const end_at = dateVal && endVal ? `${dateVal}T${endVal}` : null;
           
+          if(!selectedProviderId){
+            showBanner('Please select a caregiver to send your request to.', 'error');
+            return;
+          }
+
           if(!finalLocation){
             showBanner('Please search for childcare in your area first.', 'info');
             setTimeout(() => window.location.href = 'find-childcare.html', 1500);
@@ -311,17 +430,17 @@
               const payload = { 
                 user_id: userId, 
                 child_id: childId, 
-                location: finalLocation, 
-                notes: requestNotes.value || '',
-                start_at,
-                end_at,
-                rate: null,
-                provider_id: providerIdParam ? parseInt(providerIdParam,10) : null
-              };
-              // Only include childName if creating a new child
-              if(childName) {
-                payload.childName = childName;
-              }
+              location: finalLocation, 
+              notes: requestNotes.value || '',
+              start_at,
+              end_at,
+              rate: null,
+              provider_id: selectedProviderId ? parseInt(selectedProviderId,10) : null
+            };
+            // Only include childName if creating a new child
+            if(childName) {
+              payload.childName = childName;
+            }
             console.log('Submitting request with payload:', payload);
             const res = await fetch(`${API_BASE}/forms/request`, {
               method: 'POST',
@@ -355,6 +474,13 @@
         const heroTitle = document.getElementById('heroTitle');
         const heroSubtitle = document.getElementById('heroSubtitle');
         if(heroTitle) heroTitle.textContent = `Booking with ${providerNameParam || 'your caregiver'}`;
+        if(heroSubtitle) heroSubtitle.textContent = 'Confirm details to send your request.';
+      } else if(selectedProviderName){
+        providerSummary.style.display = 'block';
+        providerSummaryText.textContent = `Booking request will be sent to ${selectedProviderName}`;
+        const heroTitle = document.getElementById('heroTitle');
+        const heroSubtitle = document.getElementById('heroSubtitle');
+        if(heroTitle) heroTitle.textContent = `Booking with ${selectedProviderName}`;
         if(heroSubtitle) heroSubtitle.textContent = 'Confirm details to send your request.';
       }
       if(localStorage.getItem('last_search_location') && bookingLocation) bookingLocation.value = localStorage.getItem('last_search_location');
