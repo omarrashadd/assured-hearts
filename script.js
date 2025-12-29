@@ -189,6 +189,134 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Lightweight sample caregivers fallback
+  const baseCaregivers = ()=> ([
+    { id: 'cg1', name: 'Amina Khalid', city: 'Regina', bio: 'Experienced caregiver, CPR certified.' },
+    { id: 'cg2', name: 'Nadia Rahman', city: 'Regina', bio: 'ECE background, weekend availability.' }
+  ]);
+
+  async function renderHeroProviders(location, isSignedIn, container){
+    try{
+      const resp = await fetch(`${API_BASE}/forms/providers`);
+      let providers = [];
+      if(resp.ok){
+        const data = await resp.json();
+        providers = Array.isArray(data.providers) ? data.providers : [];
+      }
+      if(providers.length === 0){
+        providers = baseCaregivers();
+      }
+      const caregiversHTML = providers.map((p, idx)=> {
+        const initials = p.name ? p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : 'CG';
+        const bio = p.bio || 'Trusted caregiver in your area.';
+        const rate = p.rate ? `$${p.rate}/hr` : '';
+        const city = p.city || location;
+        const pid = p.user_id || p.id || '';
+        const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
+        let availabilityTag = '';
+        if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
+        if(availability.status === 'next24') availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
+        const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
+        return `
+          <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px; display:grid; gap:6px;">
+            <div style="display:flex; gap:10px; align-items:center;">
+              <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initials}</div>
+              <div>
+                <div style="font-weight:700; color:#06464E;">${p.name || 'Caregiver ' + (idx+1)}</div>
+                <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
+              </div>
+            </div>
+            ${availabilityTag}
+            <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
+              <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${p.name || 'Caregiver'}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      container.innerHTML = `
+        <div style="text-align:left;">
+          <p style="color:#333; margin:0 0 8px 0;"><strong>${providers.length} caregiver(s) available in ${location}</strong></p>
+          ${caregiversHTML}
+          <button id="heroCloseResultsBtn" type="button" style="margin-top: 8px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
+        </div>`;
+      const closeBtn = container.querySelector('#heroCloseResultsBtn');
+      closeBtn && closeBtn.addEventListener('click', ()=>{
+        container.remove();
+        heroFindForm.reset();
+      });
+      container.querySelectorAll('.hero-message-btn').forEach(btn=>{
+        btn.addEventListener('click', (ev)=>{
+          ev.preventDefault();
+          const other = btn.dataset.other;
+          const otherName = btn.dataset.name || 'Caregiver';
+          if(!isSignedIn){
+            const loginModal = document.getElementById('loginModal');
+            if(loginModal) loginModal.classList.remove('hidden');
+            return;
+          }
+          if(window.showChatWidget && other) window.showChatWidget(other, otherName);
+        });
+      });
+    }catch(err){
+      console.error('Provider fetch failed', err);
+      const caregiversHTML = baseCaregivers().map((p, idx)=> {
+        const initials = p.name ? p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : 'CG';
+        const bio = p.bio || 'Trusted caregiver in your area.';
+        const rate = p.rate ? `$${p.rate}/hr` : '';
+        const city = p.city || location;
+        const pid = p.user_id || p.id || '';
+        const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
+        let availabilityTag = '';
+        if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
+        if(availability.status === 'next24') availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
+        const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
+        return `
+          <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px; display:grid; gap:6px;">
+            <div style="display:flex; gap:10px; align-items:center;">
+              <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initials}</div>
+              <div>
+                <div style="font-weight:700; color:#06464E;">${p.name || 'Caregiver ' + (idx+1)}</div>
+                <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
+              </div>
+            </div>
+            ${availabilityTag}
+            <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
+              <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${p.name || 'Caregiver'}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      container.innerHTML = `
+        <div style="text-align:left;">
+          <p style="color:#333; margin:0 0 8px 0;"><strong>${baseCaregivers().length} caregiver(s) available in ${location}</strong></p>
+          ${caregiversHTML}
+          <button id="heroCloseResultsBtn" type="button" style="margin-top: 8px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
+        </div>`;
+      const closeBtn = container.querySelector('#heroCloseResultsBtn');
+      closeBtn && closeBtn.addEventListener('click', ()=>{
+        container.remove();
+        heroFindForm.reset();
+      });
+      container.querySelectorAll('.hero-message-btn').forEach(btn=>{
+        btn.addEventListener('click', (ev)=>{
+          ev.preventDefault();
+          const other = btn.dataset.other;
+          const otherName = btn.dataset.name || 'Caregiver';
+          if(!isSignedIn){
+            const loginModal = document.getElementById('loginModal');
+            if(loginModal) loginModal.classList.remove('hidden');
+            return;
+          }
+          if(window.showChatWidget && other) window.showChatWidget(other, otherName);
+        });
+      });
+    }
+  }
+
   // Hero Find Caregiver form
   const heroLocationInput = document.getElementById('heroLocationInput');
   const heroFindLocationBtn = document.getElementById('heroFindLocationBtn');
@@ -315,74 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if(hasAvailable){
         // Fetch actual providers and show cards
-        try{
-          const resp = await fetch(`${API_BASE}/forms/providers`);
-          let providers = [];
-          if(resp.ok){
-            const data = await resp.json();
-            providers = Array.isArray(data.providers) ? data.providers : [];
-          }
-          if(providers.length === 0){
-            providers = baseCaregivers(); // fallback sample
-          }
-          // Render full cards for logged-in users and guests
-          const caregiversHTML = providers.map((p, idx)=> {
-            const initials = p.name ? p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : 'CG';
-            const bio = p.bio || 'Trusted caregiver in your area.';
-            const rate = p.rate ? `$${p.rate}/hr` : '';
-            const city = p.city || location;
-            const pid = p.user_id || p.id || '';
-            const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
-            let availabilityTag = '';
-            if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
-            if(availability.status === 'next24') availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
-            const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
-            return `
-              <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px; display:grid; gap:6px;">
-                <div style="display:flex; gap:10px; align-items:center;">
-                  <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initials}</div>
-                  <div>
-                    <div style="font-weight:700; color:#06464E;">${p.name || 'Caregiver ' + (idx+1)}</div>
-                    <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
-                  </div>
-                </div>
-                ${availabilityTag}
-                <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
-                <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                  <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
-                  <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${p.name || 'Caregiver'}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
-                </div>
-              </div>
-            `;
-          }).join('');
-          newResultsDiv.innerHTML = `
-            <div style="text-align:left;">
-              <p style="color:#333; margin:0 0 8px 0;"><strong>${providers.length} caregiver(s) available in ${location}</strong></p>
-              ${caregiversHTML}
-              <button id="heroCloseResultsBtn" type="button" style="margin-top: 8px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
-            </div>`;
-          const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
-          closeBtn && closeBtn.addEventListener('click', ()=>{
-            newResultsDiv.remove();
-            heroFindForm.reset();
-          });
-          // Message buttons -> open chat if signed in
-          newResultsDiv.querySelectorAll('.hero-message-btn').forEach(btn=>{
-            btn.addEventListener('click', (ev)=>{
-              ev.preventDefault();
-              const other = btn.dataset.other;
-              const otherName = btn.dataset.name || 'Caregiver';
-              if(!isSignedIn){
-                const loginModal = document.getElementById('loginModal');
-                if(loginModal) loginModal.classList.remove('hidden');
-                return;
-              }
-              if(window.showChatWidget && other) window.showChatWidget(other, otherName);
-            });
-          });
-        }catch(err){
-          console.error('Provider fetch failed', err);
-        }
+        renderHeroProviders(location, isSignedIn, newResultsDiv);
       } else {
         const waitlistBtn = newResultsDiv.querySelector('#heroJoinWaitlistBtn');
         const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
