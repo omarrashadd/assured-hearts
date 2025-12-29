@@ -219,22 +219,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const pid = p.user_id || p.id || '';
         const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
         let availabilityTag = '';
-        if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
-        if(availability.status === 'next24') availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
+        let availabilityText = 'Availability not provided';
+        if(availability.status === 'immediate'){
+          availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
+          availabilityText = 'Available immediately';
+        }
+        if(availability.status === 'next24'){
+          availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
+          availabilityText = 'Available in the next 24 hours';
+        }
         const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
+        const profileLink = pid ? `provider-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
+        const certs = [];
+        if(p.has_cpr) certs.push('CPR certified');
+        if(p.islamic_values) certs.push('Values aligned');
+        const certText = certs.length ? certs.join(' · ') : 'Certifications pending';
         return `
-          <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px; display:grid; gap:6px;">
-            <div style="display:flex; gap:10px; align-items:center;">
-              <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initials}</div>
+          <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">${initials}</div>
               <div>
-                <div style="font-weight:700; color:#06464E;">${p.name || 'Caregiver ' + (idx+1)}</div>
+                <div style="font-weight:700; color:#06464E; font-size:15px;">${p.name || 'Caregiver ' + (idx+1)}</div>
                 <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
               </div>
             </div>
             ${availabilityTag}
-            <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">${bio}</p>
+            <div style="font-size:12px; color:#475569;"><strong>Availability:</strong> ${availabilityText}</div>
+            <div style="font-size:12px; color:#475569;"><strong>Background:</strong> ${p.experience_details || 'Details coming soon'}</div>
+            <div style="font-size:12px; color:#475569;"><strong>Certifications:</strong> ${certText}</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
               <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
+              <a class="btn secondary" href="${profileLink}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">View profile</a>
               <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${p.name || 'Caregiver'}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
             </div>
           </div>
@@ -243,13 +259,36 @@ document.addEventListener('DOMContentLoaded', () => {
       container.innerHTML = `
         <div style="text-align:left;">
           <p style="color:#333; margin:0 0 8px 0;"><strong>${providers.length} caregiver(s) available in ${location}</strong></p>
-          ${caregiversHTML}
+          <div class="hero-carousel" style="position:relative; padding:0 12px;">
+            <button type="button" class="hero-carousel-prev" style="position:absolute; left:-6px; top:40%; transform:translateY(-50%); background:#fff; border:1px solid #e5e7eb; border-radius:50%; width:32px; height:32px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.08);">‹</button>
+            <div class="hero-cards" style="display:flex; gap:12px; overflow-x:auto; padding:6px 6px 6px 0; scroll-behavior:smooth;">
+              ${caregiversHTML}
+            </div>
+            <button type="button" class="hero-carousel-next" style="position:absolute; right:-6px; top:40%; transform:translateY(-50%); background:#fff; border:1px solid #e5e7eb; border-radius:50%; width:32px; height:32px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.08);">›</button>
+          </div>
           <button id="heroCloseResultsBtn" type="button" style="margin-top: 8px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
         </div>`;
       const closeBtn = container.querySelector('#heroCloseResultsBtn');
       closeBtn && closeBtn.addEventListener('click', ()=>{
         container.remove();
         heroFindForm.reset();
+      });
+      const track = container.querySelector('.hero-cards');
+      const prevBtn = container.querySelector('.hero-carousel-prev');
+      const nextBtn = container.querySelector('.hero-carousel-next');
+      if(track && prevBtn && nextBtn){
+        const scrollBy = 320;
+        prevBtn.addEventListener('click', ()=> track.scrollBy({ left: -scrollBy, behavior: 'smooth' }));
+        nextBtn.addEventListener('click', ()=> track.scrollBy({ left: scrollBy, behavior: 'smooth' }));
+      }
+      container.querySelectorAll('.hero-card').forEach(card=>{
+        const profile = card.dataset.profile;
+        if(profile && profile !== '#'){
+          card.addEventListener('click', (e)=>{
+            if(e.target.closest('button') || e.target.closest('a')) return;
+            window.location.href = profile;
+          });
+        }
       });
       container.querySelectorAll('.hero-message-btn').forEach(btn=>{
         btn.addEventListener('click', (ev)=>{
@@ -274,22 +313,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const pid = p.user_id || p.id || '';
         const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
         let availabilityTag = '';
-        if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
-        if(availability.status === 'next24') availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
+        let availabilityText = 'Availability not provided';
+        if(availability.status === 'immediate'){
+          availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
+          availabilityText = 'Available immediately';
+        }
+        if(availability.status === 'next24'){
+          availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
+          availabilityText = 'Available in the next 24 hours';
+        }
         const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
+        const profileLink = pid ? `provider-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
         return `
-          <div style="border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:left; margin-bottom:8px; display:grid; gap:6px;">
-            <div style="display:flex; gap:10px; align-items:center;">
-              <div style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initials}</div>
+          <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">${initials}</div>
               <div>
-                <div style="font-weight:700; color:#06464E;">${p.name || 'Caregiver ' + (idx+1)}</div>
+                <div style="font-weight:700; color:#06464E; font-size:15px;">${p.name || 'Caregiver ' + (idx+1)}</div>
                 <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
               </div>
             </div>
             ${availabilityTag}
-            <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">${bio}</p>
+            <div style="font-size:12px; color:#475569;"><strong>Availability:</strong> ${availabilityText}</div>
+            <div style="font-size:12px; color:#475569;"><strong>Background:</strong> ${p.experience_details || 'Details coming soon'}</div>
+            <div style="font-size:12px; color:#475569;"><strong>Certifications:</strong> Certifications pending</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
               <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
+              <a class="btn secondary" href="${profileLink}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">View profile</a>
               <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${p.name || 'Caregiver'}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
             </div>
           </div>
@@ -298,13 +349,36 @@ document.addEventListener('DOMContentLoaded', () => {
       container.innerHTML = `
         <div style="text-align:left;">
           <p style="color:#333; margin:0 0 8px 0;"><strong>${baseCaregivers().length} caregiver(s) available in ${location}</strong></p>
-          ${caregiversHTML}
+          <div class="hero-carousel" style="position:relative; padding:0 12px;">
+            <button type="button" class="hero-carousel-prev" style="position:absolute; left:-6px; top:40%; transform:translateY(-50%); background:#fff; border:1px solid #e5e7eb; border-radius:50%; width:32px; height:32px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.08);">‹</button>
+            <div class="hero-cards" style="display:flex; gap:12px; overflow-x:auto; padding:6px 6px 6px 0; scroll-behavior:smooth;">
+              ${caregiversHTML}
+            </div>
+            <button type="button" class="hero-carousel-next" style="position:absolute; right:-6px; top:40%; transform:translateY(-50%); background:#fff; border:1px solid #e5e7eb; border-radius:50%; width:32px; height:32px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.08);">›</button>
+          </div>
           <button id="heroCloseResultsBtn" type="button" style="margin-top: 8px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
         </div>`;
       const closeBtn = container.querySelector('#heroCloseResultsBtn');
       closeBtn && closeBtn.addEventListener('click', ()=>{
         container.remove();
         heroFindForm.reset();
+      });
+      const track = container.querySelector('.hero-cards');
+      const prevBtn = container.querySelector('.hero-carousel-prev');
+      const nextBtn = container.querySelector('.hero-carousel-next');
+      if(track && prevBtn && nextBtn){
+        const scrollBy = 320;
+        prevBtn.addEventListener('click', ()=> track.scrollBy({ left: -scrollBy, behavior: 'smooth' }));
+        nextBtn.addEventListener('click', ()=> track.scrollBy({ left: scrollBy, behavior: 'smooth' }));
+      }
+      container.querySelectorAll('.hero-card').forEach(card=>{
+        const profile = card.dataset.profile;
+        if(profile && profile !== '#'){
+          card.addEventListener('click', (e)=>{
+            if(e.target.closest('button') || e.target.closest('a')) return;
+            window.location.href = profile;
+          });
+        }
       });
       container.querySelectorAll('.hero-message-btn').forEach(btn=>{
         btn.addEventListener('click', (ev)=>{
