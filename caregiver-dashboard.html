@@ -496,16 +496,40 @@
             hero.textContent = `Welcome, ${data.profile.name}!`;
           }
           const stats = data.stats || {};
-          const pendingDerived = (data.requests || []).filter(r => (r.status||'').toLowerCase() === 'pending').length;
-          setText('metricActive', stats.active ?? '0');
-          setText('metricPending', stats.pending ?? pendingDerived ?? '0');
-          setText('metricHoursScheduled', stats.hours_scheduled ?? '0');
-          setText('metricHoursTotal', stats.hours_month ?? '0');
+          const requests = data.requests || [];
+          const sessions = data.sessions || [];
+          
+          const pendingCount = requests.filter(r => (r.status||'').toLowerCase() === 'pending').length;
+          const acceptedCount = requests.filter(r => (r.status||'').toLowerCase() === 'accepted').length;
+          
+          const today = new Date().toISOString().slice(0,10);
+          const upcomingSessions = sessions.filter(s => (s.status||'').toLowerCase() !== 'cancelled' && (!s.session_date || s.session_date >= today));
+          const completedThisMonth = sessions.filter(s => (s.status||'').toLowerCase() === 'completed' || (s.session_date && s.session_date < today && s.session_date.slice(0,7) === today.slice(0,7)));
+          
+          const hoursFromSessions = (list)=>{
+            return list.reduce((sum, s)=>{
+              if(!s.start_time || !s.end_time) return sum;
+              const [sh, sm, ss='0'] = s.start_time.split(':').map(Number);
+              const [eh, em, es='0'] = s.end_time.split(':').map(Number);
+              const startMin = sh*60 + sm + (ss/60);
+              const endMin = eh*60 + em + (es/60);
+              const dur = Math.max(0, endMin - startMin);
+              return sum + dur/60;
+            }, 0);
+          };
+          
+          const hoursScheduled = hoursFromSessions(upcomingSessions);
+          const hoursCompletedMonth = hoursFromSessions(completedThisMonth);
+          
+          setText('metricActive', (upcomingSessions.length || acceptedCount || stats.active || 0).toString());
+          setText('metricPending', (pendingCount || stats.pending || 0).toString());
+          setText('metricHoursScheduled', (hoursScheduled || stats.hours_scheduled || 0).toString());
+          setText('metricHoursTotal', (hoursCompletedMonth || stats.hours_month || 0).toString());
           setText('metricEarnings', stats.earnings ? `$${stats.earnings}` : '$0');
           setText('metricTips', stats.tips ? `$${stats.tips}` : '$0');
-          renderRequests(data.requests);
+          renderRequests(requests);
           renderMessages(data.messages);
-          renderAppointments(data.sessions);
+          renderAppointments(sessions);
           renderReviews(data.reviews);
         }catch(err){
           console.error('Provider dashboard load failed', err);
