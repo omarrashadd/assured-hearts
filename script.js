@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const bio = p.bio || 'Trusted caregiver in your area.';
             const rate = p.rate ? `$${p.rate}/hr` : '';
             const city = p.city || location;
-            const pid = p.id || p.user_id || '';
+            const pid = p.user_id || p.id || '';
             const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
             let availabilityTag = '';
             if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p style="margin:0; color:#6b7280; font-size:13px;">${bio}</p>
                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
                   <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
-                  <a class="btn secondary" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Message</a>
+                  <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${p.name || 'Caregiver'}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
                 </div>
               </div>
             `;
@@ -364,6 +364,20 @@ document.addEventListener('DOMContentLoaded', () => {
           closeBtn && closeBtn.addEventListener('click', ()=>{
             newResultsDiv.remove();
             heroFindForm.reset();
+          });
+          // Message buttons -> open chat if signed in
+          newResultsDiv.querySelectorAll('.hero-message-btn').forEach(btn=>{
+            btn.addEventListener('click', (ev)=>{
+              ev.preventDefault();
+              const other = btn.dataset.other;
+              const otherName = btn.dataset.name || 'Caregiver';
+              if(!isSignedIn){
+                const loginModal = document.getElementById('loginModal');
+                if(loginModal) loginModal.classList.remove('hidden');
+                return;
+              }
+              if(window.showChatWidget && other) window.showChatWidget(other, otherName);
+            });
           });
         }catch(err){
           console.error('Provider fetch failed', err);
