@@ -1288,6 +1288,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const sendBtn = modal.querySelector('#chatSendBtn');
   const statusEl = modal.querySelector('#chatStatus');
   const bookBtn = modal.querySelector('#chatBookBtn');
+  const userType = localStorage.getItem('user_type') || '';
 
   launcher.addEventListener('click', ()=>{
     modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
@@ -1478,6 +1479,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   function updateBookButton(){
     if(!bookBtn) return;
+    // Hide for caregivers (they can't book)
+    if(userType === 'provider'){
+      bookBtn.style.display = 'none';
+      return;
+    }
     if(!activeThread){
       bookBtn.style.display = 'none';
       return;
