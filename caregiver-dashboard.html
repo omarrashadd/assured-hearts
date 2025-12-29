@@ -336,6 +336,7 @@
         if(userType !== 'provider' || !userId) return;
 
         const setText = (id, val)=>{ const el = document.getElementById(id); if(el) el.textContent = val; };
+        let resolvedProviderId = userId;
         const renderRequests = (requests)=>{
           const box = document.getElementById('requestsList');
           if(!box) return;
@@ -376,7 +377,7 @@
                 await fetch(`${API_BASE}/forms/request/${rid}/respond`, {
                   method:'POST',
                   headers:{'Content-Type':'application/json'},
-                  body: JSON.stringify({ action, provider_id:userId })
+                  body: JSON.stringify({ action, provider_id: resolvedProviderId })
                 });
                 showBanner(`Request ${action}ed`, 'success');
                 location.reload();
@@ -463,6 +464,11 @@
           const resp = await fetch(`${API_BASE}/forms/provider/${userId}`);
           if(!resp.ok) throw new Error('Failed to load provider dashboard');
           const data = await resp.json();
+          resolvedProviderId = data.profile?.id || data.profile?.provider_id || userId;
+          const hero = document.querySelector('header.hero h1');
+          if(hero && data.profile?.name){
+            hero.textContent = `Welcome, ${data.profile.name}!`;
+          }
           const stats = data.stats || {};
           const pendingDerived = (data.requests || []).filter(r => (r.status||'').toLowerCase() === 'pending').length;
           setText('metricActive', stats.active ?? '0');
