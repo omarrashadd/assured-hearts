@@ -502,24 +502,61 @@
           const pendingCount = requests.filter(r => (r.status||'').toLowerCase() === 'pending').length;
           const acceptedCount = requests.filter(r => (r.status||'').toLowerCase() === 'accepted').length;
           
-          const today = new Date().toISOString().slice(0,10);
-          const upcomingSessions = sessions.filter(s => (s.status||'').toLowerCase() !== 'cancelled' && (!s.session_date || s.session_date >= today));
-          const completedThisMonth = sessions.filter(s => (s.status||'').toLowerCase() === 'completed' || (s.session_date && s.session_date < today && s.session_date.slice(0,7) === today.slice(0,7)));
+          const today = new Date();
+          const todayStr = today.toISOString().slice(0,10);
+          const toDate = (d)=> d ? new Date(d) : null;
+          const upcomingSessions = sessions.filter(s => {
+            if((s.status||'').toLowerCase() === 'cancelled') return false;
+            const d = toDate(s.session_date);
+            return !d || d >= today;
+          });
+          const completedThisMonth = sessions.filter(s => {
+            const d = toDate(s.session_date);
+            const isPast = d && d < today;
+            return ((s.status||'').toLowerCase() === 'completed') || (isPast && d.toISOString().slice(0,7) === todayStr.slice(0,7));
+          });
           
           const hoursFromSessions = (list)=>{
             return list.reduce((sum, s)=>{
-              if(!s.start_time || !s.end_time) return sum;
-              const [sh, sm, ss='0'] = s.start_time.split(':').map(Number);
-              const [eh, em, es='0'] = s.end_time.split(':').map(Number);
-              const startMin = sh*60 + sm + (ss/60);
-              const endMin = eh*60 + em + (es/60);
-              const dur = Math.max(0, endMin - startMin);
-              return sum + dur/60;
+              // Prefer explicit start/end_time from sessions
+              if(s.start_time && s.end_time){
+                const [sh, sm, ss='0'] = s.start_time.split(':').map(Number);
+                const [eh, em, es='0'] = s.end_time.split(':').map(Number);
+                const startMin = sh*60 + sm + (ss/60);
+                const endMin = eh*60 + em + (es/60);
+                const dur = Math.max(0, endMin - startMin);
+                return sum + dur/60;
+              }
+              // Fallback: derive from start_at/end_at if present
+              if(s.start_at && s.end_at){
+                const st = new Date(s.start_at);
+                const en = new Date(s.end_at);
+                const dur = Math.max(0, (en - st) / (1000*60*60));
+                return sum + dur;
+              }
+              return sum;
+            }, 0);
+          };
+
+          // Fallback hours from accepted requests (when sessions not yet created)
+          const hoursFromAcceptedRequests = ()=>{
+            return requests.reduce((sum, r)=>{
+              if((r.status||'').toLowerCase() !== 'accepted') return sum;
+              if(r.start_at && r.end_at){
+                const st = new Date(r.start_at);
+                const en = new Date(r.end_at);
+                const dur = Math.max(0, (en - st) / (1000*60*60));
+                return sum + dur;
+              }
+              return sum;
             }, 0);
           };
           
-          const hoursScheduled = hoursFromSessions(upcomingSessions);
-          const hoursCompletedMonth = hoursFromSessions(completedThisMonth);
+          let hoursScheduled = hoursFromSessions(upcomingSessions);
+          let hoursCompletedMonth = hoursFromSessions(completedThisMonth);
+          if(hoursScheduled === 0){
+            hoursScheduled = hoursFromAcceptedRequests();
+          }
           
           setText('metricActive', (upcomingSessions.length || acceptedCount || stats.active || 0).toString());
           setText('metricPending', (pendingCount || stats.pending || 0).toString());
