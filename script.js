@@ -1270,8 +1270,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
         <div id="chatHistory" style="flex:1; padding:10px; overflow-y:auto; background:#f9fafb;"></div>
         <div style="padding:10px; border-top:1px solid #e5e7eb;">
           <textarea id="chatInput" rows="2" style="width:100%; resize:none; padding:8px; border:1px solid #e5e7eb; border-radius:8px;" placeholder="Type a message..."></textarea>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; gap:8px;">
             <span id="chatStatus" style="font-size:11px; color:#6b7280;"></span>
+            <button id="chatBookBtn" style="background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:6px; padding:6px 10px; font-weight:700; font-size:12px; display:none;">Book</button>
             <button id="chatSendBtn" style="background:#06464E; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-weight:700;">Send</button>
           </div>
         </div>
@@ -1286,6 +1287,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const inputEl = modal.querySelector('#chatInput');
   const sendBtn = modal.querySelector('#chatSendBtn');
   const statusEl = modal.querySelector('#chatStatus');
+  const bookBtn = modal.querySelector('#chatBookBtn');
 
   launcher.addEventListener('click', ()=>{
     modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
@@ -1296,16 +1298,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
   modal.querySelector('#chatCloseBtn').addEventListener('click', ()=> modal.style.display = 'none');
 
   // Expose opener so other buttons can launch a thread
-  window.openChatThread = (otherId)=>{
+  window.openChatThread = (otherId, otherName)=>{
     if(!otherId) return;
     activeThread = parseInt(otherId,10);
     modal.style.display = 'block';
     if(!threads[activeThread]){
-      threads[activeThread] = { other_id: activeThread, other_name: 'User', messages: [] };
+      threads[activeThread] = { other_id: activeThread, other_name: otherName || 'User', messages: [] };
     }
+    if(otherName && threads[activeThread]) threads[activeThread].other_name = otherName;
     renderThreads();
     renderHistory(activeThread);
     markRead(activeThread);
+    updateBookButton();
   };
 
   // Allow dashboards to open the chat widget
@@ -1350,6 +1354,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       window.latestThreads = threads;
       window.latestUnread = evt.detail.unread;
       window.dispatchEvent(evt);
+      updateBookButton();
     }catch(err){
       console.error(err);
     }
@@ -1470,6 +1475,22 @@ document.addEventListener('DOMContentLoaded', ()=>{
       sendMessage();
     }
   });
+
+  function updateBookButton(){
+    if(!bookBtn) return;
+    if(!activeThread){
+      bookBtn.style.display = 'none';
+      return;
+    }
+    const t = threads[activeThread] || {};
+    const name = t.other_name || 'Caregiver';
+    bookBtn.style.display = 'inline-block';
+    bookBtn.textContent = `Book with ${name.split(' ')[0] || name}`;
+    bookBtn.onclick = ()=>{
+      const link = `request-childcare.html?provider_id=${encodeURIComponent(activeThread)}&provider_name=${encodeURIComponent(name)}`;
+      window.location.href = link;
+    };
+  }
 
   fetchMessages();
   setInterval(fetchMessages, 15000);
