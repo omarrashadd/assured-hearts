@@ -1215,3 +1215,200 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 5000);
   }
 });
+
+// Messaging widget (parents & caregivers)
+document.addEventListener('DOMContentLoaded', ()=>{
+  const userId = parseInt(localStorage.getItem('user_id'), 10);
+  if(!userId) return;
+  const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+  let threads = {};
+  let activeThread = null;
+
+  const launcher = document.createElement('button');
+  launcher.id = 'chatLauncher';
+  launcher.innerHTML = 'Messages <span id="chatBadge" style="display:none; margin-left:6px; background:#f87171; color:#fff; padding:2px 6px; border-radius:999px; font-size:11px;"></span>';
+  Object.assign(launcher.style, {
+    position:'fixed', bottom:'20px', right:'20px', background:'linear-gradient(135deg, #67B3C2 0%, #06464E 100%)',
+    color:'#fff', border:'none', borderRadius:'999px', padding:'10px 16px', fontWeight:'700',
+    boxShadow:'0 8px 20px rgba(0,0,0,0.15)', cursor:'pointer', zIndex:'9999'
+  });
+  document.body.appendChild(launcher);
+
+  const modal = document.createElement('div');
+  modal.id = 'chatModal';
+  Object.assign(modal.style, {
+    position:'fixed', bottom:'70px', right:'20px', width:'360px', maxHeight:'70vh', background:'#fff',
+    border:'1px solid #e5e7eb', borderRadius:'12px', boxShadow:'0 12px 30px rgba(0,0,0,0.18)',
+    display:'none', zIndex:'9999'
+  });
+  modal.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; border-bottom:1px solid #e5e7eb;">
+      <div style="font-weight:700; color:#06464E;">Messages</div>
+      <div style="font-size:11px; color:#b91c1c;">Chats are monitored</div>
+      <button id="chatCloseBtn" style="border:none; background:none; font-size:18px; cursor:pointer; color:#6b7280;">×</button>
+    </div>
+    <div style="display:flex; height:300px;">
+      <div id="chatThreads" style="width:40%; border-right:1px solid #e5e7eb; overflow-y:auto;"></div>
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div id="chatHistory" style="flex:1; padding:10px; overflow-y:auto; background:#f9fafb;"></div>
+        <div style="padding:10px; border-top:1px solid #e5e7eb;">
+          <textarea id="chatInput" rows="2" style="width:100%; resize:none; padding:8px; border:1px solid #e5e7eb; border-radius:8px;" placeholder="Type a message..."></textarea>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+            <span id="chatStatus" style="font-size:11px; color:#6b7280;"></span>
+            <button id="chatSendBtn" style="background:#06464E; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-weight:700;">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const badgeEl = launcher.querySelector('#chatBadge');
+  const threadsEl = modal.querySelector('#chatThreads');
+  const historyEl = modal.querySelector('#chatHistory');
+  const inputEl = modal.querySelector('#chatInput');
+  const sendBtn = modal.querySelector('#chatSendBtn');
+  const statusEl = modal.querySelector('#chatStatus');
+
+  launcher.addEventListener('click', ()=>{
+    modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+    if(modal.style.display === 'block' && activeThread){
+      markRead(activeThread);
+    }
+  });
+  modal.querySelector('#chatCloseBtn').addEventListener('click', ()=> modal.style.display = 'none');
+
+  async function fetchMessages(){
+    try{
+      const res = await fetch(`${API_BASE}/forms/messages/${userId}`);
+      if(!res.ok) throw new Error('Failed to load messages');
+      const data = await res.json();
+      threads = {};
+      const msgs = data.messages || [];
+      msgs.forEach(m=>{
+        const key = m.other_id;
+        if(!threads[key]) threads[key] = { other_id: key, other_name: m.other_name || 'User', messages: [] };
+        threads[key].messages.push(m);
+      });
+      renderThreads();
+      updateBadge();
+      if(activeThread) renderHistory(activeThread);
+    }catch(err){
+      console.error(err);
+    }
+  }
+
+  function updateBadge(){
+    const unread = Object.values(threads).reduce((sum, t)=>{
+      return sum + t.messages.filter(m => m.receiver_id === userId && !m.read_at).length;
+    },0);
+    if(badgeEl){
+      badgeEl.style.display = unread > 0 ? 'inline-block' : 'none';
+      badgeEl.textContent = unread;
+    }
+    const pagePill = document.getElementById('pendingMessagesPill');
+    if(pagePill) pagePill.textContent = `${unread} unread`;
+  }
+
+  function renderThreads(){
+    if(!threadsEl) return;
+    const arr = Object.values(threads);
+    if(arr.length === 0){
+      threadsEl.innerHTML = '<p style="padding:10px; color:#6b7280; font-size:12px;">No messages yet.</p>';
+      historyEl.innerHTML = '<p style="padding:10px; color:#6b7280; font-size:12px;">Select a thread to start chatting.</p>';
+      return;
+    }
+    threadsEl.innerHTML = arr.map(t=>{
+      const last = t.messages[t.messages.length-1];
+      const unread = t.messages.some(m => m.receiver_id === userId && !m.read_at);
+      return `
+        <div class="chat-thread" data-id="${t.other_id}" style="padding:10px; border-bottom:1px solid #e5e7eb; cursor:pointer; background:${activeThread==t.other_id?'#eef2ff':'#fff'};">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:700; color:#06464E;">${t.other_name || 'User'}</span>
+            ${unread ? '<span style="background:#f87171; color:#fff; border-radius:999px; padding:2px 6px; font-size:11px;">●</span>' : ''}
+          </div>
+          <div style="font-size:12px; color:#6b7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${last ? last.body : ''}</div>
+        </div>
+      `;
+    }).join('');
+    threadsEl.querySelectorAll('.chat-thread').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        activeThread = parseInt(el.dataset.id,10);
+        renderThreads();
+        renderHistory(activeThread);
+        markRead(activeThread);
+      });
+    });
+  }
+
+  function renderHistory(otherId){
+    if(!historyEl) return;
+    const thread = threads[otherId];
+    if(!thread){
+      historyEl.innerHTML = '<p style="padding:10px; color:#6b7280; font-size:12px;">No messages yet.</p>';
+      return;
+    }
+    historyEl.innerHTML = thread.messages.map(m=>{
+      const mine = m.sender_id === userId;
+      const readText = mine ? (m.read_at ? 'Read' : 'Sent') : '';
+      return `
+        <div style="margin-bottom:8px; display:flex; ${mine?'justify-content:flex-end;':''}">
+          <div style="max-width:80%; background:${mine?'#06464E':'#e5e7eb'}; color:${mine?'#fff':'#111'}; padding:8px 10px; border-radius:10px; font-size:13px;">
+            <div>${m.body}</div>
+            <div style="font-size:10px; color:${mine?'#d1fae5':'#6b7280'}; text-align:right;">${readText}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    historyEl.scrollTop = historyEl.scrollHeight;
+  }
+
+  async function sendMessage(){
+    const text = (inputEl.value || '').trim();
+    if(!text || !activeThread) return;
+    sendBtn.disabled = true;
+    statusEl.textContent = 'Sending...';
+    try{
+      await fetch(`${API_BASE}/forms/messages`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ sender_id:userId, receiver_id: activeThread, body: text })
+      });
+      inputEl.value = '';
+      await fetchMessages();
+      statusEl.textContent = 'Sent';
+      markRead(activeThread);
+    }catch(err){
+      console.error(err);
+      statusEl.textContent = 'Failed to send';
+    }finally{
+      sendBtn.disabled = false;
+      setTimeout(()=> statusEl.textContent = '', 1200);
+    }
+  }
+
+  async function markRead(otherId){
+    if(!otherId) return;
+    try{
+      await fetch(`${API_BASE}/forms/messages/read`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ user_id: userId, other_id: otherId })
+      });
+      await fetchMessages();
+    }catch(err){
+      console.error(err);
+    }
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  inputEl.addEventListener('keydown', (e)=> {
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  fetchMessages();
+  setInterval(fetchMessages, 15000);
+});
