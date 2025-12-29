@@ -890,6 +890,77 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCaregiverProfile();
   }
 
+  // Child profile page
+  const childProfileShell = document.getElementById('childProfileShell');
+  if(childProfileShell){
+    const params = new URLSearchParams(window.location.search);
+    const childId = params.get('child_id');
+    const childNameEl = document.getElementById('childName');
+    const childMetaEl = document.getElementById('childMeta');
+    const childAvatar = document.getElementById('childAvatar');
+    const childNotes = document.getElementById('childNotes');
+    const childNeeds = document.getElementById('childNeeds');
+    const logs = {
+      prayer: document.getElementById('childPrayerLog'),
+      reading: document.getElementById('childReadingLog'),
+      quran: document.getElementById('childQuranLog'),
+      goals: document.getElementById('childGoals'),
+      activities: document.getElementById('childActivities')
+    };
+
+    async function loadChildProfile(){
+      if(!childId){
+        childNameEl.textContent = 'Child not found';
+        return;
+      }
+      try{
+        const res = await fetch(`${API_BASE}/forms/child/${childId}`);
+        if(!res.ok) throw new Error('Child not found');
+        const data = await res.json();
+        const c = data.child || data || {};
+        const name = c.first_name || c.name || 'Child';
+        childNameEl.textContent = name;
+        const initial = name.charAt(0).toUpperCase();
+        childAvatar.textContent = initial;
+        const age = c.age || (Array.isArray(c.ages) && c.ages.length ? c.ages[0] : '');
+        const city = c.city || '';
+        childMetaEl.textContent = [age ? `${age} yrs` : '', city].filter(Boolean).join(' • ') || 'Child profile';
+        childNotes.textContent = c.notes || 'No notes yet.';
+        childNeeds.textContent = c.special_needs || 'No special needs recorded.';
+
+        function renderList(target, items){
+          if(!target) return;
+          if(!items || items.length === 0){
+            target.innerHTML = '<li style="color:#9ca3af;">No entries yet.</li>';
+            return;
+          }
+          target.innerHTML = items.map(i=> `<li>${i}</li>`).join('');
+        }
+        renderList(logs.prayer, c.prayer_log || []);
+        renderList(logs.reading, c.reading_log || []);
+        renderList(logs.quran, c.quran_log || []);
+        renderList(logs.goals, c.goals || []);
+        renderList(logs.activities, c.activities || []);
+      }catch(err){
+        childNameEl.textContent = 'Unable to load child profile';
+        childNotes.textContent = '';
+        Object.values(logs).forEach(el=> { if(el) el.innerHTML = '<li style="color:#9ca3af;">Unable to load.</li>'; });
+        console.error(err);
+      }
+    }
+
+    // Set edit link
+    const childEditBtn = document.getElementById('childEditBtn');
+    if(childEditBtn && childId){
+      childEditBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        localStorage.setItem('child_to_edit', childId);
+        window.location.href = 'child-demographics.html';
+      });
+    }
+    loadChildProfile();
+  }
+
   const findBtn = document.getElementById('findBtn');
   const becomeBtn = document.getElementById('becomeBtn');
   const findSection = document.getElementById('find');
