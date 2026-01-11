@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Disclaimer - Assured Hearts</title>
+    <meta name="description" content="Assured Hearts Disclaimer." />
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .disclaimer-hero {
+        padding: 56px 16px;
+        background: linear-gradient(135deg, #ffffff 0%, #eef7f8 100%);
+      }
+      .disclaimer-title {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .disclaimer-meta {
+        text-align: center;
+        color: #4b5563;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .disclaimer-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 10px 30px rgba(6, 70, 78, 0.08);
+      }
+      .disclaimer-card p {
+        margin: 12px 0;
+        color: #374151;
+        line-height: 1.7;
+      }
+      .disclaimer-card a {
+        color: #06464E;
+        font-weight: 600;
+      }
+      .disclaimer-list {
+        margin: 8px 0 12px 18px;
+        padding: 0;
+        color: #374151;
+      }
+      .disclaimer-list li {
+        margin: 6px 0;
+        line-height: 1.7;
+      }
+      @media (max-width: 640px) {
+        .disclaimer-card {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="nav-links">
+          <a href="find-childcare.html">Find Childcare</a>
+          <a href="become-provider.html">Join Our Care Network</a>
+          <a href="care-process.html">Our Care Process</a>
+          <a href="learning.html">At-Home Learning</a>
+        </div>
+        <div class="nav-auth">
+          <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
+          <a id="signupBtn" class="btn-auth signup" href="account-signup.html" role="button">Sign up</a>
+        </div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobileMenu" class="mobile-menu-panel hidden" aria-hidden="true">
+      <button id="mobileMenuClose" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="find-childcare.html">Find Childcare</a>
+        <a href="become-provider.html">Join Our Care Network</a>
+        <a href="care-process.html">Our Care Process</a>
+        <a href="learning.html">At-Home Learning</a>
+      </nav>
+    </div>
+
+    <div id="loginModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="loginClose">&times;</button>
+        <h2>Sign In</h2>
+        <form id="loginForm">
+          <label>Email
+            <input type="email" name="email" placeholder="Enter your email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" placeholder="Enter your password" required>
+          </label>
+          <button type="submit" class="btn">Sign In</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="signupModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="signupClose">&times;</button>
+        <h2>Sign up</h2>
+        <form id="signupForm">
+          <label>Email
+            <input type="email" name="email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" required>
+          </label>
+          <label>Confirm Password
+            <input type="password" name="confirm" required>
+          </label>
+          <button type="submit" class="btn">Sign up</button>
+        </form>
+      </div>
+    </div>
+
+    <header class="hero disclaimer-hero">
+      <div class="container">
+        <h1 class="disclaimer-title">Assured Hearts - Disclaimer</h1>
+        <p class="disclaimer-meta">
+          Last Updated: January 12, 2026<br>
+          Company: Assured Hearts Inc.
+        </p>
+      </div>
+    </header>
+
+    <main class="container" style="padding-top: 16px; padding-bottom: 56px;">
+      <section class="disclaimer-card">
+        <p><strong>1. Platform Role Disclaimer</strong></p>
+        <p>Assured Hearts is an online marketplace and technology platform designed to connect families with independent childcare providers.</p>
+        <p>Assured Hearts:</p>
+        <ul class="disclaimer-list">
+          <li>Does not provide childcare services</li>
+          <li>Does not employ, supervise, or control caregivers</li>
+          <li>Does not direct how childcare services are performed</li>
+        </ul>
+        <p>All childcare services are provided solely by independent caregivers, and any agreement for care is entered into directly between families and caregivers.</p>
+
+        <p><strong>2. No Professional Advice</strong></p>
+        <p>Any information, content, or resources made available through the Platform, including educational materials, guides, curriculum, downloads, or subscriptions, are provided for general informational and educational purposes only.</p>
+        <p>Nothing on the Platform constitutes:</p>
+        <ul class="disclaimer-list">
+          <li>Medical advice</li>
+          <li>Legal advice</li>
+          <li>Professional childcare, developmental, or educational advice</li>
+        </ul>
+        <p>You should seek advice from qualified professionals where appropriate.</p>
+
+        <p><strong>3. No Guarantees or Warranties</strong></p>
+        <p>While Assured Hearts strives to promote trust and safety, we make no guarantees, representations, or warranties regarding:</p>
+        <ul class="disclaimer-list">
+          <li>The conduct, suitability, qualifications, or performance of caregivers</li>
+          <li>The accuracy or completeness of caregiver profiles, listings, or reviews</li>
+          <li>The safety, quality, or outcomes of childcare services</li>
+        </ul>
+        <p>Use of the Platform and reliance on any information is at your own risk.</p>
+
+        <p><strong>4. Vetting Disclaimer</strong></p>
+        <p>Assured Hearts may conduct screening or vetting processes to support trust and transparency. However:</p>
+        <ul class="disclaimer-list">
+          <li>Vetting does not constitute certification, endorsement, or approval</li>
+          <li>Vetting does not guarantee safety, quality, or suitability</li>
+          <li>Families remain responsible for conducting their own due diligence</li>
+        </ul>
+
+        <p><strong>5. Childcare Risk Acknowledgment</strong></p>
+        <p>Childcare involves inherent risks. Families and caregivers acknowledge that Assured Hearts is not responsible for injuries, damages, losses, or disputes arising from childcare services arranged through the Platform, except as required by applicable law. In the event of an emergency, contact local emergency services immediately.</p>
+
+        <p><strong>6. Third-Party Services and Links</strong></p>
+        <p>The Platform may contain links to third-party websites, tools, or services. Assured Hearts does not control and is not responsible for the content, policies, or practices of third parties.</p>
+
+        <p><strong>7. Limitation of Responsibility</strong></p>
+        <p>To the maximum extent permitted by law, Assured Hearts disclaims responsibility for any loss, damage, or injury arising from:</p>
+        <ul class="disclaimer-list">
+          <li>Use of or inability to use the Platform</li>
+          <li>Interactions between families and caregivers</li>
+          <li>Reliance on Platform content or resources</li>
+        </ul>
+        <p>Nothing in this Disclaimer limits liability where such limitation is not permitted by law.</p>
+
+        <p><strong>8. Jurisdiction</strong></p>
+        <p>This Disclaimer is governed by the laws of the Province of Saskatchewan, Canada, and applicable federal laws.</p>
+
+        <p><strong>9. Contact</strong></p>
+        <p>If you have questions about this Disclaimer, contact us at:</p>
+        <p>Email: policy@assuredhearts.com</p>
+      </section>
+    </main>
+
+    <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <p style="margin: 0;">&copy; 2025 Assured Hearts. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

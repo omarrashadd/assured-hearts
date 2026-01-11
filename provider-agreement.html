@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Provider Agreement - Assured Hearts</title>
+    <meta name="description" content="Assured Hearts Provider Agreement." />
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .agreement-hero {
+        padding: 56px 16px;
+        background: linear-gradient(135deg, #ffffff 0%, #eef7f8 100%);
+      }
+      .agreement-title {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .agreement-meta {
+        text-align: center;
+        color: #4b5563;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .agreement-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 10px 30px rgba(6, 70, 78, 0.08);
+      }
+      .agreement-card p {
+        margin: 12px 0;
+        color: #374151;
+        line-height: 1.7;
+      }
+      .agreement-card a {
+        color: #06464E;
+        font-weight: 600;
+      }
+      .agreement-list {
+        margin: 8px 0 12px 18px;
+        padding: 0;
+        color: #374151;
+      }
+      .agreement-list li {
+        margin: 6px 0;
+        line-height: 1.7;
+      }
+      @media (max-width: 640px) {
+        .agreement-card {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="nav-links">
+          <a href="find-childcare.html">Find Childcare</a>
+          <a href="become-provider.html">Join Our Care Network</a>
+          <a href="care-process.html">Our Care Process</a>
+          <a href="learning.html">At-Home Learning</a>
+        </div>
+        <div class="nav-auth">
+          <button id="loginBtn" class="btn-auth login" style="background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; display: flex; align-items: center; gap: 6px; border: none;"><img src="Assets/signinwhite.png" alt="Sign in" style="width: 16px; height: 16px;">Sign In</button>
+          <a id="signupBtn" class="btn-auth signup" href="account-signup.html" role="button">Sign up</a>
+        </div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobileMenu" class="mobile-menu-panel hidden" aria-hidden="true">
+      <button id="mobileMenuClose" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="find-childcare.html">Find Childcare</a>
+        <a href="become-provider.html">Join Our Care Network</a>
+        <a href="care-process.html">Our Care Process</a>
+        <a href="learning.html">At-Home Learning</a>
+      </nav>
+    </div>
+
+    <div id="loginModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="loginClose">&times;</button>
+        <h2>Sign In</h2>
+        <form id="loginForm">
+          <label>Email
+            <input type="email" name="email" placeholder="Enter your email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" placeholder="Enter your password" required>
+          </label>
+          <button type="submit" class="btn">Sign In</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="signupModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="signupClose">&times;</button>
+        <h2>Sign up</h2>
+        <form id="signupForm">
+          <label>Email
+            <input type="email" name="email" required>
+          </label>
+          <label>Password
+            <input type="password" name="password" required>
+          </label>
+          <label>Confirm Password
+            <input type="password" name="confirm" required>
+          </label>
+          <button type="submit" class="btn">Sign up</button>
+        </form>
+      </div>
+    </div>
+
+    <header class="hero agreement-hero">
+      <div class="container">
+        <h1 class="agreement-title">Assured Hearts - Provider Agreement</h1>
+        <p class="agreement-meta">
+          Effective Date: January 2, 2026<br>
+          Last Updated: January 11, 2026<br>
+          Company: Assured Hearts Inc.
+        </p>
+      </div>
+    </header>
+
+    <main class="container" style="padding-top: 16px; padding-bottom: 56px;">
+      <section class="agreement-card">
+        <p>This Provider Agreement ("Agreement") is entered into between Assured Hearts Inc. ("Assured Hearts," "we," "us," or "our") and the individual or entity registering as a caregiver ("Caregiver," "you," or "your").</p>
+        <p>By creating a Caregiver account, listing services, or accepting bookings on the Platform, you agree to be bound by this Agreement and the Assured Hearts <a href="terms-of-service.html">Terms of Service</a> and <a href="privacy-policy.html">Privacy Policy</a>, which are incorporated by reference.</p>
+
+        <p><strong>1. Relationship of the Parties</strong></p>
+        <p><strong>1.1</strong> You acknowledge and agree that you are an independent contractor, not an employee, agent, partner, or representative of Assured Hearts. Nothing in this Agreement creates an employment relationship, joint venture, or agency relationship.</p>
+        <p><strong>1.2</strong> You retain sole responsibility and discretion over: How Care Services are provided; Compliance with applicable laws and regulations; Your schedules, methods, and care environment. Assured Hearts does not supervise, direct, or control childcare services.</p>
+
+        <p><strong>2. Eligibility and Representations</strong></p>
+        <p><strong>2.1</strong> Minimum age: You represent and warrant that you are at least eighteen (18) years of age.</p>
+        <p><strong>2.2</strong> Legal authority: You represent and warrant that:</p>
+        <ul class="agreement-list">
+          <li>You are legally permitted to provide childcare services in your jurisdiction</li>
+          <li>You hold any licenses, certifications, or approvals required by law (if applicable)</li>
+          <li>You will maintain such credentials while using the Platform</li>
+        </ul>
+        <p><strong>2.3</strong> Accuracy of information: You agree that all information you provide is truthful, accurate, and complete, and you will promptly update it if circumstances change.</p>
+
+        <p><strong>3. Faith-Aligned Care Standards</strong></p>
+        <p><strong>3.1</strong> Affirmation of faith alignment: You acknowledge that the Platform serves families seeking childcare aligned with Islamic values. By registering as a Caregiver, you affirm that you: Understand the faith-aligned nature of the Platform; and Are willing and able to provide Care Services consistent with Islamic values and the expectations communicated by Families. No disclosure of personal religious identity is required.</p>
+        <p><strong>3.2</strong> Respect and professionalism: You agree to provide care that is respectful, compassionate, and culturally sensitive, and to communicate honestly and professionally with Families.</p>
+
+        <p><strong>4. Caregiver Vetting and Status</strong></p>
+        <p><strong>4.1</strong> Vetting process: Assured Hearts may conduct a vetting process, which may include identity verification, reference checks, screening questionnaires, or community-based indicators.</p>
+        <p><strong>4.2</strong> No guarantee: You acknowledge that Vetting does not constitute certification or endorsement; Vetting status may change or be revoked; and Families remain responsible for evaluating your suitability.</p>
+
+        <p><strong>5. Bookings, Payments, and Fees</strong></p>
+        <p><strong>5.1</strong> You may accept or decline booking requests at your discretion. Once accepted, you agree to provide Care Services as described and agreed with the Family.</p>
+        <p><strong>5.2</strong> Payments for Care Services are processed through the Platform using third-party payment processors. You authorize Assured Hearts to: Collect payments from Families on your behalf; Deduct applicable Platform service fees; Remit your earnings in accordance with Platform payment schedules.</p>
+        <p><strong>5.3</strong> Caregivers are independent contractors and are solely responsible for reporting and remitting all applicable income taxes, CPP contributions, and GST/HST arising from payments received through the Platform. Assured Hearts does not withhold or remit taxes on behalf of caregivers. Assured Hearts will issue an annual T4A information slip on or before February 28 of the following calendar year, which caregivers may use to report income to the Canada Revenue Agency (CRA). Assured Hearts does not provide tax advice.</p>
+
+        <p><strong>6. Insurance and Risk Allocation</strong></p>
+        <p><strong>6.1</strong> Caregiver insurance: You are solely responsible for maintaining any insurance required by law or reasonably appropriate for providing childcare services, including liability coverage. Assured Hearts does not provide insurance coverage for your Care Services.</p>
+        <p><strong>6.2</strong> You assume all risks arising from or related to the Care Services you provide, including interactions with children, families, and third parties.</p>
+
+        <p><strong>7. Safety and Compliance</strong></p>
+        <p><strong>7.1</strong> You agree to comply with all applicable laws, regulations, and safety requirements related to childcare, health, and supervision.</p>
+        <p><strong>7.2</strong> You agree to take appropriate action in emergencies, including contacting emergency services where required.</p>
+
+        <p><strong>8.</strong> You agree not to: Misrepresent qualifications or experience; Engage in abusive, unsafe, or unlawful conduct; Circumvent Platform payments to avoid fees; Solicit Families outside the Platform in violation of Platform rules; Share or misuse personal or child-related information.</p>
+
+        <p><strong>9. Content and Intellectual Property</strong></p>
+        <p><strong>9.1</strong> You retain ownership of content you submit but grant Assured Hearts a non-exclusive, royalty-free license to use such content to operate and promote the Platform.</p>
+        <p><strong>9.2</strong> You may not copy, distribute, or misuse Assured Hearts' branding, Resources, or proprietary materials without permission.</p>
+
+        <p><strong>10.</strong> You agree to indemnify and hold harmless Assured Hearts and its directors, officers, employees, and agents from any claims, liabilities, damages, losses, and expenses (including legal fees) arising from: Your provision of Care Services; Your interactions with Families or children; Any breach of this Agreement; Any violation of law or third-party rights. This obligation survives termination.</p>
+
+        <p><strong>11. Limitation of Liability:</strong> To the maximum extent permitted by law: Assured Hearts is not liable for damages arising from Care Services; Assured Hearts' total liability under this Agreement will not exceed CAD $5,000. Nothing in this Agreement limits liability where such limitation is not permitted by law.</p>
+
+        <p><strong>12. Suspension and Termination</strong></p>
+        <p><strong>12.1</strong> Termination by Assured Hearts: We may suspend or terminate your access if you violate this Agreement, create safety concerns, or harm the integrity of the Platform.</p>
+        <p><strong>12.2</strong> Termination by Caregiver. You may stop using the Platform at any time, subject to completing accepted bookings or resolving outstanding obligations.</p>
+
+        <p><strong>13. Confidentiality and Privacy:</strong> You agree to protect the confidentiality and privacy of Families and children and to use personal information only for legitimate childcare purposes.</p>
+
+        <p><strong>14.</strong> This Agreement is governed by the laws of the Province of Saskatchewan, Canada, and applicable federal laws.</p>
+
+        <p><strong>15.</strong> This Agreement, together with the Terms of Service and Privacy Policy, constitutes the entire agreement between you and Assured Hearts regarding your participation as a Caregiver.</p>
+
+        <p>Questions about this Agreement may be directed to:</p>
+        <p>Email: Policy@assuredhearts.com</p>
+      </section>
+    </main>
+
+    <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <p style="margin: 0;">&copy; 2025 Assured Hearts. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

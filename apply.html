@@ -29,22 +29,16 @@
         gap: 6px;
         min-width: 0;
       }
-      /* Age group grid: 2 per row on mobile, except No preference spans full width */
+      /* Age group grid: keep items uniform */
       .age-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 12px;
       }
-      .age-grid .age-wide {
-        grid-column: 1 / -1;
-      }
       @media (max-width: 640px) {
         .age-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 10px;
-        }
-        .age-grid .age-wide {
-          grid-column: 1 / -1;
         }
       }
     </style>
@@ -215,20 +209,20 @@
               <textarea name="experience_details" required rows="4" style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px; font-family: inherit;"></textarea>
             </label>
 
-            <label style="display: flex; flex-direction: column; color: #666; font-weight: 600; margin-top: 16px;">
-              <input type="checkbox" name="cpr" required style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
-              I have current CPR/First Aid certification (or willing to get certified)
+            <label style="display: flex; gap: 8px; align-items: flex-start; color: #666; font-weight: 600; margin-top: 16px;">
+              <input type="checkbox" name="cpr" required style="margin-top: 3px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;">
+              <span>I have current CPR/First Aid certification (or willing to get certified)</span>
             </label>
 
-            <label style="display: flex; flex-direction: column; color: #666; font-weight: 600; margin-top: 16px;">
-              <input type="checkbox" name="values" required style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
-              I am committed to Islamic values and can provide culturally aligned care
+            <label style="display: flex; gap: 8px; align-items: flex-start; color: #666; font-weight: 600; margin-top: 16px;">
+              <input type="checkbox" name="values" required style="margin-top: 3px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;">
+              <span>I am committed to Islamic values and can provide culturally aligned care</span>
             </label>
 
             <label style="display: flex; flex-direction: column; color: #666; font-weight: 600; margin-top: 16px;">
               Age Groups You're Comfortable With
               <div class="age-grid" style="margin-top: 8px;">
-                <label class="age-wide" style="display: flex; align-items: center; gap: 8px;">
+                <label style="display: flex; align-items: center; gap: 8px;">
                   <input type="checkbox" name="ageGroup" value="no-preference"> No preference - All ages
                 </label>
                 <label style="display: flex; align-items: center; gap: 8px;">
@@ -330,24 +324,25 @@
               </div>
             </div>
 
-            <label style="display: flex; flex-direction: column; color: #666; font-weight: 600; margin-top: 20px;">
-              <input type="checkbox" name="transportation" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
-              I have reliable transportation
-            </label>
           </fieldset>
 
           <!-- Consent -->
           <fieldset style="border: none; padding: 0; margin: 0;">
             <legend style="font-size: 18px; font-weight: 700; color: #06464E; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #67B3C2; margin-top: 24px;">Consent & Agreement</legend>
             
-            <label style="display: flex; gap: 8px; color: #666; margin-top: 16px;">
-              <input type="checkbox" name="backgroundCheck" required style="width: 18px; height: 18px; flex-shrink: 0; cursor: pointer;">
+            <label style="display: flex; gap: 8px; align-items: flex-start; color: #666; margin-top: 16px;">
+              <input type="checkbox" name="backgroundCheck" required style="margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; cursor: pointer;">
               <span>I consent to a background check and reference verification</span>
             </label>
 
-            <label style="display: flex; gap: 8px; color: #666; margin-top: 12px;">
-              <input type="checkbox" name="terms" required style="width: 18px; height: 18px; flex-shrink: 0; cursor: pointer;">
-              <span>I agree to the Terms of Service and Privacy Policy</span>
+            <label style="display: flex; gap: 8px; align-items: flex-start; color: #666; margin-top: 12px;">
+              <input type="checkbox" name="acceptPolicies" required style="margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; cursor: pointer;">
+              <span>I agree to the <a href="terms-of-service.html" style="color: #06464E; font-weight: 600; text-decoration: underline;">Terms of Service</a>, <a href="privacy-policy.html" style="color: #06464E; font-weight: 600; text-decoration: underline;">Privacy Policy</a>, <a href="disclaimers.html" style="color: #06464E; font-weight: 600; text-decoration: underline;">Disclaimers</a>, and <a href="cancellation-refund-policy.html" style="color: #06464E; font-weight: 600; text-decoration: underline;">Cancellation &amp; Refund Policy</a></span>
+            </label>
+
+            <label style="display: flex; gap: 8px; align-items: flex-start; color: #666; margin-top: 12px;">
+              <input type="checkbox" name="providerAgreement" required style="margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; cursor: pointer;">
+              <span>I agree to the <a href="provider-agreement.html" style="color: #06464E; font-weight: 600; text-decoration: underline;">Provider Agreement</a></span>
             </label>
           </fieldset>
 
@@ -364,6 +359,13 @@
     </main>
 
     <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 16px;">
+        <a href="terms-of-service.html" class="btn" style="background: #ffffff; color: #06464E; padding: 10px 16px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px;">Terms of Service</a>
+        <a href="privacy-policy.html" class="btn" style="background: #ffffff; color: #06464E; padding: 10px 16px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px;">Privacy Policy</a>
+        <a href="provider-agreement.html" class="btn" style="background: #ffffff; color: #06464E; padding: 10px 16px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px;">Provider Agreement</a>
+        <a href="disclaimers.html" class="btn" style="background: #ffffff; color: #06464E; padding: 10px 16px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px;">Disclaimers</a>
+        <a href="cancellation-refund-policy.html" class="btn" style="background: #ffffff; color: #06464E; padding: 10px 16px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px;">Cancellation &amp; Refund Policy</a>
+      </div>
       <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
     </footer>
 
