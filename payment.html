@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Complete Payment - Assured Hearts</title>
+    <meta name="description" content="Pay for your childcare booking." />
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .payment-hero {
+        padding: 48px 16px;
+        background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%);
+        text-align: center;
+      }
+      .payment-card {
+        background: #ffffff;
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        display: grid;
+        gap: 16px;
+      }
+      #payment-element {
+        padding: 8px 0;
+      }
+      .payment-summary {
+        display: grid;
+        gap: 6px;
+        color: #374151;
+        font-size: 14px;
+      }
+      .payment-summary strong {
+        color: #06464E;
+      }
+      .payment-message {
+        min-height: 20px;
+        color: #b91c1c;
+        font-size: 14px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="nav-links">
+          <a href="find-childcare.html">Find Childcare</a>
+          <a href="become-provider.html">Join Our Care Network</a>
+          <a href="care-process.html">Our Care Process</a>
+          <a href="learning.html">At-Home Learning</a>
+        </div>
+        <div class="nav-auth"></div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobileMenu" class="mobile-menu-panel hidden" aria-hidden="true">
+      <button id="mobileMenuClose" class="mobile-menu-close" aria-label="Close menu">&times;</button>
+      <nav class="mobile-nav">
+        <a href="find-childcare.html">Find Childcare</a>
+        <a href="become-provider.html">Join Our Care Network</a>
+        <a href="care-process.html">Our Care Process</a>
+        <a href="learning.html">At-Home Learning</a>
+      </nav>
+    </div>
+
+    <header class="payment-hero">
+      <div class="container" style="max-width: 900px;">
+        <h1 style="margin: 0 0 12px 0; color:#06464E;">Complete Your Payment</h1>
+        <p class="lead" style="margin: 0; color:#4b5563;">Your caregiver accepted the booking. Finish payment to confirm.</p>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 32px 24px 48px 24px; max-width: 720px;">
+      <section class="payment-card">
+        <div class="payment-summary">
+          <div>Request ID: <strong id="requestIdLabel">—</strong></div>
+          <div>Amount due: <strong id="amountDueLabel">—</strong></div>
+        </div>
+
+        <form id="payment-form">
+          <div id="payment-element"></div>
+          <button id="submit-payment-btn" class="btn" style="width: 100%; padding: 12px 16px; font-weight: 700;">Pay now</button>
+          <div id="payment-message" class="payment-message"></div>
+        </form>
+
+        <a id="backLink" href="parent-dashboard.html" style="color:#06464E; font-weight:600; text-decoration:none; font-size:13px;">← Back to dashboard</a>
+      </section>
+    </main>
+
+    <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <p style="margin: 0;">&copy; 2025 Assured Hearts. All rights reserved.</p>
+    </footer>
+
+    <script src="https://js.stripe.com/v3"></script>
+    <script src="script.js"></script>
+    <script>
+      const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+      const params = new URLSearchParams(window.location.search);
+      const requestId = params.get('request_id');
+      const userId = parseInt(localStorage.getItem('user_id'), 10);
+      const requestIdLabel = document.getElementById('requestIdLabel');
+      const amountDueLabel = document.getElementById('amountDueLabel');
+      const messageEl = document.getElementById('payment-message');
+      const form = document.getElementById('payment-form');
+      const submitBtn = document.getElementById('submit-payment-btn');
+      const backLink = document.getElementById('backLink');
+
+      if(backLink) backLink.href = 'parent-dashboard.html';
+      if(requestIdLabel) requestIdLabel.textContent = requestId || '—';
+
+      function showMessage(msg, isError){
+        if(!messageEl) return;
+        messageEl.textContent = msg || '';
+        messageEl.style.color = isError ? '#b91c1c' : '#166534';
+      }
+
+      function setLoading(isLoading){
+        if(!submitBtn) return;
+        submitBtn.disabled = isLoading;
+        submitBtn.textContent = isLoading ? 'Processing…' : 'Pay now';
+      }
+
+      async function initPayment(){
+        if(!requestId){
+          showMessage('Missing request ID.', true);
+          return;
+        }
+        if(!userId){
+          showMessage('Please sign in to complete payment.', true);
+          setTimeout(() => { window.location.href = 'account-signup.html'; }, 1200);
+          return;
+        }
+        try{
+          const configRes = await fetch(`${API_BASE}/payments/config`);
+          const configData = await configRes.json();
+          if(!configRes.ok) throw new Error(configData.error || 'Payment config failed');
+
+          const intentRes = await fetch(`${API_BASE}/payments/intent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId, userId })
+          });
+          const intentData = await intentRes.json();
+          if(!intentRes.ok) throw new Error(intentData.error || 'Payment setup failed');
+
+          if(intentData.paid){
+            showMessage('Payment already completed.', false);
+            setTimeout(() => { window.location.href = 'parent-dashboard.html?paid=1'; }, 1200);
+            return;
+          }
+
+          const amount = intentData.amountCents ? `$${(intentData.amountCents / 100).toFixed(2)}` : '$20/hr';
+          if(amountDueLabel) amountDueLabel.textContent = amount;
+
+          const stripe = Stripe(configData.publishableKey);
+          const elements = stripe.elements({ clientSecret: intentData.clientSecret });
+          const paymentElement = elements.create('payment');
+          paymentElement.mount('#payment-element');
+
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            const { error } = await stripe.confirmPayment({
+              elements,
+              confirmParams: {
+                return_url: `${window.location.origin}/parent-dashboard.html?paid=1&request_id=${encodeURIComponent(requestId)}`
+              },
+              redirect: 'if_required'
+            });
+            if(error){
+              showMessage(error.message, true);
+              setLoading(false);
+              return;
+            }
+            const confirmRes = await fetch(`${API_BASE}/payments/confirm`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ requestId, userId })
+            });
+            const confirmData = await confirmRes.json();
+            if(!confirmRes.ok){
+              showMessage(confirmData.error || 'Payment confirmation failed.', true);
+              setLoading(false);
+              return;
+            }
+            showMessage('Payment successful. Redirecting…', false);
+            setTimeout(() => { window.location.href = 'parent-dashboard.html?paid=1'; }, 1200);
+          });
+        }catch(err){
+          console.error('Payment init error:', err);
+          showMessage(err.message || 'Payment setup failed.', true);
+        }
+      }
+
+      initPayment();
+    </script>
+  </body>
+</html>
