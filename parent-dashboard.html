@@ -46,6 +46,7 @@
         <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;">
           <a href="child-demographics.html" class="btn" style="padding: 10px 16px; font-weight: 700; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; text-decoration: none; border-radius: 8px;">Add Child</a>
           <a href="request-childcare.html" class="btn secondary" style="padding: 10px 16px; font-weight: 700; border: 2px solid #06464E; background: #fff; color: #06464E; text-decoration: none; border-radius: 8px;">Book Childcare</a>
+          <button id="paymentMethodsBtn" class="btn outline" type="button" style="padding: 10px 16px; font-weight: 700; border: 2px solid #67B3C2; background: #fff; color: #06464E; border-radius: 8px; cursor: pointer;">My Payment Methods</button>
           <a href="referral.html" class="btn outline" style="padding: 10px 16px; font-weight: 700; border: 2px solid #67B3C2; background: #fff; color: #06464E; text-decoration: none; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;">Refer a Friend <span id="referralCountBadge" style="background:#eef7f2; color:#2d6b42; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700;">0</span></a>
         </div>
       </div>
@@ -139,13 +140,43 @@
 
     </main>
 
+    <div id="paymentMethodsModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-content" style="max-width: 560px; width: 94%;">
+        <button class="modal-close" id="paymentMethodsClose" aria-label="Close payment methods">&times;</button>
+        <h2 style="margin: 0 0 6px 0;">My Payment Methods</h2>
+        <p style="margin: 0 0 16px 0; color: #6b7280; font-size: 13px;">Save and name the cards you use for childcare bookings.</p>
+
+        <div id="paymentMethodsList" style="display: grid; gap: 10px; margin-bottom: 16px;">
+          <p style="margin: 0; color: #6b7280; font-size: 13px;">Loading payment methods...</p>
+        </div>
+
+        <button id="addPaymentMethodBtn" type="button" class="btn" style="padding: 10px 14px; font-size: 13px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; border-radius: 8px;">Add payment method</button>
+
+        <form id="paymentMethodForm" class="hidden" style="margin-top: 16px; display: grid; gap: 12px;">
+          <label style="display: flex; flex-direction: column; gap: 6px; color: #374151; font-size: 13px;">
+            Label (e.g., Debit)
+            <input id="paymentMethodLabel" type="text" placeholder="Debit" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px;">
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; color: #374151; font-size: 13px;">
+            <input id="paymentMethodDefault" type="checkbox">
+            Set as default
+          </label>
+          <div id="paymentMethodElement" style="padding: 8px 0;"></div>
+          <button id="savePaymentMethodBtn" type="submit" class="btn" style="padding: 10px 14px; font-size: 13px; font-weight: 700;">Save method</button>
+          <div id="paymentMethodMessage" style="min-height: 18px; color: #b91c1c; font-size: 12px; font-weight: 600;"></div>
+        </form>
+      </div>
+    </div>
+
     <footer style="background: #06464E; color: white; padding: 16px 24px; text-align: center; margin-top: 32px; font-size: 12px;">
       <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
     </footer>
 
+    <script src="https://js.stripe.com/v3"></script>
     <script src="script.js"></script>
     <script>
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+      const userId = parseInt(localStorage.getItem('user_id'), 10) || null;
 
       function baseCaregivers(){
         return [
@@ -340,19 +371,19 @@
       }
 
       async function loadParentDashboard() {
-        const userId = localStorage.getItem('user_id');
+        const storedUserId = localStorage.getItem('user_id');
         const userName = localStorage.getItem('user_name');
 
         if(userName) {
           document.getElementById('dashboardGreeting').textContent = `Welcome back, ${userName}!`;
         }
-        if(!userId) {
+        if(!storedUserId) {
           showBanner('Please log in to view your dashboard.', 'info');
           setTimeout(()=> window.location.href = 'account-signup.html', 1200);
           return;
         }
 
-        const userIdNum = parseInt(userId) || null;
+        const userIdNum = parseInt(storedUserId) || null;
         const familyId = localStorage.getItem('family_id') || (userIdNum ? `family_${userIdNum}` : null);
         const cachedChildren = JSON.parse(localStorage.getItem('child_cache') || '[]').filter(c => !userIdNum || c.parent_id === userIdNum);
 
@@ -562,7 +593,11 @@
               const requestId = btn.getAttribute('data-id');
               const mode = btn.getAttribute('data-mode') || 'pay';
               if(!requestId) return;
-              window.location.href = `payment.html?request_id=${encodeURIComponent(requestId)}&mode=${encodeURIComponent(mode)}`;
+              if(mode === 'setup'){
+                openPaymentMethodsModal(requestId);
+              } else {
+                window.location.href = `payment.html?request_id=${encodeURIComponent(requestId)}&mode=${encodeURIComponent(mode)}`;
+              }
             });
           });
 
@@ -590,6 +625,242 @@
         initManageChildrenPicker(kids);
       }
     }
+
+      // Payment methods modal
+      const paymentMethodsBtn = document.getElementById('paymentMethodsBtn');
+      const paymentMethodsModal = document.getElementById('paymentMethodsModal');
+      const paymentMethodsClose = document.getElementById('paymentMethodsClose');
+      const paymentMethodsList = document.getElementById('paymentMethodsList');
+      const addPaymentMethodBtn = document.getElementById('addPaymentMethodBtn');
+      const paymentMethodForm = document.getElementById('paymentMethodForm');
+      const paymentMethodLabel = document.getElementById('paymentMethodLabel');
+      const paymentMethodDefault = document.getElementById('paymentMethodDefault');
+      const paymentMethodElementWrap = document.getElementById('paymentMethodElement');
+      const paymentMethodMessage = document.getElementById('paymentMethodMessage');
+
+      let stripeInstance = null;
+      let paymentElements = null;
+      let setupIntentId = null;
+      let activeChargeRequestId = null;
+
+      function showPaymentMessage(msg, isError){
+        if(!paymentMethodMessage) return;
+        paymentMethodMessage.textContent = msg || '';
+        paymentMethodMessage.style.color = isError ? '#b91c1c' : '#166534';
+      }
+
+      async function ensureStripeInstance(){
+        if(stripeInstance) return stripeInstance;
+        const res = await fetch(`${API_BASE}/payments/config`);
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || 'Stripe config failed');
+        stripeInstance = Stripe(data.publishableKey);
+        return stripeInstance;
+      }
+
+      async function loadPaymentMethods(){
+        if(!paymentMethodsList) return;
+        paymentMethodsList.innerHTML = '<p style="margin:0; color:#6b7280; font-size:13px;">Loading payment methods...</p>';
+        try{
+          const res = await fetch(`${API_BASE}/payments/methods/list`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
+          });
+          const data = await res.json();
+          if(!res.ok) throw new Error(data.error || 'Failed to load methods');
+          const methods = Array.isArray(data.methods) ? data.methods : [];
+          if(methods.length === 0){
+            paymentMethodsList.innerHTML = '<p style="margin:0; color:#6b7280; font-size:13px;">No saved payment methods yet.</p>';
+            return methods;
+          }
+          paymentMethodsList.innerHTML = methods.map(m=>{
+            const label = m.label || 'Card';
+            const detail = m.brand && m.last4 ? `${m.brand.toUpperCase()} •••• ${m.last4} · ${m.exp_month || ''}/${m.exp_year || ''}` : 'Saved';
+            const defaultTag = m.is_default ? '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Default</span>' : '';
+            return `
+              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:12px; display:grid; gap:8px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                  <div>
+                    <div style="font-weight:700; color:#06464E; font-size:13px;">${label}</div>
+                    <div style="color:#6b7280; font-size:12px;">${detail}</div>
+                  </div>
+                  ${defaultTag}
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button class="pm-default-btn" data-id="${m.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #06464E; background:#fff; color:#06464E; font-size:12px; font-weight:700; cursor:pointer;">Make default</button>
+                  <button class="pm-rename-btn" data-id="${m.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #e5e7eb; background:#fff; color:#6b7280; font-size:12px; font-weight:700; cursor:pointer;">Rename</button>
+                  <button class="pm-remove-btn" data-id="${m.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #fee; background:#fff; color:#991b1b; font-size:12px; font-weight:700; cursor:pointer;">Remove</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          paymentMethodsList.querySelectorAll('.pm-default-btn').forEach(btn=>{
+            btn.addEventListener('click', async ()=>{
+              const id = btn.getAttribute('data-id');
+              try{
+                const res = await fetch(`${API_BASE}/payments/methods/default`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ userId, methodId: id })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to set default');
+                await loadPaymentMethods();
+              }catch(err){
+                showPaymentMessage(err.message, true);
+              }
+            });
+          });
+          paymentMethodsList.querySelectorAll('.pm-rename-btn').forEach(btn=>{
+            btn.addEventListener('click', async ()=>{
+              const id = btn.getAttribute('data-id');
+              const label = window.prompt('Name this payment method:');
+              if(!label) return;
+              try{
+                const res = await fetch(`${API_BASE}/payments/methods/rename`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ userId, methodId: id, label })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to rename');
+                await loadPaymentMethods();
+              }catch(err){
+                showPaymentMessage(err.message, true);
+              }
+            });
+          });
+          paymentMethodsList.querySelectorAll('.pm-remove-btn').forEach(btn=>{
+            btn.addEventListener('click', async ()=>{
+              const id = btn.getAttribute('data-id');
+              if(!window.confirm('Remove this payment method?')) return;
+              try{
+                const res = await fetch(`${API_BASE}/payments/methods/remove`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ userId, methodId: id })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Failed to remove');
+                await loadPaymentMethods();
+              }catch(err){
+                showPaymentMessage(err.message, true);
+              }
+            });
+          });
+          return methods;
+        }catch(err){
+          console.error('Load methods error:', err);
+          paymentMethodsList.innerHTML = '<p style="margin:0; color:#b91c1c; font-size:13px;">Failed to load payment methods.</p>';
+          return [];
+        }
+      }
+
+      async function openPaymentMethodsModal(requestId){
+        if(!paymentMethodsModal) return;
+        if(!userId){
+          showBanner('Please sign in to manage payment methods.', 'info');
+          return;
+        }
+        activeChargeRequestId = requestId || null;
+        paymentMethodsModal.classList.remove('hidden');
+        paymentMethodsModal.setAttribute('aria-hidden','false');
+        if(paymentMethodForm) paymentMethodForm.classList.add('hidden');
+        if(paymentMethodElementWrap) paymentMethodElementWrap.innerHTML = '';
+        showPaymentMessage('', false);
+        await loadPaymentMethods();
+      }
+
+      function closePaymentMethodsModal(){
+        if(!paymentMethodsModal) return;
+        paymentMethodsModal.classList.add('hidden');
+        paymentMethodsModal.setAttribute('aria-hidden','true');
+        activeChargeRequestId = null;
+      }
+
+      paymentMethodsBtn && paymentMethodsBtn.addEventListener('click', ()=> openPaymentMethodsModal());
+      paymentMethodsClose && paymentMethodsClose.addEventListener('click', closePaymentMethodsModal);
+      paymentMethodsModal && paymentMethodsModal.addEventListener('click', (e)=> {
+        if(e.target === paymentMethodsModal) closePaymentMethodsModal();
+      });
+
+      addPaymentMethodBtn && addPaymentMethodBtn.addEventListener('click', async ()=>{
+        if(!paymentMethodForm || !paymentMethodElementWrap) return;
+        paymentMethodForm.classList.remove('hidden');
+        paymentMethodElementWrap.innerHTML = '';
+        showPaymentMessage('', false);
+        try{
+          const stripe = await ensureStripeInstance();
+          const setupRes = await fetch(`${API_BASE}/payments/methods/setup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
+          });
+          const setupData = await setupRes.json();
+          if(!setupRes.ok) throw new Error(setupData.error || 'Setup failed');
+          setupIntentId = setupData.setupIntentId;
+          paymentElements = stripe.elements({ clientSecret: setupData.clientSecret });
+          const paymentElement = paymentElements.create('payment');
+          paymentElement.mount('#paymentMethodElement');
+        }catch(err){
+          showPaymentMessage(err.message || 'Failed to load payment form.', true);
+        }
+      });
+
+      paymentMethodForm && paymentMethodForm.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        if(!paymentElements || !setupIntentId) return;
+        try{
+          const stripe = await ensureStripeInstance();
+          showPaymentMessage('Saving...', false);
+          const { error, setupIntent } = await stripe.confirmSetup({
+            elements: paymentElements,
+            confirmParams: { return_url: `${window.location.origin}/parent-dashboard.html` },
+            redirect: 'if_required'
+          });
+          if(error){
+            showPaymentMessage(error.message, true);
+            return;
+          }
+          const label = paymentMethodLabel?.value || '';
+          const makeDefault = !!paymentMethodDefault?.checked;
+          const saveRes = await fetch(`${API_BASE}/payments/methods/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, setupIntentId, label, makeDefault })
+          });
+          const saveData = await saveRes.json();
+          if(!saveRes.ok) throw new Error(saveData.error || 'Failed to save method');
+          showPaymentMessage('Payment method saved.', false);
+          paymentMethodForm.reset();
+          paymentMethodForm.classList.add('hidden');
+          if(paymentMethodElementWrap) paymentMethodElementWrap.innerHTML = '';
+          await loadPaymentMethods();
+
+          if(activeChargeRequestId){
+            const chargeRes = await fetch(`${API_BASE}/payments/charge`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId, requestId: activeChargeRequestId, payment_method_id: saveData.stripePaymentMethodId })
+            });
+            const chargeData = await chargeRes.json();
+            if(chargeRes.ok && chargeData.status === 'paid'){
+              showPaymentMessage('Payment completed.', false);
+              setTimeout(()=> {
+                closePaymentMethodsModal();
+                loadParentDashboard();
+              }, 800);
+            } else if(chargeData.status === 'requires_action'){
+              closePaymentMethodsModal();
+              window.location.href = `payment.html?request_id=${encodeURIComponent(activeChargeRequestId)}&mode=pay`;
+            }
+          }
+        }catch(err){
+          showPaymentMessage(err.message || 'Failed to save method.', true);
+        }
+      });
 
       // Messages card hookup
       (function(){
