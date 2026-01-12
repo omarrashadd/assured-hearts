@@ -461,7 +461,11 @@
                 amountLabel = `$${(Math.max(1, hours) * 20).toFixed(2)}`;
               }
               if(!amountLabel) amountLabel = '$20/hr';
-              const isPayable = statusKey === 'accepted' && !isPaid;
+              const needsPaymentMethod = paymentStatus === 'needs_payment_method';
+              const needsPaymentAction = ['requires_action','requires_payment_method','failed'].includes(paymentStatus);
+              const isPayable = statusKey === 'accepted' && !isPaid && (needsPaymentMethod || needsPaymentAction);
+              const payMode = needsPaymentMethod ? 'setup' : 'pay';
+              const payLabel = needsPaymentMethod ? 'Add payment method' : `Complete payment ${amountLabel}`;
               const dateStr = new Date(request.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
               const canCancel = statusKey === 'pending' || statusKey === 'matched';
               const otherId = request.provider_user_id || request.provider_id || request.provider;
@@ -476,7 +480,7 @@
                     <p style="margin: 0; color: #999; font-size: 12px;">Submitted ${dateStr}</p>
                   </div>
                   <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                    ${isPayable ? `<button class="pay-request-btn" data-id="${request.id}" style="background: #06464E; color: #fff; border: 1px solid #06464E; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer;">Pay ${amountLabel}</button>` : ''}
+                    ${isPayable ? `<button class="pay-request-btn" data-id="${request.id}" data-mode="${payMode}" style="background: #06464E; color: #fff; border: 1px solid #06464E; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer;">${payLabel}</button>` : ''}
                     ${otherId ? `<button class="message-caregiver-btn" data-other="${otherId}" data-name="${request.provider_name || 'Caregiver'}" style="background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer;">Message ${request.provider_name || 'caregiver'}</button>` : ''}
                     ${canCancel ? `<button class="cancel-request-btn" data-id="${request.id}" style="background: #fff; color: #991b1b; border: 1px solid #991b1b; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">Cancel</button>` : ''}
                   </div>
@@ -556,8 +560,9 @@
           requestsList.querySelectorAll('.pay-request-btn').forEach(btn=>{
             btn.addEventListener('click', ()=>{
               const requestId = btn.getAttribute('data-id');
+              const mode = btn.getAttribute('data-mode') || 'pay';
               if(!requestId) return;
-              window.location.href = `payment.html?request_id=${encodeURIComponent(requestId)}`;
+              window.location.href = `payment.html?request_id=${encodeURIComponent(requestId)}&mode=${encodeURIComponent(mode)}`;
             });
           });
 

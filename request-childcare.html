@@ -568,8 +568,15 @@
             }
             console.log('Response data:', data);
             if(!res.ok) throw new Error(data.error || 'Failed to submit request');
-            showBanner('Request submitted successfully!', 'success');
-            setTimeout(() => window.location.href = 'parent-dashboard.html', 1500);
+            showBanner('Request submitted! Add a payment method to continue.', 'success');
+            const nextId = data.id;
+            setTimeout(() => {
+              if(nextId){
+                window.location.href = `payment.html?request_id=${encodeURIComponent(nextId)}&mode=setup`;
+              } else {
+                window.location.href = 'parent-dashboard.html';
+              }
+            }, 1200);
           } catch (err) {
             console.error('Request submission error:', err);
             showBanner(`Error: ${err.message}`, 'error');

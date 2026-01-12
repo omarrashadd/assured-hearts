@@ -70,8 +70,8 @@
 
     <header class="payment-hero">
       <div class="container" style="max-width: 900px;">
-        <h1 style="margin: 0 0 12px 0; color:#06464E;">Complete Your Payment</h1>
-        <p class="lead" style="margin: 0; color:#4b5563;">Your caregiver accepted the booking. Finish payment to confirm.</p>
+        <h1 id="paymentTitle" style="margin: 0 0 12px 0; color:#06464E;">Complete Your Payment</h1>
+        <p id="paymentSubtitle" class="lead" style="margin: 0; color:#4b5563;">Your caregiver accepted the booking. Finish payment to confirm.</p>
       </div>
     </header>
 
@@ -79,7 +79,7 @@
       <section class="payment-card">
         <div class="payment-summary">
           <div>Request ID: <strong id="requestIdLabel">—</strong></div>
-          <div>Amount due: <strong id="amountDueLabel">—</strong></div>
+          <div id="amountRow">Amount due: <strong id="amountDueLabel">—</strong></div>
         </div>
 
         <form id="payment-form">
@@ -105,10 +105,15 @@
       const userId = parseInt(localStorage.getItem('user_id'), 10);
       const requestIdLabel = document.getElementById('requestIdLabel');
       const amountDueLabel = document.getElementById('amountDueLabel');
+      const amountRow = document.getElementById('amountRow');
+      const titleEl = document.getElementById('paymentTitle');
+      const subtitleEl = document.getElementById('paymentSubtitle');
       const messageEl = document.getElementById('payment-message');
       const form = document.getElementById('payment-form');
       const submitBtn = document.getElementById('submit-payment-btn');
       const backLink = document.getElementById('backLink');
+      const mode = params.get('mode') === 'setup' ? 'setup' : 'pay';
+      const returnFromStripe = params.get('return') === '1';
 
       if(backLink) backLink.href = 'parent-dashboard.html';
       if(requestIdLabel) requestIdLabel.textContent = requestId || '—';
@@ -122,7 +127,11 @@
       function setLoading(isLoading){
         if(!submitBtn) return;
         submitBtn.disabled = isLoading;
-        submitBtn.textContent = isLoading ? 'Processing…' : 'Pay now';
+        if(isLoading){
+          submitBtn.textContent = 'Processing…';
+        } else {
+          submitBtn.textContent = mode === 'setup' ? 'Save payment method' : 'Pay now';
+        }
       }
 
       async function initPayment(){
@@ -135,10 +144,89 @@
           setTimeout(() => { window.location.href = 'account-signup.html'; }, 1200);
           return;
         }
+        if(mode === 'setup'){
+          if(titleEl) titleEl.textContent = 'Save Payment Method';
+          if(subtitleEl) subtitleEl.textContent = 'We only charge after the caregiver accepts your request.';
+          if(amountRow) amountRow.innerHTML = 'Charge later: <strong>$20/hr</strong>';
+          if(submitBtn) submitBtn.textContent = 'Save payment method';
+        }
+
         try{
           const configRes = await fetch(`${API_BASE}/payments/config`);
           const configData = await configRes.json();
           if(!configRes.ok) throw new Error(configData.error || 'Payment config failed');
+          const stripe = Stripe(configData.publishableKey);
+
+          if(mode === 'setup'){
+            const setupRes = await fetch(`${API_BASE}/payments/setup-intent`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ requestId, userId })
+            });
+            const setupData = await setupRes.json();
+            if(!setupRes.ok) throw new Error(setupData.error || 'Setup failed');
+            if(setupData.setupComplete){
+              showMessage('Payment method already saved.', false);
+              setTimeout(() => { window.location.href = 'parent-dashboard.html'; }, 1200);
+              return;
+            }
+            const elements = stripe.elements({ clientSecret: setupData.clientSecret });
+            const paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
+
+            async function finalizeSetup(){
+              const confirmRes = await fetch(`${API_BASE}/payments/setup-confirm`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requestId, userId })
+              });
+              const confirmData = await confirmRes.json();
+              if(!confirmRes.ok){
+                showMessage(confirmData.error || 'Setup confirmation failed.', true);
+                setLoading(false);
+                return;
+              }
+              showMessage('Payment method saved.', false);
+              setTimeout(() => { window.location.href = 'parent-dashboard.html'; }, 1200);
+            }
+
+            form.addEventListener('submit', async (e) => {
+              e.preventDefault();
+              setLoading(true);
+              const { error, setupIntent } = await stripe.confirmSetup({
+                elements,
+                confirmParams: {
+                  return_url: `${window.location.origin}/payment.html?request_id=${encodeURIComponent(requestId)}&mode=setup&return=1`
+                },
+                redirect: 'if_required'
+              });
+              if(error){
+                showMessage(error.message, true);
+                setLoading(false);
+                return;
+              }
+              if(setupIntent && setupIntent.status === 'succeeded'){
+                await finalizeSetup();
+                return;
+              }
+              await finalizeSetup();
+            });
+            return;
+          }
+
+          if(returnFromStripe){
+            const confirmRes = await fetch(`${API_BASE}/payments/confirm`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ requestId, userId })
+            });
+            const confirmData = await confirmRes.json();
+            if(confirmRes.ok && confirmData.status === 'paid'){
+              showMessage('Payment completed. Redirecting…', false);
+              setTimeout(() => { window.location.href = 'parent-dashboard.html?paid=1'; }, 1000);
+              return;
+            }
+          }
 
           const intentRes = await fetch(`${API_BASE}/payments/intent`, {
             method: 'POST',
@@ -156,8 +244,6 @@
 
           const amount = intentData.amountCents ? `$${(intentData.amountCents / 100).toFixed(2)}` : '$20/hr';
           if(amountDueLabel) amountDueLabel.textContent = amount;
-
-          const stripe = Stripe(configData.publishableKey);
           const elements = stripe.elements({ clientSecret: intentData.clientSecret });
           const paymentElement = elements.create('payment');
           paymentElement.mount('#payment-element');
@@ -168,7 +254,7 @@
             const { error } = await stripe.confirmPayment({
               elements,
               confirmParams: {
-                return_url: `${window.location.origin}/parent-dashboard.html?paid=1&request_id=${encodeURIComponent(requestId)}`
+                return_url: `${window.location.origin}/payment.html?request_id=${encodeURIComponent(requestId)}&mode=pay&return=1`
               },
               redirect: 'if_required'
             });
