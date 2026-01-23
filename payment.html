@@ -147,7 +147,7 @@
         if(mode === 'setup'){
           if(titleEl) titleEl.textContent = 'Save Payment Method';
           if(subtitleEl) subtitleEl.textContent = 'We only charge after the caregiver accepts your request.';
-          if(amountRow) amountRow.innerHTML = 'Charge later: <strong>$20/hr</strong>';
+          if(amountRow) amountRow.innerHTML = 'Charge later: <strong>Calculated at checkout</strong>';
           if(submitBtn) submitBtn.textContent = 'Save payment method';
         }
 
@@ -242,7 +242,7 @@
             return;
           }
 
-          const amount = intentData.amountCents ? `$${(intentData.amountCents / 100).toFixed(2)}` : '$20/hr';
+          const amount = intentData.amountCents ? `$${(intentData.amountCents / 100).toFixed(2)}` : '—';
           if(amountDueLabel) amountDueLabel.textContent = amount;
           const elements = stripe.elements({ clientSecret: intentData.clientSecret });
           const paymentElement = elements.create('payment');

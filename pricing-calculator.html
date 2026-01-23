@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Pricing Calculator - Assured Hearts</title>
+    <meta name="description" content="Adjust pricing rules and preview real-time checkout rates." />
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .pricing-hero {
+        padding: 48px 16px;
+        background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%);
+        text-align: center;
+      }
+      .pricing-grid {
+        display: grid;
+        gap: 24px;
+      }
+      @media (min-width: 980px) {
+        .pricing-grid {
+          grid-template-columns: 1.15fr 0.85fr;
+        }
+      }
+      .pricing-card {
+        background: #fff;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      }
+      .pricing-card h2 {
+        margin: 0 0 6px 0;
+        color: #06464E;
+      }
+      .pricing-section {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid #e5e7eb;
+      }
+      .pricing-section:first-child {
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+      }
+      .pricing-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .pricing-table th,
+      .pricing-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+      }
+      .pricing-table th {
+        color: #06464E;
+        font-weight: 700;
+        background: #f8fbfc;
+      }
+      .row-grid {
+        display: grid;
+        gap: 10px;
+      }
+      .row-grid.cols-3 {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+      .row-grid.cols-4 {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+      .row-grid input,
+      .row-grid select {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #d6dde5;
+        font-size: 13px;
+      }
+      .tiny-btn {
+        padding: 6px 8px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        color: #06464E;
+        cursor: pointer;
+      }
+      .tiny-btn.danger {
+        color: #991b1b;
+        border-color: #f5c6cb;
+        background: #fff5f5;
+      }
+      .status-text {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 8px;
+      }
+      .calc-box {
+        background: #f8fbfc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px;
+        display: grid;
+        gap: 8px;
+      }
+      .calc-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 13px;
+        color: #374151;
+      }
+      .calc-line strong {
+        color: #06464E;
+      }
+      .calc-highlight {
+        background: #eef7f2;
+        border: 1px solid #c7e9d4;
+        color: #14532d;
+        font-weight: 700;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="nav-links">
+          <a href="find-childcare.html">Find Childcare</a>
+          <a href="become-provider.html">Join Our Care Network</a>
+          <a href="care-process.html">Our Care Process</a>
+          <a href="learning.html">At-Home Learning</a>
+        </div>
+        <div class="nav-auth">
+          <a href="parent-dashboard.html" style="display: flex; align-items: center; gap: 6px; color: #06464E; text-decoration: none; font-weight: 600;">Dashboard</a>
+        </div>
+        <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <header class="pricing-hero">
+      <div class="container" style="max-width: 980px;">
+        <h1 style="margin: 0 0 10px 0; color:#06464E;">Pricing Calculator</h1>
+        <p class="lead" style="margin: 0; color:#4b5563;">Adjust pricing rules, preview hourly rates, and see the full fee breakdown before checkout.</p>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 32px 24px 48px 24px; max-width: 1100px;">
+      <div class="pricing-grid">
+        <section class="pricing-card">
+          <h2>Pricing Settings</h2>
+          <p style="margin: 0; color:#6b7280; font-size: 13px;">Base rate × age multiplier × time multiplier − premium discount = hourly rate. Taxes apply based on province.</p>
+
+          <div class="pricing-section">
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Base Rates by Location</h3>
+            <div id="baseRatesTable"></div>
+          </div>
+
+          <div class="pricing-section">
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Age Multipliers</h3>
+            <div id="ageBracketsWrap" style="display: grid; gap: 10px;"></div>
+            <button id="addAgeBracketBtn" class="tiny-btn" type="button" style="margin-top: 8px;">+ Add age bracket</button>
+          </div>
+
+          <div class="pricing-section">
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Time of Day Multipliers</h3>
+            <div id="timeBandsWrap" style="display: grid; gap: 10px;"></div>
+            <button id="addTimeBandBtn" class="tiny-btn" type="button" style="margin-top: 8px;">+ Add time band</button>
+          </div>
+
+          <div class="pricing-section">
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Membership Discount</h3>
+            <div class="row-grid cols-3">
+              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+                Premium discount (%)
+                <input id="premiumDiscountInput" type="number" step="0.1" min="0" max="100">
+              </label>
+            </div>
+          </div>
+
+          <div class="pricing-section">
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Fees</h3>
+            <div class="row-grid cols-4">
+              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+                Provider share (%)
+                <input id="providerShareInput" type="number" step="0.1" min="0" max="100">
+              </label>
+              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+                Platform fee (%)
+                <input id="platformFeeInput" type="number" step="0.1" min="0" max="100">
+              </label>
+              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+                Stripe fee (%)
+                <input id="stripePercentInput" type="number" step="0.1" min="0" max="100">
+              </label>
+              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+                Stripe fixed fee (cents)
+                <input id="stripeFixedInput" type="number" step="1" min="0">
+              </label>
+            </div>
+          </div>
+
+          <div class="pricing-section">
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Taxes by Province</h3>
+            <div class="row-grid cols-3" style="margin-bottom: 10px;">
+              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+                Tax applies to
+                <select id="taxAppliesSelect">
+                  <option value="platform_fee">Platform fee</option>
+                  <option value="total">Total hourly rate</option>
+                </select>
+              </label>
+            </div>
+            <div id="taxRatesTable"></div>
+          </div>
+
+          <div class="pricing-section">
+            <button id="savePricingBtn" class="btn" type="button" style="padding: 12px 16px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:#fff; border: none; border-radius: 10px; font-weight: 700;">Save Pricing Rules</button>
+            <div id="configStatus" class="status-text"></div>
+          </div>
+        </section>
+
+        <section class="pricing-card">
+          <h2>Rate Preview</h2>
+          <p style="margin: 0 0 12px 0; color:#6b7280; font-size: 13px;">Use this to preview exactly what checkout will charge.</p>
+
+          <div class="row-grid cols-3" style="margin-bottom: 12px;">
+            <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+              Province
+              <select id="calcProvince"></select>
+            </label>
+            <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+              Child age
+              <input id="calcAge" type="number" min="0" max="17" placeholder="Age">
+            </label>
+            <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+              Care type
+              <select id="calcCareType">
+                <option value="basic">Basic care</option>
+                <option value="curriculum">Curriculum care</option>
+              </select>
+            </label>
+          </div>
+          <div class="row-grid cols-3" style="margin-bottom: 12px;">
+            <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+              Membership
+              <select id="calcMembership">
+                <option value="standard">Standard</option>
+                <option value="premium">Premium</option>
+              </select>
+            </label>
+            <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+              Start date
+              <input id="calcDate" type="date">
+            </label>
+            <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+              Start time
+              <input id="calcStart" type="time">
+            </label>
+          </div>
+          <div class="row-grid cols-3" style="margin-bottom: 14px;">
+            <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+              Hours
+              <input id="calcHours" type="number" min="0.5" step="0.5" value="2">
+            </label>
+          </div>
+
+          <div class="calc-box" id="pricingBreakdown">
+            <div class="calc-line"><span>Hourly rate</span><strong>—</strong></div>
+            <div class="calc-line"><span>Provider fee (per hour)</span><strong>—</strong></div>
+            <div class="calc-line"><span>Platform fee (per hour)</span><strong>—</strong></div>
+            <div class="calc-line"><span>Tax (per hour)</span><strong>—</strong></div>
+            <div class="calc-line"><span>Stripe fee (per booking)</span><strong>—</strong></div>
+            <div class="calc-highlight">Total for booking: —</div>
+          </div>
+          <p id="calcStatus" class="status-text" style="margin-top: 10px;"></p>
+        </section>
+      </div>
+    </main>
+
+    <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
+      <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+      const PROVINCES = [
+        { code: 'default', name: 'Default' },
+        { code: 'AB', name: 'Alberta' },
+        { code: 'BC', name: 'British Columbia' },
+        { code: 'MB', name: 'Manitoba' },
+        { code: 'NB', name: 'New Brunswick' },
+        { code: 'NL', name: 'Newfoundland and Labrador' },
+        { code: 'NS', name: 'Nova Scotia' },
+        { code: 'NT', name: 'Northwest Territories' },
+        { code: 'NU', name: 'Nunavut' },
+        { code: 'ON', name: 'Ontario' },
+        { code: 'PE', name: 'Prince Edward Island' },
+        { code: 'QC', name: 'Quebec' },
+        { code: 'SK', name: 'Saskatchewan' },
+        { code: 'YT', name: 'Yukon' }
+      ];
+
+      const baseRatesTable = document.getElementById('baseRatesTable');
+      const ageBracketsWrap = document.getElementById('ageBracketsWrap');
+      const timeBandsWrap = document.getElementById('timeBandsWrap');
+      const taxRatesTable = document.getElementById('taxRatesTable');
+      const configStatus = document.getElementById('configStatus');
+      const savePricingBtn = document.getElementById('savePricingBtn');
+      const premiumDiscountInput = document.getElementById('premiumDiscountInput');
+      const providerShareInput = document.getElementById('providerShareInput');
+      const platformFeeInput = document.getElementById('platformFeeInput');
+      const stripePercentInput = document.getElementById('stripePercentInput');
+      const stripeFixedInput = document.getElementById('stripeFixedInput');
+      const taxAppliesSelect = document.getElementById('taxAppliesSelect');
+
+      const calcProvince = document.getElementById('calcProvince');
+      const calcAge = document.getElementById('calcAge');
+      const calcCareType = document.getElementById('calcCareType');
+      const calcMembership = document.getElementById('calcMembership');
+      const calcDate = document.getElementById('calcDate');
+      const calcStart = document.getElementById('calcStart');
+      const calcHours = document.getElementById('calcHours');
+      const pricingBreakdown = document.getElementById('pricingBreakdown');
+      const calcStatus = document.getElementById('calcStatus');
+
+      let pricingConfig = null;
+      let calcTimer = null;
+
+      function dollarsToCents(value) {
+        const num = Number(value);
+        if(!Number.isFinite(num)) return 0;
+        return Math.round(num * 100);
+      }
+
+      function centsToDollars(cents) {
+        const num = Number(cents);
+        if(!Number.isFinite(num)) return '0.00';
+        return (num / 100).toFixed(2);
+      }
+
+      function renderBaseRates(config) {
+        const rates = config?.base_rates || {};
+        const rows = PROVINCES.map((p) => {
+          const entry = rates[p.code] || rates.default || {};
+          const basic = centsToDollars(entry.basic || 0);
+          const curriculum = centsToDollars(entry.curriculum || 0);
+          return `
+            <tr data-location="${p.code}">
+              <td>${p.name}</td>
+              <td><input type="number" step="0.01" class="base-basic" value="${basic}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+              <td><input type="number" step="0.01" class="base-curriculum" value="${curriculum}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+            </tr>
+          `;
+        }).join('');
+        baseRatesTable.innerHTML = `
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Basic ($/hr)</th>
+                <th>Curriculum ($/hr)</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      }
+
+      function ageRowTemplate(bracket = {}) {
+        const min = bracket.min ?? 0;
+        const max = bracket.max ?? 0;
+        const multiplier = bracket.multiplier ?? 1;
+        return `
+          <div class="row-grid cols-4 age-row">
+            <input type="number" class="age-min" value="${min}" min="0" placeholder="Min age">
+            <input type="number" class="age-max" value="${max}" min="0" placeholder="Max age">
+            <input type="number" class="age-multiplier" value="${multiplier}" step="0.01" min="0">
+            <button class="tiny-btn danger remove-age" type="button">Remove</button>
+          </div>
+        `;
+      }
+
+      function renderAgeBrackets(config) {
+        const brackets = Array.isArray(config?.age_brackets) ? config.age_brackets : [];
+        ageBracketsWrap.innerHTML = brackets.map((bracket) => ageRowTemplate(bracket)).join('');
+        if(brackets.length === 0){
+          ageBracketsWrap.innerHTML = ageRowTemplate({ min: 0, max: 12, multiplier: 1 });
+        }
+      }
+
+      function timeRowTemplate(band = {}) {
+        const label = band.label || '';
+        const start = band.start || '09:00';
+        const end = band.end || '17:00';
+        const multiplier = band.multiplier ?? 1;
+        return `
+          <div class="row-grid cols-4 time-row">
+            <input type="text" class="time-label" value="${label}" placeholder="Label">
+            <input type="time" class="time-start" value="${start}">
+            <input type="time" class="time-end" value="${end}">
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="number" class="time-multiplier" value="${multiplier}" step="0.01" min="0" style="width: 100%;">
+              <button class="tiny-btn danger remove-time" type="button">Remove</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderTimeBands(config) {
+        const bands = Array.isArray(config?.time_of_day) ? config.time_of_day : [];
+        timeBandsWrap.innerHTML = bands.map((band) => timeRowTemplate(band)).join('');
+        if(bands.length === 0){
+          timeBandsWrap.innerHTML = timeRowTemplate({ label: 'Standard', start: '09:00', end: '17:00', multiplier: 1 });
+        }
+      }
+
+      function renderTaxRates(config) {
+        const rates = config?.tax_rates || {};
+        const rows = PROVINCES.filter(p => p.code !== 'default').map((p) => {
+          const rate = rates[p.code] ?? 0;
+          return `
+            <tr data-province="${p.code}">
+              <td>${p.name}</td>
+              <td><input type="number" step="0.1" min="0" max="30" class="tax-rate" value="${rate}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+            </tr>
+          `;
+        }).join('');
+        taxRatesTable.innerHTML = `
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Province</th>
+                <th>Tax %</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      }
+
+      function populateCalculator() {
+        if(calcProvince){
+          calcProvince.innerHTML = PROVINCES.filter(p => p.code !== 'default').map(p => `<option value="${p.code}">${p.name}</option>`).join('');
+        }
+        if(calcDate && !calcDate.value){
+          const today = new Date();
+          const month = String(today.getMonth() + 1).padStart(2, '0');
+          const day = String(today.getDate()).padStart(2, '0');
+          calcDate.value = `${today.getFullYear()}-${month}-${day}`;
+        }
+        if(calcStart && !calcStart.value) calcStart.value = '09:00';
+      }
+
+      function applyConfigToUI(config) {
+        renderBaseRates(config);
+        renderAgeBrackets(config);
+        renderTimeBands(config);
+        renderTaxRates(config);
+        premiumDiscountInput.value = config?.premium_discount_percent ?? 0;
+        providerShareInput.value = config?.fees?.provider_share_percent ?? 0;
+        platformFeeInput.value = config?.fees?.platform_fee_percent ?? 0;
+        stripePercentInput.value = config?.fees?.stripe_percent ?? 0;
+        stripeFixedInput.value = config?.fees?.stripe_fixed_cents ?? 0;
+        taxAppliesSelect.value = config?.tax_applies_to || 'platform_fee';
+        populateCalculator();
+      }
+
+      function readConfigFromUI() {
+        const baseRates = {};
+        baseRatesTable.querySelectorAll('tbody tr').forEach((row) => {
+          const location = row.dataset.location;
+          const basic = row.querySelector('.base-basic')?.value;
+          const curriculum = row.querySelector('.base-curriculum')?.value;
+          baseRates[location] = {
+            basic: dollarsToCents(basic),
+            curriculum: dollarsToCents(curriculum)
+          };
+        });
+
+        const ageBrackets = Array.from(ageBracketsWrap.querySelectorAll('.age-row')).map((row, index) => ({
+          id: `age-${index + 1}`,
+          min: Number(row.querySelector('.age-min')?.value || 0),
+          max: Number(row.querySelector('.age-max')?.value || 0),
+          multiplier: Number(row.querySelector('.age-multiplier')?.value || 1)
+        }));
+
+        const timeBands = Array.from(timeBandsWrap.querySelectorAll('.time-row')).map((row, index) => ({
+          id: `time-${index + 1}`,
+          label: row.querySelector('.time-label')?.value || '',
+          start: row.querySelector('.time-start')?.value || '09:00',
+          end: row.querySelector('.time-end')?.value || '17:00',
+          multiplier: Number(row.querySelector('.time-multiplier')?.value || 1)
+        }));
+
+        const taxRates = {};
+        taxRatesTable.querySelectorAll('tbody tr').forEach((row) => {
+          const province = row.dataset.province;
+          const rate = Number(row.querySelector('.tax-rate')?.value || 0);
+          taxRates[province] = rate;
+        });
+
+        return {
+          version: pricingConfig?.version || 1,
+          currency: pricingConfig?.currency || 'cad',
+          location_fallback: 'default',
+          base_rates: baseRates,
+          age_brackets: ageBrackets,
+          time_of_day: timeBands,
+          premium_discount_percent: Number(premiumDiscountInput.value || 0),
+          fees: {
+            provider_share_percent: Number(providerShareInput.value || 0),
+            platform_fee_percent: Number(platformFeeInput.value || 0),
+            stripe_percent: Number(stripePercentInput.value || 0),
+            stripe_fixed_cents: Number(stripeFixedInput.value || 0)
+          },
+          tax_rates: taxRates,
+          tax_applies_to: taxAppliesSelect.value || 'platform_fee'
+        };
+      }
+
+      function buildEndDate(dateVal, startVal, hoursVal) {
+        if(!dateVal || !startVal || !hoursVal) return null;
+        const [year, month, day] = dateVal.split('-').map(Number);
+        const [hour, minute] = startVal.split(':').map(Number);
+        const durationHours = Number(hoursVal);
+        if(!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+        if(!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+        if(!Number.isFinite(durationHours)) return null;
+        const startDate = new Date(year, month - 1, day, hour, minute);
+        return new Date(startDate.getTime() + Math.round(durationHours * 60) * 60000);
+      }
+
+      function getCalculatorFactors() {
+        const dateVal = calcDate?.value || '';
+        const startVal = calcStart?.value || '';
+        const hoursVal = Number(calcHours?.value || 1);
+        const ageRaw = calcAge?.value || '';
+        const ageVal = ageRaw === '' ? null : Number(ageRaw);
+        const endDate = buildEndDate(dateVal, startVal, hoursVal);
+        const endAt = endDate
+          ? `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2,'0')}-${String(endDate.getDate()).padStart(2,'0')}T${String(endDate.getHours()).padStart(2,'0')}:${String(endDate.getMinutes()).padStart(2,'0')}`
+          : null;
+        return {
+          province: calcProvince?.value || '',
+          age: ageVal,
+          care_type: calcCareType?.value || 'basic',
+          is_premium: calcMembership?.value === 'premium',
+          start_at: dateVal && startVal ? `${dateVal}T${startVal}` : null,
+          end_at: endAt,
+          hours: hoursVal
+        };
+      }
+
+      async function updateCalculator() {
+        if(!pricingConfig) return;
+        const config = readConfigFromUI();
+        const factors = getCalculatorFactors();
+        try{
+          const res = await fetch(`${API_BASE}/pricing/calculate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...factors, config })
+          });
+          const data = await res.json();
+          if(!res.ok) throw new Error(data.error || 'Failed to calculate');
+          const pricing = data.pricing;
+          const hourlyTotal = pricing.total_hourly_cents;
+          const providerFee = pricing.provider_fee_cents;
+          const platformFee = pricing.platform_fee_cents;
+          const taxCents = pricing.tax_cents;
+          const stripeFee = pricing.stripe_fee_cents;
+          const totalBooking = pricing.total_booking_cents;
+          pricingBreakdown.innerHTML = `
+            <div class="calc-line"><span>Hourly rate</span><strong>$${centsToDollars(hourlyTotal)}</strong></div>
+            <div class="calc-line"><span>Provider fee (per hour)</span><strong>$${centsToDollars(providerFee)}</strong></div>
+            <div class="calc-line"><span>Platform fee (per hour)</span><strong>$${centsToDollars(platformFee)}</strong></div>
+            <div class="calc-line"><span>Tax (per hour)</span><strong>$${centsToDollars(taxCents)}</strong></div>
+            <div class="calc-line"><span>Stripe fee (per booking)</span><strong>$${centsToDollars(stripeFee)}</strong></div>
+            <div class="calc-highlight">Total for booking: $${centsToDollars(totalBooking)}</div>
+          `;
+          calcStatus.textContent = `Using ${factors.hours} hour(s) in ${factors.province || 'your province'}.`;
+        }catch(err){
+          calcStatus.textContent = err.message || 'Unable to calculate pricing.';
+        }
+      }
+
+      function scheduleCalc() {
+        clearTimeout(calcTimer);
+        calcTimer = setTimeout(updateCalculator, 200);
+      }
+
+      async function loadConfig() {
+        try{
+          const res = await fetch(`${API_BASE}/pricing/config`);
+          const data = await res.json();
+          pricingConfig = data.config || {};
+          applyConfigToUI(pricingConfig);
+          updateCalculator();
+        }catch(err){
+          configStatus.textContent = 'Failed to load pricing config.';
+        }
+      }
+
+      savePricingBtn.addEventListener('click', async () => {
+        const config = readConfigFromUI();
+        configStatus.textContent = 'Saving...';
+        try{
+          const res = await fetch(`${API_BASE}/pricing/config`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ config })
+          });
+          const data = await res.json();
+          if(!res.ok) throw new Error(data.error || 'Save failed');
+          pricingConfig = data.config || config;
+          configStatus.textContent = 'Pricing rules saved.';
+          updateCalculator();
+        }catch(err){
+          configStatus.textContent = err.message || 'Unable to save pricing rules.';
+        }
+      });
+
+      document.getElementById('addAgeBracketBtn').addEventListener('click', () => {
+        ageBracketsWrap.insertAdjacentHTML('beforeend', ageRowTemplate({ min: 0, max: 0, multiplier: 1 }));
+        scheduleCalc();
+      });
+
+      document.getElementById('addTimeBandBtn').addEventListener('click', () => {
+        timeBandsWrap.insertAdjacentHTML('beforeend', timeRowTemplate({ label: '', start: '09:00', end: '17:00', multiplier: 1 }));
+        scheduleCalc();
+      });
+
+      ageBracketsWrap.addEventListener('click', (e) => {
+        if(e.target.classList.contains('remove-age')){
+          const row = e.target.closest('.age-row');
+          if(row) row.remove();
+          scheduleCalc();
+        }
+      });
+
+      timeBandsWrap.addEventListener('click', (e) => {
+        if(e.target.classList.contains('remove-time')){
+          const row = e.target.closest('.time-row');
+          if(row) row.remove();
+          scheduleCalc();
+        }
+      });
+
+      document.addEventListener('input', (event) => {
+        if(event.target && event.target.matches('input, select, textarea')) {
+          scheduleCalc();
+        }
+      });
+      document.addEventListener('change', (event) => {
+        if(event.target && event.target.matches('input, select, textarea')) {
+          scheduleCalc();
+        }
+      });
+
+      loadConfig();
+    </script>
+  </body>
+</html>

@@ -118,10 +118,27 @@
               </select>
             </label>
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-              End time
-              <select id="bookingEnd" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
-                <option value="">Select end time</option>
+              How many hours?
+              <select id="bookingDuration" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+                <option value="">Select hours</option>
               </select>
+              <small id="bookingEndPreview" style="color:#6b7280; font-size:12px;">Ends at: --</small>
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+              Care type
+              <select id="careTypeSelect" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+                <option value="basic">Basic care</option>
+                <option value="curriculum">Curriculum care</option>
+              </select>
+              <small style="color:#6b7280; font-size:12px;">Curriculum includes guided learning activities.</small>
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+              Membership
+              <select id="membershipSelect" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+                <option value="standard">Standard</option>
+                <option value="premium">Premium member</option>
+              </select>
+              <small style="color:#6b7280; font-size:12px;">Premium pricing applies if your account is eligible.</small>
             </label>
           </div>
           <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
@@ -131,13 +148,11 @@
             </select>
             <input type="text" id="otherLocation" placeholder="Enter other address" style="margin-top:8px; padding:10px 12px; border:1px solid #ddd; border-radius:8px; display:none;">
           </label>
-          <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+          <div style="display:flex; flex-direction:column; gap:6px; color:#374151;">
             Payment method
-            <select id="paymentMethodSelect" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
-              <option value="">Loading payment methods...</option>
-            </select>
-            <small id="paymentMethodHint" style="color:#6b7280; font-size:12px;">Uses your default if you don't choose.</small>
-          </label>
+            <div style="padding:10px 12px; border:1px solid #e5e7eb; border-radius:8px; background:#f9fafb; color:#06464E; font-weight:600;">Stripe Checkout</div>
+            <small style="color:#6b7280; font-size:12px;">All payments are handled securely through Stripe.</small>
+          </div>
           <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
             Notes to caregiver (optional)
             <textarea id="requestNotes" rows="2" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-family:inherit;" placeholder="Anything they should know?"></textarea>
@@ -215,7 +230,10 @@
       const favoriteProvidersWrap = document.getElementById('favoriteProviders');
       const otherProvidersWrap = document.getElementById('otherProvidersWrap');
       const bookingStart = document.getElementById('bookingStart');
-      const bookingEnd = document.getElementById('bookingEnd');
+      const bookingDuration = document.getElementById('bookingDuration');
+      const bookingEndPreview = document.getElementById('bookingEndPreview');
+      const careTypeSelect = document.getElementById('careTypeSelect');
+      const membershipSelect = document.getElementById('membershipSelect');
       const recurringBlock = document.getElementById('recurringBlock');
       const recurringToggle = document.getElementById('recurringToggle');
       const recurringFields = document.getElementById('recurringFields');
@@ -251,8 +269,68 @@
         }
         selectEl.innerHTML = '<option value="">Select time</option>' + times.map(t=> `<option value="${t.value}">${t.label}</option>`).join('');
       }
+      function populateDurationSelect(selectEl){
+        if(!selectEl) return;
+        const durations = [];
+        for(let i=1; i<=24; i++){
+          const hours = i / 2;
+          const label = hours === 1 ? '1 hour' : `${hours} hours`;
+          durations.push({ value: String(hours), label });
+        }
+        selectEl.innerHTML = '<option value="">Select hours</option>' + durations.map(d=> `<option value="${d.value}">${d.label}</option>`).join('');
+      }
+      function formatDateValue(dateObj){
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2,'0');
+        const day = String(dateObj.getDate()).padStart(2,'0');
+        return `${year}-${month}-${day}`;
+      }
+      function formatTimeLabel(dateObj){
+        const hour = dateObj.getHours();
+        const minute = String(dateObj.getMinutes()).padStart(2,'0');
+        const labelHour = hour % 12 === 0 ? 12 : hour % 12;
+        const ampm = hour < 12 ? 'AM' : 'PM';
+        return `${labelHour}:${minute} ${ampm}`;
+      }
+      function getEndDate(dateVal, startVal, durationVal){
+        if(!dateVal || !startVal || !durationVal) return null;
+        const [year, month, day] = dateVal.split('-').map(Number);
+        const [hour, minute] = startVal.split(':').map(Number);
+        const durationHours = parseFloat(durationVal);
+        if(!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+        if(!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+        if(!Number.isFinite(durationHours)) return null;
+        const startDate = new Date(year, month - 1, day, hour, minute);
+        if(Number.isNaN(startDate.getTime())) return null;
+        const durationMinutes = Math.round(durationHours * 60);
+        return new Date(startDate.getTime() + (durationMinutes * 60000));
+      }
+      function buildEndAt(dateVal, startVal, durationVal){
+        const endDate = getEndDate(dateVal, startVal, durationVal);
+        if(!endDate) return null;
+        const endDateStr = formatDateValue(endDate);
+        const endTimeStr = `${String(endDate.getHours()).padStart(2,'0')}:${String(endDate.getMinutes()).padStart(2,'0')}`;
+        return `${endDateStr}T${endTimeStr}`;
+      }
+      function updateEndPreview(){
+        if(!bookingEndPreview) return;
+        const endDate = getEndDate(bookingDate.value, bookingStart.value, bookingDuration.value);
+        if(!endDate){
+          bookingEndPreview.textContent = 'Ends at: --';
+          return;
+        }
+        const endDateStr = formatDateValue(endDate);
+        const timeLabel = formatTimeLabel(endDate);
+        bookingEndPreview.textContent = endDateStr === bookingDate.value
+          ? `Ends at: ${timeLabel}`
+          : `Ends at: ${timeLabel} (${endDateStr})`;
+      }
       populateTimeSelect(bookingStart);
-      populateTimeSelect(bookingEnd);
+      populateDurationSelect(bookingDuration);
+      bookingStart?.addEventListener('change', updateEndPreview);
+      bookingDuration?.addEventListener('change', updateEndPreview);
+      bookingDate?.addEventListener('change', updateEndPreview);
+      updateEndPreview();
 
       function renderProviderCard(p){
         const initial = (p.name || 'Caregiver').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
@@ -552,9 +630,12 @@
           const childName = isCreatingNew ? detailChildName.value.trim() : null;
           const dateVal = bookingDate.value;
           const startVal = bookingStart.value;
-          const endVal = bookingEnd.value;
           const start_at = dateVal && startVal ? `${dateVal}T${startVal}` : null;
-          const end_at = dateVal && endVal ? `${dateVal}T${endVal}` : null;
+          const durationVal = bookingDuration ? bookingDuration.value : '';
+          const end_at = buildEndAt(dateVal, startVal, durationVal);
+          const careTypeValue = careTypeSelect ? careTypeSelect.value : 'basic';
+          const isPremium = membershipSelect ? membershipSelect.value === 'premium' : false;
+          const childAgeValue = detailChildAge ? detailChildAge.value : '';
           const selectedPaymentMethod = paymentMethodSelect ? paymentMethodSelect.value : '';
           
           if(!selectedProviderId){
@@ -582,7 +663,7 @@
             submitRequestBtn.textContent = 'Submitting...';
 
             try {
-              const payload = { 
+            const payload = { 
                 user_id: userId, 
                 child_id: childId, 
               location: finalLocation, 
@@ -590,6 +671,9 @@
               start_at,
               end_at,
               rate: null,
+              care_type: careTypeValue,
+              is_premium: isPremium,
+              child_age: childAgeValue !== '' ? childAgeValue : null,
               provider_id: selectedProviderId ? parseInt(selectedProviderId,10) : null,
               payment_method_id: selectedPaymentMethod || null
             };

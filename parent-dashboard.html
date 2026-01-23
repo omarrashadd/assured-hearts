@@ -482,16 +482,26 @@
               const status = statusColors[statusKey] || statusColors.pending;
               const paymentStatus = (request.payment_status || '').toLowerCase();
               const isPaid = ['paid','succeeded'].includes(paymentStatus);
-              const amountCents = request.payment_amount_cents;
-              let amountLabel = amountCents ? `$${(amountCents / 100).toFixed(2)}` : '';
-              if(!amountLabel && request.start_at && request.end_at){
-                const start = new Date(request.start_at);
-                const end = new Date(request.end_at);
-                const diffMs = end - start;
-                const hours = Number.isFinite(diffMs) && diffMs > 0 ? diffMs / 36e5 : 1;
-                amountLabel = `$${(Math.max(1, hours) * 20).toFixed(2)}`;
+              let pricingSnapshot = request.pricing_snapshot || null;
+              if(pricingSnapshot && typeof pricingSnapshot === 'string'){
+                try{ pricingSnapshot = JSON.parse(pricingSnapshot); }catch(_err){ pricingSnapshot = null; }
               }
-              if(!amountLabel) amountLabel = '$20/hr';
+              const storedTotalCents = request.payment_amount_cents || pricingSnapshot?.total_booking_cents;
+              const storedHourlyCents = request.hourly_rate_cents || pricingSnapshot?.total_hourly_cents;
+              let amountLabel = storedTotalCents ? `$${(storedTotalCents / 100).toFixed(2)}` : '';
+              if(!amountLabel && storedHourlyCents){
+                if(request.start_at && request.end_at){
+                  const start = new Date(request.start_at);
+                  const end = new Date(request.end_at);
+                  const diffMs = end - start;
+                  const hours = Number.isFinite(diffMs) && diffMs > 0 ? diffMs / 36e5 : 1;
+                  const total = Math.round(storedHourlyCents * Math.max(1, hours));
+                  amountLabel = `$${(total / 100).toFixed(2)}`;
+                } else {
+                  amountLabel = `$${(storedHourlyCents / 100).toFixed(2)}/hr`;
+                }
+              }
+              if(!amountLabel) amountLabel = '$--';
               const needsPaymentMethod = paymentStatus === 'needs_payment_method';
               const needsPaymentAction = ['requires_action','requires_payment_method','failed'].includes(paymentStatus);
               const isPayable = statusKey === 'accepted' && !isPaid && (needsPaymentMethod || needsPaymentAction);
