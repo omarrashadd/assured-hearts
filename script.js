@@ -1488,6 +1488,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       try{
+        const consent_background_check = !!applicationForm.querySelector('input[name="backgroundCheck"]')?.checked;
+        const consent_terms = !!applicationForm.querySelector('input[name="acceptPolicies"]')?.checked;
+        const consent_provider_agreement = !!applicationForm.querySelector('input[name="providerAgreement"]')?.checked;
         const payload = { 
           name, 
           email, 
@@ -1501,7 +1504,11 @@ document.addEventListener('DOMContentLoaded', () => {
             availability,
             references,
             payout_method,
-            languages
+            languages,
+            address_line1: applicationForm.querySelector('input[name="address"]')?.value || '',
+            consent_background_check,
+            consent_terms,
+            consent_provider_agreement
           }
         };
         console.log('Submitting provider application:', payload);

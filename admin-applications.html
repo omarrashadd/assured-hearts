@@ -317,9 +317,9 @@
 
     function formatConsents(app){
       const items = [];
-      if(app.consent_background_check) items.push('Background check');
-      if(app.consent_terms) items.push('Terms accepted');
-      if(app.consent_provider_agreement) items.push('Provider agreement accepted');
+      if(app.consent_background_check !== undefined) items.push(`Background check: ${app.consent_background_check ? 'Yes' : 'No'}`);
+      if(app.consent_terms !== undefined) items.push(`Terms: ${app.consent_terms ? 'Accepted' : 'Not accepted'}`);
+      if(app.consent_provider_agreement !== undefined) items.push(`Provider agreement: ${app.consent_provider_agreement ? 'Accepted' : 'Not accepted'}`);
       return items.length ? items.join(' · ') : 'Not provided';
     }
 
