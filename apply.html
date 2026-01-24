@@ -177,11 +177,13 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px;">
               <label style="display: flex; flex-direction: column; color: #666; font-weight: 600;">
                 City
-                <input type="text" name="city" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
+                <select id="providerCitySelect" name="city" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
+                  <option value="">Select city</option>
+                </select>
               </label>
               <label style="display: flex; flex-direction: column; color: #666; font-weight: 600;">
                 Province
-                <select name="province" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
+                <select id="providerProvinceSelect" name="province" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
                   <option value="">Select Province</option>
                   <option value="AB">Alberta</option>
                   <option value="BC">British Columbia</option>
@@ -189,10 +191,13 @@
                   <option value="NB">New Brunswick</option>
                   <option value="NL">Newfoundland & Labrador</option>
                   <option value="NS">Nova Scotia</option>
+                  <option value="NT">Northwest Territories</option>
+                  <option value="NU">Nunavut</option>
                   <option value="ON">Ontario</option>
                   <option value="PE">Prince Edward Island</option>
                   <option value="QC">Quebec</option>
                   <option value="SK">Saskatchewan</option>
+                  <option value="YT">Yukon</option>
                 </select>
               </label>
             </div>

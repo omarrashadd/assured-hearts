@@ -1323,6 +1323,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // Provider application -> send intake to backend
   const applicationForm = document.getElementById('applicationForm');
   if(applicationForm){
+    const provinceSelect = applicationForm.querySelector('#providerProvinceSelect');
+    const citySelect = applicationForm.querySelector('#providerCitySelect');
+    const citiesByProvince = {
+      AB: ['Calgary', 'Edmonton', 'Red Deer', 'Lethbridge'],
+      BC: ['Vancouver', 'Victoria', 'Surrey', 'Burnaby', 'Kelowna'],
+      MB: ['Winnipeg'],
+      NB: ['Saint John'],
+      NL: ["St. John's"],
+      NS: ['Halifax'],
+      NT: ['Yellowknife'],
+      NU: ['Iqaluit'],
+      ON: ['Toronto', 'Ottawa', 'Hamilton', 'London'],
+      PE: ['Charlottetown'],
+      QC: ['Quebec City', 'Montreal'],
+      SK: ['Regina', 'Saskatoon', 'Prince Albert', 'Moose Jaw', 'Yorkton', 'Swift Current'],
+      YT: ['Whitehorse']
+    };
+
+    function populateProviderCities(province){
+      if(!citySelect) return;
+      const cities = citiesByProvince[province] || [];
+      citySelect.innerHTML = '<option value="">Select city</option>' +
+        cities.map((city)=> `<option value="${city}">${city}</option>`).join('');
+    }
+
+    if(provinceSelect && citySelect){
+      populateProviderCities(provinceSelect.value);
+      provinceSelect.addEventListener('change', () => {
+        populateProviderCities(provinceSelect.value);
+      });
+    }
+
     applicationForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const fd = new FormData(applicationForm);
