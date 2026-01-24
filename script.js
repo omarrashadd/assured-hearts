@@ -212,9 +212,8 @@ document.addEventListener('DOMContentLoaded', () => {
         providers = baseCaregivers();
       }
       const caregiversHTML = providers.map((p, idx)=> {
-        const initials = p.name ? p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : 'CG';
-        const bio = p.bio || 'Trusted caregiver in your area.';
-        const rate = p.rate ? `$${p.rate}/hr` : '';
+        const displayName = p.name || 'Caregiver ' + (idx + 1);
+        const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() || 'CG';
         const city = p.city || location;
         const pid = p.user_id || p.id || '';
         const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
@@ -228,29 +227,27 @@ document.addEventListener('DOMContentLoaded', () => {
           availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
           availabilityText = 'Available in the next 24 hours';
         }
-        const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
+        const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'request-childcare.html';
         const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
-        const certs = [];
-        if(p.has_cpr) certs.push('CPR certified');
-        const certText = certs.length ? certs.join(' · ') : 'Certifications pending';
+        const certText = p.certifications || 'Certifications on file';
+        const ageGroups = Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (typeof p.age_groups === 'string' ? p.age_groups : 'Age groups on file');
         return `
           <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
             <div style="display:flex; gap:12px; align-items:center;">
               <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">${initials}</div>
               <div>
-                <div style="font-weight:700; color:#06464E; font-size:15px;">${p.name || 'Caregiver ' + (idx+1)}</div>
-                <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
+                <div style="font-weight:700; color:#06464E; font-size:15px;">${displayName}</div>
+                <div style="font-size:12px; color:#6b7280;">${city || 'Location on file'}</div>
               </div>
             </div>
             ${availabilityTag}
-            <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">${bio}</p>
             <div style="font-size:12px; color:#475569;"><strong>Availability:</strong> ${availabilityText}</div>
-            <div style="font-size:12px; color:#475569;"><strong>Background:</strong> ${p.experience_details || 'Details coming soon'}</div>
             <div style="font-size:12px; color:#475569;"><strong>Certifications:</strong> ${certText}</div>
+            <div style="font-size:12px; color:#475569;"><strong>Age groups:</strong> ${ageGroups}</div>
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
-              <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
+              <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${displayName.split(' ')[0]}</a>
               <a class="btn secondary" href="${profileLink}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">View profile</a>
-              <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${p.name || 'Caregiver'}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
+              <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${displayName}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${displayName.split(' ')[0]}</button>
             </div>
           </div>
         `;
@@ -305,9 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }catch(err){
       console.error('Provider fetch failed', err);
       const caregiversHTML = baseCaregivers().map((p, idx)=> {
-        const initials = p.name ? p.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : 'CG';
-        const bio = p.bio || 'Trusted caregiver in your area.';
-        const rate = p.rate ? `$${p.rate}/hr` : '';
+        const displayName = p.name || 'Caregiver ' + (idx + 1);
+        const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() || 'CG';
         const city = p.city || location;
         const pid = p.user_id || p.id || '';
         const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
@@ -321,26 +317,27 @@ document.addEventListener('DOMContentLoaded', () => {
           availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
           availabilityText = 'Available in the next 24 hours';
         }
-        const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(p.name || '')}` : 'request-childcare.html';
+        const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'request-childcare.html';
         const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
+        const certText = p.certifications || 'Certifications on file';
+        const ageGroups = Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (typeof p.age_groups === 'string' ? p.age_groups : 'Age groups on file');
         return `
           <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
             <div style="display:flex; gap:12px; align-items:center;">
               <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">${initials}</div>
               <div>
-                <div style="font-weight:700; color:#06464E; font-size:15px;">${p.name || 'Caregiver ' + (idx+1)}</div>
-                <div style="font-size:12px; color:#6b7280;">${city} ${rate ? '· ' + rate : ''}</div>
+                <div style="font-weight:700; color:#06464E; font-size:15px;">${displayName}</div>
+                <div style="font-size:12px; color:#6b7280;">${city || 'Location on file'}</div>
               </div>
             </div>
             ${availabilityTag}
-            <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">${bio}</p>
             <div style="font-size:12px; color:#475569;"><strong>Availability:</strong> ${availabilityText}</div>
-            <div style="font-size:12px; color:#475569;"><strong>Background:</strong> ${p.experience_details || 'Details coming soon'}</div>
-            <div style="font-size:12px; color:#475569;"><strong>Certifications:</strong> Certifications pending</div>
+            <div style="font-size:12px; color:#475569;"><strong>Certifications:</strong> ${certText}</div>
+            <div style="font-size:12px; color:#475569;"><strong>Age groups:</strong> ${ageGroups}</div>
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
-              <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${p.name ? p.name.split(' ')[0] : 'caregiver'}</a>
+              <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${displayName.split(' ')[0]}</a>
               <a class="btn secondary" href="${profileLink}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">View profile</a>
-              <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${p.name || 'Caregiver'}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${p.name ? p.name.split(' ')[0] : 'caregiver'}</button>
+              <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${displayName}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${displayName.split(' ')[0]}</button>
             </div>
           </div>
         `;
@@ -841,15 +838,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('provAddr2').value = p.address_line2 || '';
             document.getElementById('provPostal').value = p.postal_code || '';
             document.getElementById('provPayoutMethod').value = p.payout_method || '';
-            document.getElementById('provPayoutDetails').value = p.payout_details || '';
-            document.getElementById('provBio').value = p.bio || '';
             document.getElementById('provLanguages').value = p.languages || '';
-            document.getElementById('prov2FA').checked = !!p.two_factor_enabled;
-            document.getElementById('provPaused').checked = !!p.paused;
             const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
             document.getElementById('provAvailabilityStatus').value = availability.status || '';
             document.getElementById('provAvailabilityNotes').value = availability.notes || '';
-            document.getElementById('provWeeklyHours').value = p.weekly_hours ?? '';
           }
         }catch(_err){}
       })();
@@ -863,14 +855,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const fd = new FormData(providerProfileForm);
       const payload = Object.fromEntries(fd.entries());
-      payload.two_factor_enabled = document.getElementById('prov2FA').checked;
-      payload.paused = document.getElementById('provPaused').checked;
       const availability = {
         status: document.getElementById('provAvailabilityStatus').value || null,
         notes: document.getElementById('provAvailabilityNotes').value || null
       };
       payload.availability = availability;
-      payload.weekly_hours = payload.weekly_hours ? Number(payload.weekly_hours) : null;
       try{
         const res = await fetch(`${API_BASE}/forms/provider/${userId}`, {
           method: 'PUT',
@@ -936,8 +925,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const province = p.province || '';
         const locationLabel = [city, province].filter(Boolean).join(', ');
         cgMetaEl.textContent = locationLabel || 'Trusted caregiver';
-        cgBioEl.textContent = p.bio || 'Biography coming soon.';
-        cgExpEl.textContent = p.experience_details || 'Experience details coming soon.';
+        cgBioEl.textContent = p.certifications || 'Certifications on file.';
+        const ageGroups = Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (p.age_groups || 'Age groups on file.');
+        cgExpEl.textContent = ageGroups;
         const initials = (p.name || 'CG').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
         cgAvatar.textContent = initials;
         const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
@@ -1458,7 +1448,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const phone = fd.get('phone');
       const password = fd.get('password');
       const confirmPassword = fd.get('confirmPassword');
-      const experience = fd.get('experience');
       const has_cpr = !!fd.get('cpr');
       const city = fd.get('city');
       const province = fd.get('province');
@@ -1504,7 +1493,6 @@ document.addEventListener('DOMContentLoaded', () => {
           email, 
           phone, 
           password, 
-          experience,
           has_cpr,
           age_groups,
           meta: { 

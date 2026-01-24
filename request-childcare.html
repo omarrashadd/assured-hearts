@@ -395,8 +395,8 @@
             name: p.name || 'Caregiver',
             city: p.city || '',
             province: p.province || '',
-            bio: p.bio || '',
-            rate: p.rate || ''
+            certifications: p.certifications || 'On file',
+            age_groups: Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (p.age_groups || 'On file')
           }));
           if(providers.length){
             renderProvidersUI(providers);
@@ -610,7 +610,6 @@
               notes: requestNotes.value || '',
               start_at,
               end_at,
-              rate: null,
               care_type: careTypeValue,
               is_premium: isPremium,
               child_age: childAgeValue !== '' ? childAgeValue : null,

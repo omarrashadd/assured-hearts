@@ -68,11 +68,6 @@
             </label>
           </div>
 
-          <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-            Short bio
-            <textarea name="bio" id="provBio" rows="3" style="padding:12px; border:1px solid #d1d5db; border-radius:8px; font-family:inherit;"></textarea>
-          </label>
-
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:12px;">
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
               Payout method
@@ -83,10 +78,6 @@
                 <option value="cash">Cash</option>
               </select>
             </label>
-            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-              Payout details
-              <input type="text" name="payout_details" id="provPayoutDetails" placeholder="Email/Account #" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
-            </label>
           </div>
 
           <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
@@ -94,15 +85,6 @@
             <input type="text" name="languages" id="provLanguages" placeholder="English, Arabic, Urdu" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
             <small style="color:#6b7280;">Shown on your public profile.</small>
           </label>
-
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px;">
-            <label style="display:flex; align-items:center; gap:8px; color:#374151;">
-              <input type="checkbox" id="prov2FA" name="two_factor_enabled"> Enable two-factor authentication
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; color:#374151;">
-              <input type="checkbox" id="provPaused" name="paused"> Pause my account
-            </label>
-          </div>
 
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:12px;">
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
@@ -115,11 +97,6 @@
                 <option value="custom">Custom/limited availability</option>
               </select>
               <small style="color:#6b7280;">Choose what families see on your card.</small>
-            </label>
-            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-              Hours you want this week
-              <input type="number" min="0" name="weekly_hours" id="provWeeklyHours" placeholder="e.g., 10" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
-              <small style="color:#6b7280;">How many hours you want to book this week.</small>
             </label>
           </div>
 
