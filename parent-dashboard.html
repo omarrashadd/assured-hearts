@@ -148,17 +148,6 @@
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
       const userId = parseInt(localStorage.getItem('user_id'), 10) || null;
 
-      function baseCaregivers(){
-        return [
-          { id: 'amina-khalid', name: 'Amina Khalid', initials: 'AK', info: '5 yrs • CPR • Islamic stories', quote: 'Love teaching duas and story time after Asr.', rating: 4.9, reviews: 28 },
-          { id: 'sara-malik', name: 'Sara Malik', initials: 'SM', info: '4 yrs • ECE • Crafts', quote: 'Hands-on activities and positive routines are my jam.', rating: 4.8, reviews: 19 },
-          { id: 'nadia-rahman', name: 'Nadia Rahman', initials: 'NR', info: '3 yrs • First Aid • Qur’an basics', quote: 'Gentle approach, reading, and outdoor play whenever possible.', rating: 4.7, reviews: 22 },
-          { id: 'layla-yusuf', name: 'Layla Yusuf', initials: 'LY', info: '6 yrs • Montessori inspired', quote: 'Building confidence through choice-based play and kindness.', rating: 5.0, reviews: 31 },
-          { id: 'fatima-noor', name: 'Fatima Noor', initials: 'FN', info: '4 yrs • Arts & Quran', quote: 'Meet me to talk through routines and expectations.', rating: 4.9, reviews: 17 },
-          { id: 'hana-ali', name: 'Hana Ali', initials: 'HA', info: '5 yrs • Outdoors & STEM', quote: 'Meet for a quick intro call—happy to share references.', rating: 4.8, reviews: 21 }
-        ];
-      }
-
       function renderCaregiverTrack(trackId, viewportId, prevId, nextId, caregivers, opts={}){
         const track = document.getElementById(trackId);
         const viewport = document.getElementById(viewportId);
@@ -261,14 +250,30 @@
         });
       }
 
-      async function renderCaregivers(){
-        const location = localStorage.getItem('last_search_location') || 'your area';
+      async function renderCaregivers(profile = {}){
+        const lastSearch = localStorage.getItem('last_search_location');
+        const profileCity = (profile?.city || '').trim();
+        const profileProvince = (profile?.province || '').trim();
+        const queryCity = profileCity || (!profileProvince ? (lastSearch || '').trim() : '');
+        const profileLabel = profileProvince || profileCity;
+        const locationLabel = profileLabel ||
+          lastSearch ||
+          'your area';
         const hint = document.getElementById('caregiverLocationHint');
-        if(hint) hint.textContent = `Based on your last search in ${location}`;
+        if(hint){
+          const source = profileLabel ? 'profile' : (lastSearch ? 'last search' : '');
+          hint.textContent = source === 'profile'
+            ? `Based on your profile in ${locationLabel}`
+            : (source === 'last search' ? `Based on your last search in ${locationLabel}` : 'Based on your area');
+        }
 
         async function loadProviders(){
           try{
-            const resp = await fetch(`${API_BASE}/forms/providers`);
+            const params = new URLSearchParams();
+            if(queryCity) params.set('city', queryCity);
+            if(profileProvince) params.set('province', profileProvince);
+            const url = params.toString() ? `${API_BASE}/forms/providers?${params.toString()}` : `${API_BASE}/forms/providers`;
+            const resp = await fetch(url);
             if(!resp.ok) return [];
             const data = await resp.json();
             return (data.providers || []).map(p=>({
@@ -281,7 +286,7 @@
               sessions: p.sessions || 0,
               bio: p.bio || 'Trusted caregiver in your area.',
               quote: p.bio || 'Trusted caregiver in your area.',
-              interest: p.city || location,
+              interest: p.city || locationLabel,
               rate: p.rate || '',
               availability: p.availability || null,
               weekly_hours: p.weekly_hours || null
@@ -293,8 +298,32 @@
         }
 
         let all = await loadProviders();
-        if(!all || all.length === 0){
-          all = baseCaregivers();
+        if((!all || all.length === 0) && profileProvince && profileCity){
+          const params = new URLSearchParams();
+          params.set('province', profileProvince);
+          try{
+            const resp = await fetch(`${API_BASE}/forms/providers?${params.toString()}`);
+            if(resp.ok){
+              const data = await resp.json();
+              all = (data.providers || []).map(p=>({
+                id: String(p.user_id || p.id),
+                name: p.name || 'Caregiver',
+                initials: (p.name || 'CG').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase(),
+                info: p.city || '',
+                rating: p.rating || 4.8,
+                reviews: p.reviews || 12,
+                sessions: p.sessions || 0,
+                bio: p.bio || 'Trusted caregiver in your area.',
+                quote: p.bio || 'Trusted caregiver in your area.',
+                interest: p.city || locationLabel,
+                rate: p.rate || '',
+                availability: p.availability || null,
+                weekly_hours: p.weekly_hours || null
+              }));
+            }
+          }catch(err){
+            console.warn('Province provider fetch failed:', err);
+          }
         }
 
         const sessionCounts = JSON.parse(localStorage.getItem('caregiver_sessions') || '{}');
@@ -311,7 +340,23 @@
         });
 
         const emptyText = document.getElementById('caregiverRecentEmpty');
-        if(emptyText) emptyText.style.display = all.length ? 'none' : 'block';
+        const prevBtn = document.getElementById('caregiverPrevRecent');
+        const nextBtn = document.getElementById('caregiverNextRecent');
+        const viewport = document.getElementById('caregiverViewportRecent');
+        if(!all || all.length === 0){
+          if(viewport) viewport.style.display = 'none';
+          if(prevBtn) prevBtn.style.display = 'none';
+          if(nextBtn) nextBtn.style.display = 'none';
+          if(emptyText){
+            emptyText.textContent = `No caregivers in ${locationLabel} yet.`;
+            emptyText.style.display = 'block';
+          }
+          return;
+        }
+        if(viewport) viewport.style.display = 'block';
+        if(prevBtn) prevBtn.style.display = 'flex';
+        if(nextBtn) nextBtn.style.display = 'flex';
+        if(emptyText) emptyText.style.display = 'none';
         renderCaregiverTrack('caregiverTrackRecent','caregiverViewportRecent','caregiverPrevRecent','caregiverNextRecent', all, { meet:false, showSessions:true, sessionCounts });
       }
 
@@ -419,6 +464,7 @@
           const resp = await fetch(`${API_BASE}/forms/parent/${userId}`);
           if(!resp.ok) throw new Error('Failed to load dashboard');
           const data = await resp.json();
+          renderCaregivers(data.profile || {});
 
           const requests = Array.isArray(data.requests) ? data.requests : [];
           const childSource = Array.isArray(data.children) ? data.children :
@@ -590,6 +636,7 @@
       } catch(err) {
         console.error('Dashboard error:', err);
         showBanner('Error loading dashboard', 'error');
+        renderCaregivers({});
         const childrenList = document.getElementById('childrenList');
         const learningProgress = document.getElementById('learningProgress');
         const kids = cachedChildren.map(normalizeChild);
@@ -716,7 +763,6 @@
 
       // Load dashboard on page load
       window.addEventListener('DOMContentLoaded', ()=> {
-        renderCaregivers();
         loadParentDashboard();
         handleCheckoutReturn();
         // Load referral count badge from localStorage
