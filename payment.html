@@ -79,14 +79,11 @@
       <section class="payment-card">
         <div class="payment-summary">
           <div>Request ID: <strong id="requestIdLabel">—</strong></div>
-          <div id="amountRow">Amount due: <strong id="amountDueLabel">—</strong></div>
+          <div id="amountRow">Secure checkout powered by Stripe.</div>
         </div>
 
-        <form id="payment-form">
-          <div id="payment-element"></div>
-          <button id="submit-payment-btn" class="btn" style="width: 100%; padding: 12px 16px; font-weight: 700;">Pay now</button>
-          <div id="payment-message" class="payment-message"></div>
-        </form>
+        <div id="payment-message" class="payment-message"></div>
+        <button id="checkoutBtn" class="btn" style="width: 100%; padding: 12px 16px; font-weight: 700;">Continue to Stripe Checkout</button>
 
         <a id="backLink" href="parent-dashboard.html" style="color:#06464E; font-weight:600; text-decoration:none; font-size:13px;">← Back to dashboard</a>
       </section>
@@ -96,7 +93,6 @@
       <p style="margin: 0;">&copy; 2025 Assured Hearts. All rights reserved.</p>
     </footer>
 
-    <script src="https://js.stripe.com/v3"></script>
     <script src="script.js"></script>
     <script>
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
@@ -104,16 +100,9 @@
       const requestId = params.get('request_id');
       const userId = parseInt(localStorage.getItem('user_id'), 10);
       const requestIdLabel = document.getElementById('requestIdLabel');
-      const amountDueLabel = document.getElementById('amountDueLabel');
-      const amountRow = document.getElementById('amountRow');
-      const titleEl = document.getElementById('paymentTitle');
-      const subtitleEl = document.getElementById('paymentSubtitle');
       const messageEl = document.getElementById('payment-message');
-      const form = document.getElementById('payment-form');
-      const submitBtn = document.getElementById('submit-payment-btn');
+      const checkoutBtn = document.getElementById('checkoutBtn');
       const backLink = document.getElementById('backLink');
-      const mode = params.get('mode') === 'setup' ? 'setup' : 'pay';
-      const returnFromStripe = params.get('return') === '1';
 
       if(backLink) backLink.href = 'parent-dashboard.html';
       if(requestIdLabel) requestIdLabel.textContent = requestId || '—';
@@ -125,16 +114,12 @@
       }
 
       function setLoading(isLoading){
-        if(!submitBtn) return;
-        submitBtn.disabled = isLoading;
-        if(isLoading){
-          submitBtn.textContent = 'Processing…';
-        } else {
-          submitBtn.textContent = mode === 'setup' ? 'Save payment method' : 'Pay now';
-        }
+        if(!checkoutBtn) return;
+        checkoutBtn.disabled = isLoading;
+        checkoutBtn.textContent = isLoading ? 'Redirecting…' : 'Continue to Stripe Checkout';
       }
 
-      async function initPayment(){
+      async function startCheckout(){
         if(!requestId){
           showMessage('Missing request ID.', true);
           return;
@@ -144,146 +129,31 @@
           setTimeout(() => { window.location.href = 'account-signup.html'; }, 1200);
           return;
         }
-        if(mode === 'setup'){
-          if(titleEl) titleEl.textContent = 'Save Payment Method';
-          if(subtitleEl) subtitleEl.textContent = 'We only charge after the caregiver accepts your request.';
-          if(amountRow) amountRow.innerHTML = 'Charge later: <strong>Calculated at checkout</strong>';
-          if(submitBtn) submitBtn.textContent = 'Save payment method';
-        }
-
+        setLoading(true);
         try{
-          const configRes = await fetch(`${API_BASE}/payments/config`);
-          const configData = await configRes.json();
-          if(!configRes.ok) throw new Error(configData.error || 'Payment config failed');
-          const stripe = Stripe(configData.publishableKey);
-
-          if(mode === 'setup'){
-            const setupRes = await fetch(`${API_BASE}/payments/setup-intent`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ requestId, userId })
-            });
-            const setupData = await setupRes.json();
-            if(!setupRes.ok) throw new Error(setupData.error || 'Setup failed');
-            if(setupData.setupComplete){
-              showMessage('Payment method already saved.', false);
-              setTimeout(() => { window.location.href = 'parent-dashboard.html'; }, 1200);
-              return;
-            }
-            const elements = stripe.elements({ clientSecret: setupData.clientSecret });
-            const paymentElement = elements.create('payment');
-            paymentElement.mount('#payment-element');
-
-            async function finalizeSetup(){
-              const confirmRes = await fetch(`${API_BASE}/payments/setup-confirm`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ requestId, userId })
-              });
-              const confirmData = await confirmRes.json();
-              if(!confirmRes.ok){
-                showMessage(confirmData.error || 'Setup confirmation failed.', true);
-                setLoading(false);
-                return;
-              }
-              showMessage('Payment method saved.', false);
-              setTimeout(() => { window.location.href = 'parent-dashboard.html'; }, 1200);
-            }
-
-            form.addEventListener('submit', async (e) => {
-              e.preventDefault();
-              setLoading(true);
-              const { error, setupIntent } = await stripe.confirmSetup({
-                elements,
-                confirmParams: {
-                  return_url: `${window.location.origin}/payment.html?request_id=${encodeURIComponent(requestId)}&mode=setup&return=1`
-                },
-                redirect: 'if_required'
-              });
-              if(error){
-                showMessage(error.message, true);
-                setLoading(false);
-                return;
-              }
-              if(setupIntent && setupIntent.status === 'succeeded'){
-                await finalizeSetup();
-                return;
-              }
-              await finalizeSetup();
-            });
-            return;
-          }
-
-          if(returnFromStripe){
-            const confirmRes = await fetch(`${API_BASE}/payments/confirm`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ requestId, userId })
-            });
-            const confirmData = await confirmRes.json();
-            if(confirmRes.ok && confirmData.status === 'paid'){
-              showMessage('Payment completed. Redirecting…', false);
-              setTimeout(() => { window.location.href = 'parent-dashboard.html?paid=1'; }, 1000);
-              return;
-            }
-          }
-
-          const intentRes = await fetch(`${API_BASE}/payments/intent`, {
+          const res = await fetch(`${API_BASE}/payments/checkout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ requestId, userId })
           });
-          const intentData = await intentRes.json();
-          if(!intentRes.ok) throw new Error(intentData.error || 'Payment setup failed');
-
-          if(intentData.paid){
-            showMessage('Payment already completed.', false);
-            setTimeout(() => { window.location.href = 'parent-dashboard.html?paid=1'; }, 1200);
+          const data = await res.json();
+          if(!res.ok) throw new Error(data.error || 'Checkout failed');
+          if(data.paid){
+            showMessage('Payment already completed. Redirecting…', false);
+            setTimeout(() => { window.location.href = 'parent-dashboard.html?checkout=success'; }, 900);
             return;
           }
-
-          const amount = intentData.amountCents ? `$${(intentData.amountCents / 100).toFixed(2)}` : '—';
-          if(amountDueLabel) amountDueLabel.textContent = amount;
-          const elements = stripe.elements({ clientSecret: intentData.clientSecret });
-          const paymentElement = elements.create('payment');
-          paymentElement.mount('#payment-element');
-
-          form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            setLoading(true);
-            const { error } = await stripe.confirmPayment({
-              elements,
-              confirmParams: {
-                return_url: `${window.location.origin}/payment.html?request_id=${encodeURIComponent(requestId)}&mode=pay&return=1`
-              },
-              redirect: 'if_required'
-            });
-            if(error){
-              showMessage(error.message, true);
-              setLoading(false);
-              return;
-            }
-            const confirmRes = await fetch(`${API_BASE}/payments/confirm`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ requestId, userId })
-            });
-            const confirmData = await confirmRes.json();
-            if(!confirmRes.ok){
-              showMessage(confirmData.error || 'Payment confirmation failed.', true);
-              setLoading(false);
-              return;
-            }
-            showMessage('Payment successful. Redirecting…', false);
-            setTimeout(() => { window.location.href = 'parent-dashboard.html?paid=1'; }, 1200);
-          });
+          if(!data.url) throw new Error('Checkout URL missing.');
+          window.location.href = data.url;
         }catch(err){
-          console.error('Payment init error:', err);
-          showMessage(err.message || 'Payment setup failed.', true);
+          console.error('Checkout init error:', err);
+          showMessage(err.message || 'Checkout failed.', true);
+          setLoading(false);
         }
       }
 
-      initPayment();
+      checkoutBtn?.addEventListener('click', startCheckout);
+      startCheckout();
     </script>
   </body>
 </html>

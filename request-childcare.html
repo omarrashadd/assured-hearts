@@ -207,8 +207,6 @@
       const locationSelect = document.getElementById('locationSelect');
       const otherLocation = document.getElementById('otherLocation');
       const requestNotes = document.getElementById('requestNotes');
-      const paymentMethodSelect = document.getElementById('paymentMethodSelect');
-      const paymentMethodHint = document.getElementById('paymentMethodHint');
       const favoriteProvidersList = document.getElementById('favoriteProvidersList');
       const otherProvidersList = document.getElementById('otherProvidersList');
       const favoriteProvidersWrap = document.getElementById('favoriteProviders');
@@ -438,47 +436,6 @@
         showBanner('Please sign in to request childcare.', 'info');
         setTimeout(() => window.location.href = 'account-signup.html', 1500);
       } else {
-        const loadPaymentMethods = async () => {
-          if(!paymentMethodSelect) return;
-          try{
-            const res = await fetch(`${API_BASE}/payments/methods/list`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId })
-            });
-            const data = await res.json();
-            if(!res.ok) throw new Error(data.error || 'Failed to load payment methods');
-            const methods = Array.isArray(data.methods) ? data.methods : [];
-            if(methods.length === 0){
-              paymentMethodSelect.innerHTML = '<option value="">No payment methods saved</option>';
-              if(paymentMethodHint){
-                paymentMethodHint.innerHTML = 'Add one from your <a href="parent-dashboard.html" style="color:#06464E; font-weight:600; text-decoration:underline;">dashboard</a>.';
-              }
-              return;
-            }
-            paymentMethodSelect.innerHTML = methods.map(m=>{
-              const label = m.label || 'Card';
-              const detail = m.brand && m.last4 ? `${m.brand.toUpperCase()} •••• ${m.last4}` : 'Saved';
-              const suffix = m.is_default ? ' (default)' : '';
-              return `<option value="${m.stripe_payment_method_id}">${label} — ${detail}${suffix}</option>`;
-            }).join('');
-            const defaultMethod = methods.find(m => m.is_default);
-            if(defaultMethod){
-              paymentMethodSelect.value = defaultMethod.stripe_payment_method_id;
-              if(paymentMethodHint){
-                const detail = defaultMethod.brand && defaultMethod.last4 ? `${defaultMethod.brand.toUpperCase()} •••• ${defaultMethod.last4}` : 'Saved';
-                paymentMethodHint.innerHTML = `Default: ${defaultMethod.label || 'Card'} (${detail}). <a href="parent-dashboard.html" style="color:#06464E; font-weight:600; text-decoration:underline;">Manage</a>`;
-              }
-            }
-          }catch(err){
-            console.warn('Payment methods load failed:', err);
-            if(paymentMethodSelect){
-              paymentMethodSelect.innerHTML = '<option value="">Unable to load payment methods</option>';
-            }
-          }
-        };
-
-        loadPaymentMethods();
         // Load existing children
         fetch(`${API_BASE}/forms/parent/${userId}`)
           .then(res => res.json())
@@ -620,7 +577,6 @@
           const careTypeValue = isMember ? 'curriculum' : 'basic';
           const isPremium = isMember;
           const childAgeValue = detailChildAge ? detailChildAge.value : '';
-          const selectedPaymentMethod = paymentMethodSelect ? paymentMethodSelect.value : '';
           
           if(!selectedProviderId){
             showBanner('Please select a caregiver to send your request to.', 'error');
@@ -658,8 +614,7 @@
               care_type: careTypeValue,
               is_premium: isPremium,
               child_age: childAgeValue !== '' ? childAgeValue : null,
-              provider_id: selectedProviderId ? parseInt(selectedProviderId,10) : null,
-              payment_method_id: selectedPaymentMethod || null
+              provider_id: selectedProviderId ? parseInt(selectedProviderId,10) : null
             };
             // Only include childName if creating a new child
             if(childName) {
