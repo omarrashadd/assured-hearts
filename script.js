@@ -1332,12 +1332,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = fd.get('password');
       const confirmPassword = fd.get('confirmPassword');
       const experience = fd.get('experience');
-      const experience_details = fd.get('experience_details');
       const has_cpr = !!fd.get('cpr');
       const islamic_values = !!fd.get('values');
       const city = fd.get('city');
       const province = fd.get('province');
       const references = fd.get('references') || '';
+      const payout_method = fd.get('payoutMethod') || '';
       
       // Collect age groups (checkboxes with name="ageGroup")
       const ageGroupCheckboxes = applicationForm.querySelectorAll('input[name="ageGroup"]:checked');
@@ -1345,14 +1345,13 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Collect availability (day + times)
       const availability = {};
-      const dayCheckboxes = applicationForm.querySelectorAll('input[type="checkbox"][name^="day"]');
+      const dayCheckboxes = applicationForm.querySelectorAll('input[type="checkbox"][name="days"]');
       dayCheckboxes.forEach(dayCheckbox => {
         const dayName = dayCheckbox.value;
         const isSelected = dayCheckbox.checked;
         if(isSelected) {
-          const daySection = dayCheckbox.closest('div');
-          const fromInput = daySection?.querySelector('input[name$="From"]');
-          const toInput = daySection?.querySelector('input[name$="To"]');
+          const fromInput = applicationForm.querySelector(`input[name="${dayName}_start"]`);
+          const toInput = applicationForm.querySelector(`input[name="${dayName}_end"]`);
           availability[dayName] = {
             from: fromInput?.value || '',
             to: toInput?.value || ''
@@ -1367,14 +1366,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       // Validate required fields
-      if(!experience) {
-        showBanner('Please select your experience level', 'error');
-        return;
-      }
-      if(!experience_details?.trim()) {
-        showBanner('Please describe your childcare experience', 'error');
-        return;
-      }
       if(age_groups.length === 0) {
         showBanner('Please select at least one age group', 'error');
         return;
@@ -1387,7 +1378,6 @@ document.addEventListener('DOMContentLoaded', () => {
           phone, 
           password, 
           experience,
-          experience_details,
           has_cpr,
           islamic_values,
           age_groups,
@@ -1395,7 +1385,8 @@ document.addEventListener('DOMContentLoaded', () => {
             city, 
             province,
             availability,
-            references
+            references,
+            payout_method
           }
         };
         console.log('Submitting provider application:', payload);
@@ -1538,7 +1529,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const input = button.previousElementSibling;
       const isPassword = input.type === 'password';
       input.type = isPassword ? 'text' : 'password';
-      button.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+      button.textContent = isPassword ? 'Hide' : 'Show';
+      button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+      button.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
     });
   });
 

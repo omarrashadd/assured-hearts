@@ -124,22 +124,6 @@
               </select>
               <small id="bookingEndPreview" style="color:#6b7280; font-size:12px;">Ends at: --</small>
             </label>
-            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-              Care type
-              <select id="careTypeSelect" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
-                <option value="basic">Basic care</option>
-                <option value="curriculum">Curriculum care</option>
-              </select>
-              <small style="color:#6b7280; font-size:12px;">Curriculum includes guided learning activities.</small>
-            </label>
-            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-              Membership
-              <select id="membershipSelect" style="padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff;">
-                <option value="standard">Standard</option>
-                <option value="premium">Premium member</option>
-              </select>
-              <small style="color:#6b7280; font-size:12px;">Premium pricing applies if your account is eligible.</small>
-            </label>
           </div>
           <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
             Location
@@ -232,8 +216,6 @@
       const bookingStart = document.getElementById('bookingStart');
       const bookingDuration = document.getElementById('bookingDuration');
       const bookingEndPreview = document.getElementById('bookingEndPreview');
-      const careTypeSelect = document.getElementById('careTypeSelect');
-      const membershipSelect = document.getElementById('membershipSelect');
       const recurringBlock = document.getElementById('recurringBlock');
       const recurringToggle = document.getElementById('recurringToggle');
       const recurringFields = document.getElementById('recurringFields');
@@ -247,6 +229,7 @@
       let allChildren = [];
       let isCreatingNew = false;
       let homeAddress = '';
+      let isMember = false;
       // Show recurring if parent has at least 2 sessions
       const totalSessions = Object.values(JSON.parse(localStorage.getItem('caregiver_sessions') || '{}')).reduce((a,b)=> a + Number(b||0), 0);
       if(recurringBlock){
@@ -505,6 +488,7 @@
             if(profile.city || profile.province){
               homeAddress = [profile.city, profile.province].filter(Boolean).join(', ');
             }
+            isMember = !!profile.is_premium;
             const savedLocations = JSON.parse(localStorage.getItem('saved_locations') || '[]');
             const options = [''];
             if(homeAddress) options.push('home');
@@ -633,8 +617,8 @@
           const start_at = dateVal && startVal ? `${dateVal}T${startVal}` : null;
           const durationVal = bookingDuration ? bookingDuration.value : '';
           const end_at = buildEndAt(dateVal, startVal, durationVal);
-          const careTypeValue = careTypeSelect ? careTypeSelect.value : 'basic';
-          const isPremium = membershipSelect ? membershipSelect.value === 'premium' : false;
+          const careTypeValue = isMember ? 'curriculum' : 'basic';
+          const isPremium = isMember;
           const childAgeValue = detailChildAge ? detailChildAge.value : '';
           const selectedPaymentMethod = paymentMethodSelect ? paymentMethodSelect.value : '';
           
