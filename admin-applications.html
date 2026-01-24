@@ -146,15 +146,11 @@
         const fullName = [app.first_name, app.last_name].filter(Boolean).join(' ') || app.name || 'Caregiver';
         const addressLines = [app.address_line1, app.address_line2].filter(Boolean).join(', ');
         const payout = app.payout_method ? app.payout_method.replace(/_/g,' ') : 'Not provided';
-        const languages = app.languages || 'Not provided';
-        const consents = [
-          app.consent_background_check ? 'Background check' : null,
-          app.consent_terms ? 'Terms accepted' : null,
-          app.consent_provider_agreement ? 'Provider agreement accepted' : null
-        ].filter(Boolean).join(' · ') || 'Not provided';
+        const languages = formatLanguages(app.languages);
+        const consents = formatConsents(app);
         const ageGroups = formatAgeGroups(app.age_groups);
         const availabilityText = formatAvailability(app.availability);
-        const certifications = app.certifications || 'Not provided';
+        const certifications = formatCertifications(app.certifications);
         const appliedAt = app.created_at ? new Date(app.created_at).toLocaleString() : 'Unknown';
         return `
         <div class="application-card" data-app-id="${app.id}">
@@ -274,6 +270,11 @@
       return 'Not specified';
     }
 
+    function formatCertifications(certs){
+      if(!certs) return 'Not provided';
+      return certs;
+    }
+
     function formatAvailability(availability) {
       if (typeof availability === 'string') {
         try {
@@ -283,14 +284,43 @@
         }
       }
       if (!availability || typeof availability !== 'object') return 'Not specified';
-      if (availability.status || availability.notes){
-        const parts = [];
-        if(availability.status) parts.push(availability.status.replace(/_/g,' '));
-        if(availability.notes) parts.push(availability.notes);
-        return parts.join(' · ') || 'Not specified';
+      const parts = [];
+      if (availability.status) parts.push(availability.status.replace(/_/g,' '));
+      if (availability.notes) parts.push(availability.notes);
+      const dayKeys = Object.keys(availability).filter(k => ['status','notes'].indexOf(k) === -1 && availability[k]);
+      if(dayKeys.length){
+        const dayLines = dayKeys.map(day=>{
+          const val = availability[day];
+          if(val && typeof val === 'object'){
+            const from = val.from || val.start || '';
+            const to = val.to || val.end || '';
+            const range = from || to ? `${from || '—'} to ${to || '—'}` : '';
+            return `${capitalize(day)} ${range}`.trim();
+          }
+          return capitalize(day);
+        });
+        parts.push(dayLines.join(', '));
       }
-      const days = Object.keys(availability).filter(day => availability[day]);
-      return days.length > 0 ? days.join(', ') : 'Not specified';
+      return parts.join(' · ') || 'Not specified';
+    }
+
+    function capitalize(str){
+      if(!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function formatLanguages(langs){
+      if(!langs) return 'Not provided';
+      if(Array.isArray(langs)) return langs.join(', ');
+      return langs;
+    }
+
+    function formatConsents(app){
+      const items = [];
+      if(app.consent_background_check) items.push('Background check');
+      if(app.consent_terms) items.push('Terms accepted');
+      if(app.consent_provider_agreement) items.push('Provider agreement accepted');
+      return items.length ? items.join(' · ') : 'Not provided';
     }
 
     function showError(message) {
