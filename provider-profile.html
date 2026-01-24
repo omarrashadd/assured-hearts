@@ -75,10 +75,6 @@
 
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:12px;">
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-              Hourly rate
-              <input type="text" name="rate" id="provRate" placeholder="$" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
-            </label>
-            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
               Payout method
               <select name="payout_method" id="provPayoutMethod" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
                 <option value="">Select</option>
@@ -92,6 +88,12 @@
               <input type="text" name="payout_details" id="provPayoutDetails" placeholder="Email/Account #" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
             </label>
           </div>
+
+          <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+            Languages spoken
+            <input type="text" name="languages" id="provLanguages" placeholder="English, Arabic, Urdu" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
+            <small style="color:#6b7280;">Shown on your public profile.</small>
+          </label>
 
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px;">
             <label style="display:flex; align-items:center; gap:8px; color:#374151;">

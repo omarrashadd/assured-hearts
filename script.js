@@ -232,7 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
         const certs = [];
         if(p.has_cpr) certs.push('CPR certified');
-        if(p.islamic_values) certs.push('Values aligned');
         const certText = certs.length ? certs.join(' · ') : 'Certifications pending';
         return `
           <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
@@ -841,10 +840,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('provAddr1').value = p.address_line1 || '';
             document.getElementById('provAddr2').value = p.address_line2 || '';
             document.getElementById('provPostal').value = p.postal_code || '';
-            document.getElementById('provRate').value = p.rate || '';
             document.getElementById('provPayoutMethod').value = p.payout_method || '';
             document.getElementById('provPayoutDetails').value = p.payout_details || '';
             document.getElementById('provBio').value = p.bio || '';
+            document.getElementById('provLanguages').value = p.languages || '';
             document.getElementById('prov2FA').checked = !!p.two_factor_enabled;
             document.getElementById('provPaused').checked = !!p.paused;
             const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
@@ -911,12 +910,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cgCertsEl = document.getElementById('cgCerts');
     const cgAvailText = document.getElementById('cgAvailText');
     const cgAvailNotes = document.getElementById('cgAvailNotes');
+    const cgAvailList = document.getElementById('cgAvailList');
+    const cgAvailabilityTag = document.getElementById('cgAvailabilityTag');
     const cgAvatar = document.getElementById('cgAvatar');
     const cgBookBtn = document.getElementById('cgBookBtn');
     const cgMessageBtn = document.getElementById('cgMessageBtn');
     const cgContact = document.getElementById('cgContact');
-    const cgHours = document.getElementById('cgHours');
-    const cgValues = document.getElementById('cgValues');
+    const cgLanguages = document.getElementById('cgLanguages');
 
     const isSignedIn = !!localStorage.getItem('user_id');
     const userId = localStorage.getItem('user_id');
@@ -934,30 +934,107 @@ document.addEventListener('DOMContentLoaded', () => {
         cgNameEl.textContent = p.name || 'Caregiver';
         const city = p.city || '';
         const province = p.province || '';
-        const rate = p.rate ? `$${p.rate}/hr` : '';
-        cgMetaEl.textContent = [city, province, rate].filter(Boolean).join(' · ') || 'Trusted caregiver';
+        const locationLabel = [city, province].filter(Boolean).join(', ');
+        cgMetaEl.textContent = locationLabel || 'Trusted caregiver';
         cgBioEl.textContent = p.bio || 'Biography coming soon.';
         cgExpEl.textContent = p.experience_details || 'Experience details coming soon.';
         const initials = (p.name || 'CG').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
         cgAvatar.textContent = initials;
         const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
-        let availLabel = 'Availability not provided';
-        if(availability.status === 'immediate') availLabel = 'Available immediately';
-        if(availability.status === 'next24') availLabel = 'Available in the next 24 hours';
-        if(availability.status === 'week') availLabel = 'Available this week';
-        cgAvailText.textContent = availLabel;
-        cgAvailNotes.textContent = availability.notes || '';
+        const statusMap = {
+          immediate: 'Available immediately',
+          next24: 'Available in the next 24 hours',
+          week: 'Available this week',
+          custom: 'Limited availability'
+        };
+        const statusLabel = availability.status ? (statusMap[availability.status] || 'Availability updated') : '';
+        if(cgAvailabilityTag){
+          cgAvailabilityTag.innerHTML = statusLabel
+            ? `<span style="background:#eef7f2; color:#2d6b42; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700;">${statusLabel}</span>`
+            : '';
+        }
+        const dayOrder = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+        const dayLabels = {
+          monday: 'Mon',
+          tuesday: 'Tue',
+          wednesday: 'Wed',
+          thursday: 'Thu',
+          friday: 'Fri',
+          saturday: 'Sat',
+          sunday: 'Sun'
+        };
+        function formatTime(value){
+          if(!value) return '';
+          const [hStr, mStr] = String(value).split(':');
+          const h = parseInt(hStr, 10);
+          if(!Number.isFinite(h)) return value;
+          const minutes = mStr || '00';
+          const hour12 = h % 12 === 0 ? 12 : h % 12;
+          const ampm = h < 12 ? 'AM' : 'PM';
+          return `${hour12}:${minutes} ${ampm}`;
+        }
+        const scheduleSource = availability.schedule && typeof availability.schedule === 'object'
+          ? availability.schedule
+          : availability;
+        const scheduleRows = dayOrder.map((day)=>{
+          const slot = scheduleSource?.[day];
+          if(!slot) return null;
+          const fromLabel = formatTime(slot.from);
+          const toLabel = formatTime(slot.to);
+          const timeLabel = fromLabel && toLabel
+            ? `${fromLabel} - ${toLabel}`
+            : (fromLabel || toLabel || '');
+          if(!timeLabel) return null;
+          return { day: dayLabels[day] || day, time: timeLabel };
+        }).filter(Boolean);
+        if(scheduleRows.length){
+          if(cgAvailText) cgAvailText.textContent = 'Weekly schedule';
+          if(cgAvailList){
+            cgAvailList.innerHTML = scheduleRows.map(row=> `
+              <div style="display:flex; justify-content:space-between; gap:10px; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; background:#f8fafc; font-size:13px; color:#475569;">
+                <span style="font-weight:700; color:#0f172a;">${row.day}</span>
+                <span>${row.time}</span>
+              </div>
+            `).join('');
+          }
+          if(cgAvailNotes) cgAvailNotes.textContent = availability.notes || 'Times shown in local time.';
+        } else {
+          if(cgAvailText) cgAvailText.textContent = statusLabel || 'Availability not provided';
+          if(cgAvailList) cgAvailList.innerHTML = '';
+          if(cgAvailNotes) cgAvailNotes.textContent = availability.notes || '';
+        }
         const certs = [];
         if(p.has_cpr) certs.push('CPR certified');
-        if(p.islamic_values) certs.push('Values aligned');
         if(certs.length === 0) certs.push('Certifications pending');
         cgCertsEl.innerHTML = certs.map(c=> `<li>${c}</li>`).join('');
         cgContact.innerHTML = `
           <div>${p.email || 'Email on file'}</div>
           <div>${p.phone || ''}</div>
         `;
-        cgHours.textContent = p.weekly_hours ? `${p.weekly_hours} hrs / week goal` : 'Not specified';
-        cgValues.textContent = p.islamic_values ? 'Faith-aligned' : 'Values not provided';
+        if(cgLanguages){
+          let languageList = [];
+          if(Array.isArray(p.languages)){
+            languageList = p.languages;
+          } else if(typeof p.languages === 'string'){
+            const trimmed = p.languages.trim();
+            if(trimmed.startsWith('[')){
+              try{
+                const parsed = JSON.parse(trimmed);
+                if(Array.isArray(parsed)) languageList = parsed;
+              }catch(_err){
+                languageList = trimmed.split(',');
+              }
+            } else {
+              languageList = trimmed.split(',');
+            }
+          }
+          languageList = languageList.map(l=> String(l || '').trim()).filter(Boolean);
+          if(languageList.length === 0){
+            cgLanguages.textContent = 'Languages not provided';
+          } else {
+            cgLanguages.innerHTML = languageList.map(lang=> `<span style="display:inline-block; margin:0 6px 6px 0; padding:4px 10px; border-radius:999px; background:#eef2ff; color:#4338ca; font-size:12px; font-weight:700;">${lang}</span>`).join('');
+          }
+        }
         const bookHref = `request-childcare.html?provider_id=${encodeURIComponent(providerId)}&provider_name=${encodeURIComponent(p.name || '')}`;
         cgBookBtn.href = bookHref;
         cgMessageBtn.addEventListener('click', (ev)=>{
@@ -1383,11 +1460,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const confirmPassword = fd.get('confirmPassword');
       const experience = fd.get('experience');
       const has_cpr = !!fd.get('cpr');
-      const islamic_values = !!fd.get('values');
       const city = fd.get('city');
       const province = fd.get('province');
       const references = fd.get('references') || '';
       const payout_method = fd.get('payoutMethod') || '';
+      const languages = (fd.get('languages') || '').trim();
       
       // Collect age groups (checkboxes with name="ageGroup")
       const ageGroupCheckboxes = applicationForm.querySelectorAll('input[name="ageGroup"]:checked');
@@ -1429,14 +1506,14 @@ document.addEventListener('DOMContentLoaded', () => {
           password, 
           experience,
           has_cpr,
-          islamic_values,
           age_groups,
           meta: { 
             city, 
             province,
             availability,
             references,
-            payout_method
+            payout_method,
+            languages
           }
         };
         console.log('Submitting provider application:', payload);
