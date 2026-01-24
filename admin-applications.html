@@ -142,14 +142,29 @@
         return;
       }
 
-      container.innerHTML = applications.map(app => `
+      container.innerHTML = applications.map(app => {
+        const fullName = [app.first_name, app.last_name].filter(Boolean).join(' ') || app.name || 'Caregiver';
+        const addressLines = [app.address_line1, app.address_line2].filter(Boolean).join(', ');
+        const payout = app.payout_method ? app.payout_method.replace(/_/g,' ') : 'Not provided';
+        const languages = app.languages || 'Not provided';
+        const consents = [
+          app.consent_background_check ? 'Background check' : null,
+          app.consent_terms ? 'Terms accepted' : null,
+          app.consent_provider_agreement ? 'Provider agreement accepted' : null
+        ].filter(Boolean).join(' · ') || 'Not provided';
+        const ageGroups = formatAgeGroups(app.age_groups);
+        const availabilityText = formatAvailability(app.availability);
+        const certifications = app.certifications || 'Not provided';
+        const appliedAt = app.created_at ? new Date(app.created_at).toLocaleString() : 'Unknown';
+        return `
         <div class="application-card" data-app-id="${app.id}">
           <div class="application-header">
             <div class="application-info">
-              <h3>${app.name}</h3>
-              <p><strong>Email:</strong> ${app.email}</p>
+              <h3>${fullName}</h3>
+              <p><strong>Email:</strong> ${app.email || 'N/A'}</p>
               <p><strong>Phone:</strong> ${app.phone || 'N/A'}</p>
               <p><strong>Location:</strong> ${app.city || 'N/A'}, ${app.province || 'N/A'}</p>
+              ${addressLines ? `<p><strong>Address:</strong> ${addressLines}${app.postal_code ? ', ' + app.postal_code : ''}</p>` : ''}
             </div>
             <button class="approve-btn" onclick="approveApplication(${app.id})">
               Approve
@@ -158,32 +173,37 @@
           
           <div class="application-details">
             <div class="detail-row">
-              <span class="detail-label">Experience:</span>
-              <p>${app.experience || 'Not provided'}</p>
-            </div>
-            <div class="detail-row">
               <span class="detail-label">Certifications:</span>
-              <p>${app.certifications || 'Not provided'}</p>
+              <p>${certifications}</p>
             </div>
-            ${app.age_groups ? `
             <div class="detail-row">
               <span class="detail-label">Age Groups:</span>
-              <p>${formatAgeGroups(app.age_groups)}</p>
+              <p>${ageGroups}</p>
             </div>
-            ` : ''}
-            ${app.availability ? `
             <div class="detail-row">
               <span class="detail-label">Availability:</span>
-              <p>${formatAvailability(app.availability)}</p>
+              <p>${availabilityText}</p>
             </div>
-            ` : ''}
+            <div class="detail-row">
+              <span class="detail-label">Languages:</span>
+              <p>${languages}</p>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Payout Method:</span>
+              <p>${payout}</p>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Consents:</span>
+              <p>${consents}</p>
+            </div>
             <div class="detail-row">
               <span class="detail-label">Applied:</span>
-              <p>${new Date(app.created_at).toLocaleString()}</p>
+              <p>${appliedAt}</p>
             </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     async function approveApplication(appId) {
@@ -240,15 +260,18 @@
           return ageGroups;
         }
       }
-      if (!ageGroups || typeof ageGroups !== 'object') return 'Not specified';
-      
-      const groups = [];
-      if (ageGroups.infants) groups.push('Infants (0-1)');
-      if (ageGroups.toddlers) groups.push('Toddlers (1-3)');
-      if (ageGroups.preschool) groups.push('Preschool (3-5)');
-      if (ageGroups.schoolAge) groups.push('School Age (5+)');
-      
-      return groups.length > 0 ? groups.join(', ') : 'Not specified';
+      if (!ageGroups) return 'Not specified';
+      if (Array.isArray(ageGroups)) return ageGroups.join(', ');
+      if (typeof ageGroups === 'object') {
+        const groups = [];
+        Object.keys(ageGroups).forEach(key => {
+          if(ageGroups[key]){
+            groups.push(key.replace(/_/g,' '));
+          }
+        });
+        return groups.length ? groups.join(', ') : 'Not specified';
+      }
+      return 'Not specified';
     }
 
     function formatAvailability(availability) {
@@ -260,7 +283,12 @@
         }
       }
       if (!availability || typeof availability !== 'object') return 'Not specified';
-      
+      if (availability.status || availability.notes){
+        const parts = [];
+        if(availability.status) parts.push(availability.status.replace(/_/g,' '));
+        if(availability.notes) parts.push(availability.notes);
+        return parts.join(' · ') || 'Not specified';
+      }
       const days = Object.keys(availability).filter(day => availability[day]);
       return days.length > 0 ? days.join(', ') : 'Not specified';
     }
