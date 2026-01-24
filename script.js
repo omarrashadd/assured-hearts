@@ -1284,9 +1284,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const citiesByProvince = {
+    AB: ['Calgary', 'Edmonton', 'Red Deer', 'Lethbridge'],
+    BC: ['Vancouver', 'Victoria', 'Surrey', 'Burnaby', 'Kelowna'],
+    MB: ['Winnipeg'],
+    NB: ['Saint John'],
+    NL: ["St. John's"],
+    NS: ['Halifax'],
+    NT: ['Yellowknife'],
+    NU: ['Iqaluit'],
+    ON: ['Toronto', 'Ottawa', 'Hamilton', 'London'],
+    PE: ['Charlottetown'],
+    QC: ['Quebec City', 'Montreal'],
+    SK: ['Regina', 'Saskatoon', 'Prince Albert', 'Moose Jaw', 'Yorkton', 'Swift Current'],
+    YT: ['Whitehorse']
+  };
+
   // Parent signup -> send basic intake to backend
   const parentSignupForm = document.getElementById('parentSignupForm');
   if(parentSignupForm){
+    const parentProvinceSelect = parentSignupForm.querySelector('#parentProvinceSelect');
+    const parentCitySelect = parentSignupForm.querySelector('#parentCitySelect');
+
+    function populateParentCities(province){
+      if(!parentCitySelect) return;
+      const cities = citiesByProvince[province] || [];
+      parentCitySelect.innerHTML = '<option value="">Select city</option>' +
+        cities.map((city)=> `<option value="${city}">${city}</option>`).join('');
+    }
+
+    if(parentProvinceSelect && parentCitySelect){
+      populateParentCities(parentProvinceSelect.value);
+      parentProvinceSelect.addEventListener('change', () => {
+        populateParentCities(parentProvinceSelect.value);
+      });
+    }
+
     parentSignupForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
       const fd = new FormData(parentSignupForm);
@@ -1325,21 +1358,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if(applicationForm){
     const provinceSelect = applicationForm.querySelector('#providerProvinceSelect');
     const citySelect = applicationForm.querySelector('#providerCitySelect');
-    const citiesByProvince = {
-      AB: ['Calgary', 'Edmonton', 'Red Deer', 'Lethbridge'],
-      BC: ['Vancouver', 'Victoria', 'Surrey', 'Burnaby', 'Kelowna'],
-      MB: ['Winnipeg'],
-      NB: ['Saint John'],
-      NL: ["St. John's"],
-      NS: ['Halifax'],
-      NT: ['Yellowknife'],
-      NU: ['Iqaluit'],
-      ON: ['Toronto', 'Ottawa', 'Hamilton', 'London'],
-      PE: ['Charlottetown'],
-      QC: ['Quebec City', 'Montreal'],
-      SK: ['Regina', 'Saskatoon', 'Prince Albert', 'Moose Jaw', 'Yorkton', 'Swift Current'],
-      YT: ['Whitehorse']
-    };
 
     function populateProviderCities(province){
       if(!citySelect) return;

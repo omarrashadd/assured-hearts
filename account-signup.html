@@ -89,35 +89,43 @@
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
             <div>
               <label for="password" style="display: block; margin-bottom: 6px; color: #333;">Password</label>
-              <input id="password" name="password" type="password" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+              <div style="position: relative; display: flex; align-items: center;">
+                <input id="password" name="password" type="password" class="passwordInput" required style="width: 100%; padding: 12px; padding-right: 74px; border: 1px solid #dfe3e6; border-radius: 8px;">
+                <button type="button" class="togglePassword" aria-label="Show password" aria-pressed="false" style="position: absolute; right: 10px; background: #f3f4f6; border: 1px solid #e5e7eb; cursor: pointer; color: #374151; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;">Show</button>
+              </div>
             </div>
             <div>
               <label for="confirm" style="display: block; margin-bottom: 6px; color: #333;">Confirm password</label>
-              <input id="confirm" name="confirm" type="password" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+              <div style="position: relative; display: flex; align-items: center;">
+                <input id="confirm" name="confirm" type="password" class="passwordInput" required style="width: 100%; padding: 12px; padding-right: 74px; border: 1px solid #dfe3e6; border-radius: 8px;">
+                <button type="button" class="togglePassword" aria-label="Show password" aria-pressed="false" style="position: absolute; right: 10px; background: #f3f4f6; border: 1px solid #e5e7eb; cursor: pointer; color: #374151; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;">Show</button>
+              </div>
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
             <div>
-              <label for="city" style="display: block; margin-bottom: 6px; color: #333;">City</label>
-              <input id="city" name="city" type="text" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+              <label for="parentCitySelect" style="display: block; margin-bottom: 6px; color: #333;">City</label>
+              <select id="parentCitySelect" name="city" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+                <option value="">Select city</option>
+              </select>
             </div>
             <div>
-              <label for="province" style="display: block; margin-bottom: 6px; color: #333;">Province</label>
-              <select id="province" name="province" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
+              <label for="parentProvinceSelect" style="display: block; margin-bottom: 6px; color: #333;">Province</label>
+              <select id="parentProvinceSelect" name="province" required style="width: 100%; padding: 12px; border: 1px solid #dfe3e6; border-radius: 8px;">
                 <option value="">Select a province</option>
                 <option value="AB">Alberta</option>
                 <option value="BC">British Columbia</option>
                 <option value="MB">Manitoba</option>
                 <option value="NB">New Brunswick</option>
-                <option value="NL">Newfoundland and Labrador</option>
+                <option value="NL">Newfoundland &amp; Labrador</option>
                 <option value="NS">Nova Scotia</option>
+                <option value="NT">Northwest Territories</option>
+                <option value="NU">Nunavut</option>
                 <option value="ON">Ontario</option>
                 <option value="PE">Prince Edward Island</option>
                 <option value="QC">Quebec</option>
                 <option value="SK">Saskatchewan</option>
-                <option value="NT">Northwest Territories</option>
-                <option value="NU">Nunavut</option>
                 <option value="YT">Yukon</option>
               </select>
             </div>
