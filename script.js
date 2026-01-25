@@ -816,7 +816,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if(providerProfileForm){
     const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
     const provStatusEl = document.getElementById('provStatus');
-    const userId = parseInt(localStorage.getItem('user_id'), 10);
+    const userIdRaw = localStorage.getItem('user_id');
+    const userId = userIdRaw ? parseInt(userIdRaw, 10) : null;
     let resolvedProviderId = userId;
     if(!userId || localStorage.getItem('user_type') !== 'provider'){
       if(provStatusEl){
@@ -873,6 +874,10 @@ document.addEventListener('DOMContentLoaded', () => {
         showBanner('Please log in to update your profile.', 'info');
         return;
       }
+      if(!userId || Number.isNaN(userId)){
+        showBanner('Please log in to update your profile.', 'info');
+        return;
+      }
       const fd = new FormData(providerProfileForm);
       const payload = Object.fromEntries(fd.entries());
       const first = payload.first_name || '';
@@ -900,7 +905,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Do not attempt to update login email from this form
       delete payload.email;
       try{
-        const targetId = resolvedProviderId || userId;
+        const targetId = (resolvedProviderId && !Number.isNaN(resolvedProviderId)) ? resolvedProviderId : userId;
+        if(!targetId){
+          throw new Error('Missing user id');
+        }
         const res = await fetch(`${API_BASE}/forms/provider/${targetId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
