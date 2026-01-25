@@ -171,7 +171,7 @@
 
             <label style="display: flex; flex-direction: column; color: #666; font-weight: 600; margin-top: 16px;">
               Address
-              <input type="text" name="address" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
+              <input type="text" name="address_line1" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
             </label>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px;">
@@ -199,6 +199,10 @@
                   <option value="SK">Saskatchewan</option>
                   <option value="YT">Yukon</option>
                 </select>
+              </label>
+              <label style="display: flex; flex-direction: column; color: #666; font-weight: 600;">
+                Postal/ZIP
+                <input type="text" name="postal_code" required style="padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 6px;">
               </label>
             </div>
           </fieldset>

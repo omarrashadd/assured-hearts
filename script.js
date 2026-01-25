@@ -1533,7 +1533,8 @@ document.addEventListener('DOMContentLoaded', () => {
             references,
             payout_method,
             languages,
-            address_line1: applicationForm.querySelector('input[name="address"]')?.value || '',
+            address_line1: applicationForm.querySelector('input[name="address_line1"]')?.value || '',
+            postal_code: applicationForm.querySelector('input[name="postal_code"]')?.value || '',
             consent_background_check,
             consent_terms,
             consent_provider_agreement
