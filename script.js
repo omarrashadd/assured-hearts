@@ -829,7 +829,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if(res.ok){
             const data = await res.json();
             const p = data.profile || {};
-            document.getElementById('provName').value = p.name || '';
+            const splitName = (p.name || '').split(' ');
+            document.getElementById('provFirstName').value = p.first_name || splitName[0] || '';
+            document.getElementById('provLastName').value = p.last_name || splitName.slice(1).join(' ') || '';
             document.getElementById('provEmail').value = p.email || '';
             document.getElementById('provPhone').value = p.phone || '';
             document.getElementById('provCity').value = p.city || '';
@@ -839,9 +841,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('provPostal').value = p.postal_code || '';
             document.getElementById('provPayoutMethod').value = p.payout_method || '';
             document.getElementById('provLanguages').value = p.languages || '';
+            document.getElementById('provCerts').value = p.certifications || '';
             const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
-            document.getElementById('provAvailabilityStatus').value = availability.status || '';
             document.getElementById('provAvailabilityNotes').value = availability.notes || '';
+            const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+            days.forEach(day=>{
+              const checkbox = document.querySelector(`input[data-day="${day}"]`);
+              const fromInput = document.querySelector(`input[data-day-from="${day}"]`);
+              const toInput = document.querySelector(`input[data-day-to="${day}"]`);
+              const dayVal = availability[day];
+              if(dayVal){
+                checkbox.checked = true;
+                fromInput.value = dayVal.from || dayVal.start || '';
+                toInput.value = dayVal.to || dayVal.end || '';
+              } else {
+                checkbox.checked = false;
+                fromInput.value = '';
+                toInput.value = '';
+              }
+            });
           }
         }catch(_err){}
       })();
@@ -855,10 +873,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const fd = new FormData(providerProfileForm);
       const payload = Object.fromEntries(fd.entries());
-      const availability = {
-        status: document.getElementById('provAvailabilityStatus').value || null,
-        notes: document.getElementById('provAvailabilityNotes').value || null
-      };
+      const first = payload.first_name || '';
+      const last = payload.last_name || '';
+      payload.name = [first, last].filter(Boolean).join(' ') || payload.name || null;
+      const availability = { notes: document.getElementById('provAvailabilityNotes').value || null };
+      const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+      days.forEach(day=>{
+        const checked = document.querySelector(`input[data-day="${day}"]`)?.checked;
+        if(checked){
+          const fromVal = document.querySelector(`input[data-day-from="${day}"]`)?.value || '';
+          const toVal = document.querySelector(`input[data-day-to="${day}"]`)?.value || '';
+          availability[day] = { from: fromVal, to: toVal };
+        }
+      });
       payload.availability = availability;
       try{
         const res = await fetch(`${API_BASE}/forms/provider/${userId}`, {

@@ -32,8 +32,12 @@
         <form id="providerProfileForm" style="display:grid; gap:16px;">
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:12px;">
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-              Full name
-              <input type="text" name="name" id="provName" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
+              First name
+              <input type="text" name="first_name" id="provFirstName" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+              Last name
+              <input type="text" name="last_name" id="provLastName" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
             </label>
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
               Email (login)
@@ -73,37 +77,94 @@
               Payout method
               <select name="payout_method" id="provPayoutMethod" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
                 <option value="">Select</option>
-                <option value="etransfer">E-transfer</option>
+                <option value="etransfer">Interac e-Transfer</option>
                 <option value="direct_deposit">Direct deposit</option>
-                <option value="cash">Cash</option>
+                <option value="paypal">PayPal</option>
               </select>
             </label>
-          </div>
-
-          <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-            Languages spoken
-            <input type="text" name="languages" id="provLanguages" placeholder="English, Arabic, Urdu" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
-            <small style="color:#6b7280;">Shown on your public profile.</small>
-          </label>
-
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:12px;">
             <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-              Availability status
-              <select name="availability_status" id="provAvailabilityStatus" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
-                <option value="">Select</option>
-                <option value="immediate">Available immediately</option>
-                <option value="next24">Available in next 24 hours</option>
-                <option value="week">Available this week</option>
-                <option value="custom">Custom/limited availability</option>
-              </select>
-              <small style="color:#6b7280;">Choose what families see on your card.</small>
+              Languages spoken
+              <input type="text" name="languages" id="provLanguages" placeholder="English, Arabic, Urdu" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
+              <small style="color:#6b7280;">Shown on your public profile.</small>
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
+              Certifications
+              <input type="text" name="certifications" id="provCerts" placeholder="CPR, First Aid" style="padding:12px; border:1px solid #d1d5db; border-radius:8px;">
             </label>
           </div>
 
-          <label style="display:flex; flex-direction:column; gap:6px; color:#374151;">
-            Availability notes (optional)
-            <textarea name="availability_notes" id="provAvailabilityNotes" rows="2" style="padding:12px; border:1px solid #d1d5db; border-radius:8px; font-family:inherit;" placeholder="Add any schedule notes..."></textarea>
-          </label>
+          <div style="display:flex; flex-direction:column; gap:10px; color:#374151;">
+            <div style="font-weight:700;">Weekly availability</div>
+            <div class="availability-grid" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap:10px;">
+              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:capitalize;">
+                  <input type="checkbox" name="avail_day" value="monday" data-day="monday" style="width:16px; height:16px;"> Monday
+                </label>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <input type="time" name="monday_from" data-day-from="monday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                  <input type="time" name="monday_to" data-day-to="monday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                </div>
+              </div>
+              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:capitalize;">
+                  <input type="checkbox" name="avail_day" value="tuesday" data-day="tuesday" style="width:16px; height:16px;"> Tuesday
+                </label>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <input type="time" name="tuesday_from" data-day-from="tuesday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                  <input type="time" name="tuesday_to" data-day-to="tuesday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                </div>
+              </div>
+              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:capitalize;">
+                  <input type="checkbox" name="avail_day" value="wednesday" data-day="wednesday" style="width:16px; height:16px;"> Wednesday
+                </label>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <input type="time" name="wednesday_from" data-day-from="wednesday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                  <input type="time" name="wednesday_to" data-day-to="wednesday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                </div>
+              </div>
+              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:capitalize;">
+                  <input type="checkbox" name="avail_day" value="thursday" data-day="thursday" style="width:16px; height:16px;"> Thursday
+                </label>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <input type="time" name="thursday_from" data-day-from="thursday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                  <input type="time" name="thursday_to" data-day-to="thursday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                </div>
+              </div>
+              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:capitalize;">
+                  <input type="checkbox" name="avail_day" value="friday" data-day="friday" style="width:16px; height:16px;"> Friday
+                </label>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <input type="time" name="friday_from" data-day-from="friday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                  <input type="time" name="friday_to" data-day-to="friday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                </div>
+              </div>
+              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:capitalize;">
+                  <input type="checkbox" name="avail_day" value="saturday" data-day="saturday" style="width:16px; height:16px;"> Saturday
+                </label>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <input type="time" name="saturday_from" data-day-from="saturday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                  <input type="time" name="saturday_to" data-day-to="saturday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                </div>
+              </div>
+              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:capitalize;">
+                  <input type="checkbox" name="avail_day" value="sunday" data-day="sunday" style="width:16px; height:16px;"> Sunday
+                </label>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <input type="time" name="sunday_from" data-day-from="sunday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                  <input type="time" name="sunday_to" data-day-to="sunday" style="flex:1; padding:8px; border:1px solid #d1d5db; border-radius:6px;">
+                </div>
+              </div>
+            </div>
+            <label style="display:flex; flex-direction:column; gap:6px;">
+              Notes (optional)
+              <textarea id="provAvailabilityNotes" style="padding:10px; border:1px solid #d1d5db; border-radius:8px; min-height:60px;"></textarea>
+            </label>
+          </div>
 
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button type="submit" class="btn" style="padding:12px 16px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:#fff; border:none; border-radius:10px; font-weight:700;">Save changes</button>
