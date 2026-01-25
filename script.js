@@ -818,7 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const provStatusEl = document.getElementById('provStatus');
     const userIdRaw = localStorage.getItem('user_id');
     const userId = userIdRaw ? parseInt(userIdRaw, 10) : null;
-    let resolvedProviderId = userId;
+    let resolvedProviderId = null;
     if(!userId || localStorage.getItem('user_type') !== 'provider'){
       if(provStatusEl){
         provStatusEl.style.color = '#b91c1c';
@@ -831,8 +831,11 @@ document.addEventListener('DOMContentLoaded', () => {
           if(res.ok){
             const data = await res.json();
             const p = data.profile || {};
-            resolvedProviderId = userId; // force to user_id as the canonical ID
-            localStorage.removeItem('provider_id');
+            resolvedProviderId = p.id || p.provider_id || null;
+            if(!resolvedProviderId && provStatusEl){
+              provStatusEl.style.color = '#b91c1c';
+              provStatusEl.textContent = 'Profile editing will be available after approval.';
+            }
             const splitName = (p.name || '').split(' ');
             document.getElementById('provFirstName').value = p.first_name || splitName[0] || '';
             document.getElementById('provLastName').value = p.last_name || splitName.slice(1).join(' ') || '';
@@ -905,9 +908,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // Do not attempt to update login email from this form
       delete payload.email;
       try{
-        const targetId = (resolvedProviderId && !Number.isNaN(resolvedProviderId)) ? resolvedProviderId : userId;
+        const targetId = (resolvedProviderId && !Number.isNaN(resolvedProviderId)) ? resolvedProviderId : null;
         if(!targetId){
-          throw new Error('Missing user id');
+          showBanner('Profile editing is available after approval.', 'info');
+          if(provStatusEl){
+            provStatusEl.style.color = '#b91c1c';
+            provStatusEl.textContent = 'Approval pending. Cannot save yet.';
+          }
+          return;
         }
         const res = await fetch(`${API_BASE}/forms/provider/${targetId}`, {
           method: 'PUT',
