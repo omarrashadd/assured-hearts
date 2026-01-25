@@ -817,6 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
     const provStatusEl = document.getElementById('provStatus');
     const userId = parseInt(localStorage.getItem('user_id'), 10);
+    let resolvedProviderId = userId;
     if(!userId || localStorage.getItem('user_type') !== 'provider'){
       if(provStatusEl){
         provStatusEl.style.color = '#b91c1c';
@@ -829,6 +830,8 @@ document.addEventListener('DOMContentLoaded', () => {
           if(res.ok){
             const data = await res.json();
             const p = data.profile || {};
+            resolvedProviderId = p.id || p.provider_id || userId;
+            if(resolvedProviderId) localStorage.setItem('provider_id', String(resolvedProviderId));
             const splitName = (p.name || '').split(' ');
             document.getElementById('provFirstName').value = p.first_name || splitName[0] || '';
             document.getElementById('provLastName').value = p.last_name || splitName.slice(1).join(' ') || '';
@@ -897,7 +900,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Do not attempt to update login email from this form
       delete payload.email;
       try{
-        const res = await fetch(`${API_BASE}/forms/provider/${userId}`, {
+        const storedProviderId = parseInt(localStorage.getItem('provider_id') || '', 10);
+        const targetId = storedProviderId || resolvedProviderId || userId;
+        const res = await fetch(`${API_BASE}/forms/provider/${targetId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
