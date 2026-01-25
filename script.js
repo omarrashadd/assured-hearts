@@ -837,7 +837,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('provCity').value = p.city || '';
             document.getElementById('provProvince').value = p.province || '';
             document.getElementById('provAddr1').value = p.address_line1 || '';
-            document.getElementById('provAddr2').value = p.address_line2 || '';
             document.getElementById('provPostal').value = p.postal_code || '';
             document.getElementById('provPayoutMethod').value = p.payout_method || '';
             document.getElementById('provLanguages').value = p.languages || '';
@@ -876,6 +875,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const first = payload.first_name || '';
       const last = payload.last_name || '';
       payload.name = [first, last].filter(Boolean).join(' ') || payload.name || null;
+      // Remove unused address_line2 from payload if present
+      delete payload.address_line2;
       const availability = { notes: document.getElementById('provAvailabilityNotes').value || null };
       const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
       days.forEach(day=>{
