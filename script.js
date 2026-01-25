@@ -1519,7 +1519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const consent_background_check = !!applicationForm.querySelector('input[name="backgroundCheck"]')?.checked;
         const consent_terms = !!applicationForm.querySelector('input[name="acceptPolicies"]')?.checked;
         const consent_provider_agreement = !!applicationForm.querySelector('input[name="providerAgreement"]')?.checked;
-        const certifications = has_cpr ? 'CPR/First Aid (has or willing to obtain)' : '';
+        const certifications = has_cpr ? 'Yes' : 'No';
         const payload = { 
           name, 
           email, 
