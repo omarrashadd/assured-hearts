@@ -888,6 +888,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       payload.availability = availability;
+      // Clean empty strings to null so COALESCE works and avoid updating immutable fields
+      ['first_name','last_name','phone','city','province','address_line1','postal_code','payout_method','languages','certifications'].forEach(k=>{
+        if(payload[k] !== undefined && payload[k] !== null && payload[k].trim() === ''){
+          payload[k] = null;
+        }
+      });
+      // Do not attempt to update login email from this form
+      delete payload.email;
       try{
         const res = await fetch(`${API_BASE}/forms/provider/${userId}`, {
           method: 'PUT',
