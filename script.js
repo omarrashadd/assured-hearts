@@ -830,8 +830,8 @@ document.addEventListener('DOMContentLoaded', () => {
           if(res.ok){
             const data = await res.json();
             const p = data.profile || {};
-            resolvedProviderId = p.id || p.provider_id || userId;
-            if(resolvedProviderId) localStorage.setItem('provider_id', String(resolvedProviderId));
+            resolvedProviderId = userId; // force to user_id as the canonical ID
+            localStorage.removeItem('provider_id');
             const splitName = (p.name || '').split(' ');
             document.getElementById('provFirstName').value = p.first_name || splitName[0] || '';
             document.getElementById('provLastName').value = p.last_name || splitName.slice(1).join(' ') || '';
@@ -900,8 +900,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Do not attempt to update login email from this form
       delete payload.email;
       try{
-        const storedProviderId = parseInt(localStorage.getItem('provider_id') || '', 10);
-        const targetId = storedProviderId || resolvedProviderId || userId;
+        const targetId = resolvedProviderId || userId;
         const res = await fetch(`${API_BASE}/forms/provider/${targetId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -1867,8 +1866,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   };
 
   async function fetchMessages(){
+    const API_BASE_MSG = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+    const uid = userId ? parseInt(userId, 10) : null;
+    if(!uid || Number.isNaN(uid)) return;
     try{
-      const res = await fetch(`${API_BASE}/forms/messages/${userId}`);
+      const res = await fetch(`${API_BASE_MSG}/forms/messages/${uid}`);
       if(!res.ok){
         const errText = await res.text();
         console.error('Failed to load messages', res.status, errText);
@@ -1890,7 +1892,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       updateBadge();
       if(activeThread) renderHistory(activeThread);
       const evt = new CustomEvent('chat-updated', { detail: { threads, unread: (function(){
-        return Object.values(threads).reduce((sum, t)=> sum + t.messages.filter(m => m.receiver_id === userId && !m.read_at).length, 0);
+        return Object.values(threads).reduce((sum, t)=> sum + t.messages.filter(m => m.receiver_id === uid && !m.read_at).length, 0);
       })() } });
       window.latestThreads = threads;
       window.latestUnread = evt.detail.unread;
