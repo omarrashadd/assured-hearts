@@ -818,7 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const provStatusEl = document.getElementById('provStatus');
     const userIdRaw = localStorage.getItem('user_id');
     const userId = userIdRaw ? parseInt(userIdRaw, 10) : null;
-    let resolvedProviderId = null;
+    let profileApproved = false;
     if(!userId || localStorage.getItem('user_type') !== 'provider'){
       if(provStatusEl){
         provStatusEl.style.color = '#b91c1c';
@@ -831,8 +831,8 @@ document.addEventListener('DOMContentLoaded', () => {
           if(res.ok){
             const data = await res.json();
             const p = data.profile || {};
-            resolvedProviderId = p.id || p.provider_id || null;
-            if(!resolvedProviderId && provStatusEl){
+            profileApproved = !!p.approved;
+            if(!profileApproved && provStatusEl){
               provStatusEl.style.color = '#b91c1c';
               provStatusEl.textContent = 'Profile editing will be available after approval.';
             }
@@ -908,7 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Do not attempt to update login email from this form
       delete payload.email;
       try{
-        const targetId = (resolvedProviderId && !Number.isNaN(resolvedProviderId)) ? resolvedProviderId : null;
+        const targetId = profileApproved ? userId : null;
         if(!targetId){
           showBanner('Profile editing is available after approval.', 'info');
           if(provStatusEl){

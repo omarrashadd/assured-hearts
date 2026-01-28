@@ -478,7 +478,7 @@
           const resp = await fetch(`${API_BASE}/forms/provider/${userId}`);
           if(!resp.ok) throw new Error('Failed to load provider dashboard');
           const data = await resp.json();
-          resolvedProviderId = data.profile?.id || data.profile?.provider_id || userId;
+          resolvedProviderId = data.profile?.approved ? userId : null;
           const hero = document.querySelector('header.hero h1');
           if(hero && data.profile?.name){
             hero.textContent = `Welcome, ${data.profile.name}!`;

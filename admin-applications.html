@@ -144,7 +144,7 @@
 
       container.innerHTML = applications.map(app => {
         const fullName = [app.first_name, app.last_name].filter(Boolean).join(' ') || app.name || 'Caregiver';
-        const addressLines = [app.address_line1, app.address_line2].filter(Boolean).join(', ');
+        const addressLines = app.address_line1 || '';
         const payout = app.payout_method ? app.payout_method.replace(/_/g,' ') : 'Not provided';
         const languages = formatLanguages(app.languages);
         const consents = formatConsents(app);
