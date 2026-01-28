@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Caregiver Dashboard - Assured Hearts</title>
-    <meta name="description" content="Manage your bookings, availability, and caregiver profile." />
+    <meta name="description" content="Manage your caregiver dashboard, sessions, and families." />
     <link rel="stylesheet" href="style.css">
   </head>
 
@@ -17,10 +17,6 @@
           <a href="become-provider.html">Join Our Care Network</a>
           <a href="care-process.html">Our Care Process</a>
           <a href="learning.html">At-Home Learning</a>
-        </div>
-        <div class="nav-auth">
-          <a href="caregiver-dashboard.html" style="display: flex; align-items: center; gap: 6px; color: #06464E; text-decoration: none; font-weight: 600;">Dashboard</a>
-          <button id="logoutBtn" class="btn-auth" style="background: #f5f5f5; color: #333;">Log out</button>
         </div>
         <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
           <span></span>
@@ -40,615 +36,663 @@
       </nav>
     </div>
 
-    <header class="hero" style="padding: 48px 16px; background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%);">
-      <div class="container" style="max-width: 1200px;">
-        <h1 style="margin-bottom: 8px;">Welcome, Amina!</h1>
-        <p class="lead" style="margin-bottom: 0;">Your caregiver hub for bookings, families, and learning resources</p>
-      </div>
-    </header>
-
-    <main class="container" style="padding: 48px 24px; max-width: 1200px;">
-
-      <section id="reviewNotice" style="display: none; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); margin-bottom: 24px;">
-        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
-          <span style="width: 36px; height: 36px; border-radius: 50%; background: #fff9e6; color: #8b6914; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700;">⏳</span>
-          <div>
-            <h2 style="margin: 0; color: #06464E; font-size: 16px;">Application under review</h2>
-            <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 13px;">We've received your application and will email you with next steps shortly. Actions are locked until approval.</p>
-          </div>
+    <main class="provider-shell">
+      <aside class="provider-sidebar">
+        <div class="provider-sidebar-header">
+          <span class="provider-sidebar-eyebrow">Caregiver Portal</span>
+          <div class="provider-sidebar-title">Assured Hearts</div>
+          <div id="providerSidebarName" class="provider-sidebar-name">Signed in</div>
         </div>
-        <div id="reviewTimeline" style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; align-items: start;">
-          <div class="step" data-step="0" style="display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; padding:6px;">
-            <span class="label" style="font-size:12px; color:#374151; font-weight:700;">Received</span>
-            <span class="dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #d1d5db; background:#fff;"></span>
-            <span class="desc" style="font-size:12px; color:#6b7280;">Your application is in our queue.</span>
+
+        <nav class="provider-nav" role="tablist" aria-label="Provider dashboard sections">
+          <button id="tab-dashboard" class="provider-nav-item is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel="dashboard">Dashboard</button>
+          <button id="tab-calendar" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-calendar" data-panel="calendar">Calendar</button>
+          <button id="tab-inbox" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-inbox" data-panel="inbox">Inbox</button>
+          <button id="tab-availability" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-availability" data-panel="availability">Availability</button>
+          <button id="tab-families" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-families" data-panel="families">My Families</button>
+          <button id="tab-curriculum" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-curriculum" data-panel="curriculum">Curriculum Library</button>
+        </nav>
+
+        <div class="provider-sidebar-footer">
+          <div class="provider-upgrade-card">
+            <div class="provider-upgrade-title">Upgrade to Care+ Provider Access</div>
+            <p class="provider-upgrade-copy">Unlock priority visibility, curriculum tools, and premium scheduling.</p>
+            <a class="provider-upgrade-btn" href="shop.html">Upgrade</a>
           </div>
-          <div class="step" data-step="1" style="display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; padding:6px;">
-            <span class="label" style="font-size:12px; color:#374151; font-weight:700;">Under review</span>
-            <span class="dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #d1d5db; background:#fff;"></span>
-            <span class="desc" style="font-size:12px; color:#6b7280;">We’re checking your details and availability.</span>
+          <button id="providerLogout" class="provider-logout" type="button">Log out</button>
+        </div>
+      </aside>
+
+      <section class="provider-content">
+        <header class="provider-content-header">
+          <div>
+            <p class="provider-eyebrow">Dashboard</p>
+            <h1 class="provider-title">Welcome back<span id="providerWelcomeName"></span></h1>
+            <p class="provider-subtitle">Your caregiver hub for sessions, families, and learning tools.</p>
           </div>
-          <div class="step" data-step="2" style="display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; padding:6px;">
-            <span class="label" style="font-size:12px; color:#374151; font-weight:700;">Verifying</span>
-            <span class="dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #d1d5db; background:#fff;"></span>
-            <span class="desc" style="font-size:12px; color:#6b7280;">Background and values alignment checks.</span>
-          </div>
-          <div class="step" data-step="3" style="display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; padding:6px;">
-            <span class="label" style="font-size:12px; color:#374151; font-weight:700;">Approve</span>
-            <span class="dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #d1d5db; background:#fff;"></span>
-            <span class="desc" style="font-size:12px; color:#6b7280;">We’ll email you and unlock your dashboard.</span>
-          </div>
+        </header>
+
+        <div class="provider-panels">
+          <section id="panel-dashboard" class="provider-panel is-active" role="tabpanel" aria-labelledby="tab-dashboard">
+            <div class="provider-kpi-grid">
+              <div class="provider-kpi-card">
+                <p class="provider-kpi-label">Monthly Earnings</p>
+                <p id="metricMonthlyEarnings" class="provider-kpi-value">$0</p>
+                <p class="provider-kpi-foot">This month</p>
+              </div>
+              <div class="provider-kpi-card">
+                <p class="provider-kpi-label">Total session hours this month</p>
+                <p id="metricMonthlyHours" class="provider-kpi-value">0</p>
+                <p class="provider-kpi-foot">Completed and scheduled</p>
+              </div>
+            </div>
+            <div class="provider-dashboard-grid">
+              <section class="provider-bookings-card">
+                <div class="provider-card-head">
+                  <div>
+                    <h2>Upcoming bookings</h2>
+                    <p class="provider-card-sub">Next sessions on your calendar.</p>
+                  </div>
+                  <span id="upcomingCount" class="provider-card-pill">0 upcoming</span>
+                </div>
+                <div class="provider-bookings-table">
+                  <div class="provider-bookings-row provider-bookings-head">
+                    <div class="provider-booking-cell">Child</div>
+                    <div class="provider-booking-cell">Family</div>
+                    <div class="provider-booking-cell">Hours booked</div>
+                    <div class="provider-booking-cell">Care type</div>
+                    <div class="provider-booking-cell">Time scheduled</div>
+                  </div>
+                  <div id="upcomingBookingsList" class="provider-bookings-body">
+                    <div class="provider-bookings-empty">No upcoming bookings yet.</div>
+                  </div>
+                </div>
+              </section>
+              <section class="provider-requests-card">
+                <div class="provider-card-head">
+                  <div>
+                    <h2>Requests in your area</h2>
+                    <p class="provider-card-sub">Browse new family requests near you.</p>
+                  </div>
+                  <span id="areaRequestsCount" class="provider-card-pill">0 requests</span>
+                </div>
+                <div class="provider-requests-table">
+                  <div class="provider-requests-row provider-requests-head">
+                    <div class="provider-requests-cell">Request type</div>
+                    <div class="provider-requests-cell">Child age</div>
+                    <div class="provider-requests-cell">Hours / week</div>
+                    <div class="provider-requests-cell">Care type</div>
+                    <div class="provider-requests-cell">Time of day</div>
+                    <div class="provider-requests-cell provider-requests-action">Action</div>
+                  </div>
+                  <div id="areaRequestsList" class="provider-requests-body">
+                    <div class="provider-requests-empty">No requests in your area yet.</div>
+                  </div>
+                </div>
+              </section>
+              <section class="provider-chart-card">
+                <div class="provider-card-head">
+                  <div>
+                    <h2>Families mix</h2>
+                    <p class="provider-card-sub">New families vs my families.</p>
+                  </div>
+                </div>
+                <div class="provider-chart-wrap">
+                  <div id="familyMixPie" class="provider-pie" role="img" aria-label="New families 0 percent, returning families 0 percent">
+                    <div class="provider-pie-center">
+                      <span id="familyNewPercent" class="provider-pie-value">0%</span>
+                      <span class="provider-pie-label">New families</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="provider-legend">
+                  <div class="provider-legend-item"><span class="provider-dot provider-dot-new"></span> New families <strong id="familyNewCount">0</strong></div>
+                  <div class="provider-legend-item"><span class="provider-dot provider-dot-returning"></span> My families <strong id="familyReturningCount">0</strong></div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section id="panel-calendar" class="provider-panel" role="tabpanel" aria-labelledby="tab-calendar" hidden>
+            <div class="provider-panel-card">
+              <h2>Calendar</h2>
+              <p>View your upcoming sessions and availability here.</p>
+            </div>
+          </section>
+
+          <section id="panel-inbox" class="provider-panel" role="tabpanel" aria-labelledby="tab-inbox" hidden>
+            <div class="provider-panel-card">
+              <h2>Inbox</h2>
+              <p>Your conversations with families will appear here.</p>
+            </div>
+          </section>
+
+          <section id="panel-availability" class="provider-panel" role="tabpanel" aria-labelledby="tab-availability" hidden>
+            <div class="provider-panel-card provider-availability-card">
+              <div class="provider-card-head">
+                <div>
+                  <h2>Set availability</h2>
+                  <p class="provider-card-sub">Set the hours when you are available for sessions.</p>
+                </div>
+              </div>
+              <div id="availabilityEditor" class="availability-editor" aria-live="polite"></div>
+              <div class="availability-actions">
+                <span id="availabilityStatus" class="availability-status">Changes save locally for now.</span>
+                <div class="availability-buttons">
+                  <button id="availabilityCancelBtn" class="availability-btn availability-btn-ghost" type="button">Cancel</button>
+                  <button id="availabilitySaveBtn" class="availability-btn" type="button">Save</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="panel-families" class="provider-panel" role="tabpanel" aria-labelledby="tab-families" hidden>
+            <div class="provider-panel-card">
+              <h2>My Families</h2>
+              <p>Manage family profiles and ongoing sessions here.</p>
+            </div>
+          </section>
+
+          <section id="panel-curriculum" class="provider-panel" role="tabpanel" aria-labelledby="tab-curriculum" hidden>
+            <div class="provider-panel-card">
+              <h2>Curriculum Library</h2>
+              <p>Access curriculum resources, activities, and learning guides here.</p>
+            </div>
+          </section>
         </div>
       </section>
-      
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 24px;">
-        <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
-          <div style="font-size:12px; color:#6b7280;">Active bookings</div>
-          <div id="metricActive" style="font-size:26px; font-weight:800; color:#06464E; line-height:1;">0</div>
-        </div>
-        <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
-          <div style="font-size:12px; color:#6b7280;">Hours scheduled</div>
-          <div id="metricHoursScheduled" style="font-size:26px; font-weight:800; color:#06464E; line-height:1;">0</div>
-        </div>
-        <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
-          <div style="font-size:12px; color:#6b7280;">Total hours this month</div>
-          <div id="metricHoursTotal" style="font-size:26px; font-weight:800; color:#10b981; line-height:1;">0</div>
-        </div>
-        <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
-          <div style="font-size:12px; color:#6b7280;">Monthly Earnings</div>
-          <div id="metricEarnings" style="font-size:26px; font-weight:800; color:#06464E; line-height:1;">$0</div>
-        </div>
-        <div style="background:#fff; padding:14px; border-radius:10px; border:1px solid #e5e7eb; display:flex; flex-direction:column; gap:6px;">
-          <div style="font-size:12px; color:#6b7280;">Tips</div>
-          <div id="metricTips" style="font-size:26px; font-weight:800; color:#f59e0b; line-height:1;">$0</div>
-        </div>
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
-        <a href="provider-profile.html" class="review-lock" style="padding:10px 12px; background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:8px; font-weight:700; font-size:12px; text-decoration:none;">My Profile & Settings</a>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 20px; margin-bottom: 32px; align-items: start;">
-        
-        <section style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h2 style="margin: 0; color: #06464E;">My Requests</h2>
-            <span id="pendingPill" style="background:#eef2ff; color:#4338ca; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700;">0 pending</span>
-          </div>
-          <div style="display: grid; gap: 10px;">
-            <div id="requestsList" style="display:grid; gap:10px;">
-              <p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">Loading requests...</p>
-            </div>
-          </div>
-        </section>
-
-        <section style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h2 style="margin:0; color:#06464E;">Messages</h2>
-            <span id="cgMessagesUnread" style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700; display:none;">0 unread</span>
-          </div>
-          <div style="display: grid; gap: 10px;">
-            <div id="cgMessagesList" style="display:grid; gap:10px; min-height:40px;">
-              <p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">Loading messages...</p>
-            </div>
-            <button id="cgMessagesOpenBtn" class="review-lock" style="padding: 10px 12px; background:#06464E; color:white; border:none; border-radius:8px; font-size:13px; font-weight:700; width:100%;">Open messages</button>
-          </div>
-        </section>
-
-      </div>
-
-        <section style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e5e7eb; margin-bottom: 32px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h2 style="margin:0; color:#06464E;">My upcoming appointments</h2>
-            <a href="#" class="review-lock" style="font-size:12px; color:#06464E; text-decoration:none; font-weight:700;">Manage availability</a>
-          </div>
-          <div style="display:grid; gap:10px;">
-          <div id="appointmentsList" style="display:grid; gap:10px;">
-            <p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">Loading appointments...</p>
-          </div>
-          </div>
-        </section>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
-        
-        <section style="background: white; padding: 28px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-          <h2 style="margin: 0 0 16px 0; color: #06464E;">My Families</h2>
-          
-          <div id="familyList" style="display:grid; gap:10px;">
-            <p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">Loading families...</p>
-          </div>
-        </section>
-
-        <section style="background: white; padding: 28px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-          <h2 style="margin: 0 0 16px 0; color: #06464E;">Curriculum Access</h2>
-          <p style="margin: 0 0 16px 0; color: #666; line-height: 1.6;">Access learning activities and resources to guide children during care sessions.</p>
-          <div style="display: grid; gap: 10px;">
-            <a href="learning.html" style="display: block; padding: 12px 14px; background: #f8fbfc; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #06464E; font-weight: 600;">
-              📖 Prophet Stories
-            </a>
-            <a href="learning.html" style="display: block; padding: 12px 14px; background: #f8fbfc; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #06464E; font-weight: 600;">
-              🤲 Salah Basics
-            </a>
-            <a href="learning.html" style="display: block; padding: 12px 14px; background: #f8fbfc; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #06464E; font-weight: 600;">
-              ✨ Kindness Activities
-            </a>
-            <a href="learning.html" style="display: block; padding: 12px 14px; background: #f8fbfc; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #06464E; font-weight: 600;">
-              🔤 Arabic Letters
-            </a>
-          </div>
-        </section>
-
-        <section style="background: white; padding: 28px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-          <h2 style="margin: 0 0 12px 0; color: #06464E;">My Reviews</h2>
-          <div id="reviewsList" style="display:grid; gap:10px;">
-            <p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No reviews yet.</p>
-          </div>
-        </section>
-
-      </div>
-
     </main>
 
     <footer style="background: #06464E; color: white; padding: 32px 24px; text-align: center; margin-top: 48px;">
       <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
     </footer>
 
-    <style>
-      @keyframes pulseDot {
-        0% { box-shadow: 0 0 0 0 rgba(103,179,194,0.5); }
-        70% { box-shadow: 0 0 0 8px rgba(103,179,194,0); }
-        100% { box-shadow: 0 0 0 0 rgba(103,179,194,0); }
-      }
-      @keyframes pulseBtn {
-        0% { box-shadow: 0 0 0 0 rgba(6,70,78,0.35); }
-        70% { box-shadow: 0 0 0 10px rgba(6,70,78,0); }
-        100% { box-shadow: 0 0 0 0 rgba(6,70,78,0); }
-      }
-      .pulse-btn { animation: pulseBtn 1.6s infinite; }
-      /* Override locks for build preview and add hover lift */
-      .review-lock {
-        pointer-events: auto !important;
-        opacity: 1 !important;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-      }
-      .review-lock:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-      }
-    </style>
-
     <script src="script.js"></script>
     <script>
-      // For build preview: force approved state so controls are unlocked
-      localStorage.setItem('provider_status', 'approved');
+      const activateProviderPanel = (panelId) => {
+        const navItems = Array.from(document.querySelectorAll('.provider-nav-item'));
+        const panels = Array.from(document.querySelectorAll('.provider-panel'));
+        navItems.forEach((btn) => {
+          const isActive = btn.dataset.panel === panelId;
+          btn.classList.toggle('is-active', isActive);
+          btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        panels.forEach((panel) => {
+          const isActive = panel.id === `panel-${panelId}`;
+          panel.classList.toggle('is-active', isActive);
+          panel.hidden = !isActive;
+        });
+      };
 
-      document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        if(confirm('Are you sure you want to log out?')) {
-          window.location.href = 'index.html';
-        }
+      document.querySelectorAll('.provider-nav-item').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if(btn.dataset.panel) activateProviderPanel(btn.dataset.panel);
+        });
+        btn.addEventListener('keydown', (event) => {
+          if(event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            btn.click();
+          }
+        });
       });
 
-      (function(){
-        // Build preview: keep approved (unlocked) but still show the status bar for design
-        const previewMode = true;
-        const status = localStorage.getItem('provider_status') || 'approved';
-        const notice = document.getElementById('reviewNotice');
-        const lockables = document.querySelectorAll('.review-lock');
-        const steps = document.querySelectorAll('#reviewTimeline .step');
-        const dots = document.querySelectorAll('#reviewTimeline .dot');
-        const statusToIndex = { received:0, under_review:1, verifying:2, approved:3 };
-        const activeIndex = statusToIndex[status] ?? 1;
+      const initialPanel = window.location.hash.replace('#', '');
+      activateProviderPanel(initialPanel || 'dashboard');
 
-        if(previewMode){
-          if(notice) notice.style.display = 'block';
-          // Do not lock any buttons in preview; ensure they are enabled
-          lockables.forEach(el => {
-            el.removeAttribute('disabled');
-            el.removeAttribute('aria-disabled');
-          });
-        } else if(status !== 'approved'){
-          if(notice) notice.style.display = 'block';
-          lockables.forEach(el => {
-            el.style.opacity = '0.55';
-            el.style.pointerEvents = 'none';
-            el.style.cursor = 'not-allowed';
-            if(el.tagName === 'BUTTON'){
-              el.setAttribute('disabled', 'disabled');
-            } else {
-              el.setAttribute('aria-disabled', 'true');
-            }
-          });
-        } else if(notice){
-          notice.style.display = 'none';
+      const logoutHandler = () => {
+        if(confirm('Are you sure you want to log out?')) {
+          localStorage.removeItem('user_id');
+          localStorage.removeItem('user_type');
+          window.location.href = 'index.html';
+        }
+      };
+      document.getElementById('providerLogout')?.addEventListener('click', logoutHandler);
+
+      const formatCurrency = (value) => {
+        const num = Number(value);
+        if(Number.isNaN(num)) return '$0';
+        return `$${num.toLocaleString('en-CA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      };
+
+      const formatHours = (value) => {
+        const num = Number(value);
+        if(Number.isNaN(num)) return '0';
+        return num.toFixed(1).replace(/\.0$/, '');
+      };
+
+      const toDate = (value) => {
+        if(!value) return null;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      };
+
+      const minutesFromTime = (timeStr) => {
+        if(!timeStr) return null;
+        const parts = timeStr.split(':').map(Number);
+        if(parts.length < 2 || parts.some((p) => Number.isNaN(p))) return null;
+        return (parts[0] * 60) + parts[1];
+      };
+
+      const durationHours = (entry) => {
+        if(entry.start_time && entry.end_time) {
+          const start = minutesFromTime(entry.start_time);
+          const end = minutesFromTime(entry.end_time);
+          if(start === null || end === null) return 0;
+          return Math.max(0, (end - start) / 60);
+        }
+        if(entry.start_at && entry.end_at) {
+          const start = new Date(entry.start_at);
+          const end = new Date(entry.end_at);
+          if(Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
+          return Math.max(0, (end - start) / (1000 * 60 * 60));
+        }
+        return 0;
+      };
+
+      const computeMonthlyHours = (sessions, requests) => {
+        const monthKey = new Date().toISOString().slice(0, 7);
+        const acceptedRequests = (requests || []).filter((req) => (req.status || '').toLowerCase() === 'accepted');
+        const combined = [...(sessions || []), ...acceptedRequests];
+        return combined.reduce((total, entry) => {
+          const dateValue = entry.session_date || entry.date || entry.start_at;
+          const entryDate = toDate(dateValue);
+          if(!entryDate) return total;
+          if(entryDate.toISOString().slice(0, 7) !== monthKey) return total;
+          return total + durationHours(entry);
+        }, 0);
+      };
+
+      const formatDateLabel = (date) => date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+
+      const formatTimeLabel = (timeStr) => {
+        if(!timeStr) return '';
+        const parts = timeStr.split(':').map(Number);
+        if(parts.length < 2 || parts.some((p) => Number.isNaN(p))) return timeStr;
+        const base = new Date();
+        base.setHours(parts[0], parts[1], 0, 0);
+        return base.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' });
+      };
+
+      const getStartDate = (entry) => {
+        if(entry.start_at) return toDate(entry.start_at);
+        const dateValue = entry.session_date || entry.date;
+        if(!dateValue) return null;
+        const timeValue = entry.start_time || '00:00';
+        return toDate(`${dateValue}T${timeValue}`);
+      };
+
+      const formatScheduleLabel = (entry) => {
+        if(entry.start_at && entry.end_at) {
+          const start = toDate(entry.start_at);
+          const end = toDate(entry.end_at);
+          if(!start || !end) return 'TBD';
+          return `${formatDateLabel(start)} ${start.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })} - ${end.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}`;
+        }
+        if(entry.session_date) {
+          const date = toDate(entry.session_date);
+          if(!date) return 'TBD';
+          if(entry.start_time && entry.end_time) {
+            return `${formatDateLabel(date)} ${formatTimeLabel(entry.start_time)} - ${formatTimeLabel(entry.end_time)}`;
+          }
+          return `${formatDateLabel(date)}`;
+        }
+        return 'TBD';
+      };
+
+      const resolveCareType = (entry) => {
+        const raw = String(entry.care_type || entry.careType || entry.care || '').toLowerCase();
+        if(raw.includes('mixed')) return 'Mixed';
+        if(entry.curriculum === true || entry.is_curriculum === true || raw.includes('curr')) return 'Curriculum';
+        if(raw.includes('standard') || raw.includes('basic')) return 'Standard';
+        return 'Standard';
+      };
+
+      const buildUpcomingBookings = (sessions, requests) => {
+        const acceptedRequests = (requests || [])
+          .filter((req) => (req.status || '').toLowerCase() === 'accepted')
+          .map((req) => ({
+            id: req.id ? `req-${req.id}` : `req-${Math.random().toString(36).slice(2)}`,
+            child_name: req.child_name || req.childName || req.child,
+            parent_name: req.parent_name || req.parentName || req.family_name || req.family,
+            parent_id: req.parent_id || req.parentId || req.parent_user_id || req.parent,
+            start_at: req.start_at,
+            end_at: req.end_at,
+            session_date: req.session_date || req.date || (req.start_at ? String(req.start_at).slice(0, 10) : null),
+            start_time: req.start_time,
+            end_time: req.end_time,
+            care_type: req.care_type || req.careType || req.care,
+            status: req.status || 'accepted'
+          }));
+        const combined = [...(sessions || []), ...acceptedRequests];
+        const upcoming = combined.filter((entry) => {
+          if((entry.status || '').toLowerCase() === 'cancelled') return false;
+          const start = getStartDate(entry);
+          if(!start) return true;
+          return start >= new Date();
+        });
+        return upcoming.sort((a, b) => {
+          const aStart = getStartDate(a);
+          const bStart = getStartDate(b);
+          if(!aStart && !bStart) return 0;
+          if(!aStart) return 1;
+          if(!bStart) return -1;
+          return aStart - bStart;
+        });
+      };
+
+      const renderUpcomingBookings = (sessions, requests) => {
+        const upcoming = buildUpcomingBookings(sessions, requests);
+        const listEl = document.getElementById('upcomingBookingsList');
+        const countEl = document.getElementById('upcomingCount');
+        if(countEl) countEl.textContent = `${upcoming.length} upcoming`;
+        if(listEl) {
+          if(upcoming.length === 0) {
+            listEl.innerHTML = '<div class="provider-bookings-empty">No upcoming bookings yet.</div>';
+          } else {
+            listEl.innerHTML = upcoming.map((entry) => {
+              const childName = entry.child_name || entry.childName || entry.child || 'Child';
+              const rawFamily = entry.parent_name || entry.family_name || entry.family || 'Family';
+              const familyLabel = String(rawFamily).toLowerCase().includes('family') ? rawFamily : `${rawFamily}'s family`;
+              const hoursValue = durationHours(entry);
+              const hoursLabel = hoursValue ? `${formatHours(hoursValue)} hrs` : 'TBD';
+              const careLabel = resolveCareType(entry);
+              const careClass = careLabel === 'Curriculum' ? 'care-pill-curriculum' : 'care-pill-standard';
+              const timeLabel = formatScheduleLabel(entry);
+              return `
+                <div class="provider-bookings-row provider-bookings-item">
+                  <div class="provider-booking-cell" data-label="Child">${childName}</div>
+                  <div class="provider-booking-cell" data-label="Family">${familyLabel}</div>
+                  <div class="provider-booking-cell" data-label="Hours booked">${hoursLabel}</div>
+                  <div class="provider-booking-cell" data-label="Care type"><span class="care-pill ${careClass}">${careLabel}</span></div>
+                  <div class="provider-booking-cell" data-label="Time scheduled">${timeLabel}</div>
+                </div>
+              `;
+            }).join('');
+          }
         }
 
-        // Timeline coloring/pulse regardless (for design)
-        dots.forEach((dot, idx)=>{
-          if(idx < activeIndex){
-            dot.style.background = '#2d6b42';
-            dot.style.borderColor = '#2d6b42';
-          } else if(idx === activeIndex){
-            dot.style.background = '#67B3C2';
-            dot.style.borderColor = '#67B3C2';
-            dot.style.boxShadow = '0 0 0 0 rgba(103,179,194,0.5)';
-            dot.style.animation = 'pulseDot 1.5s infinite';
+        const familyCounts = new Map();
+        upcoming.forEach((entry) => {
+          const key = entry.parent_id || entry.parentId || entry.parent_user_id || entry.parent || entry.parent_name || entry.family_name || entry.family || entry.email || entry.id;
+          if(!key) return;
+          familyCounts.set(key, (familyCounts.get(key) || 0) + 1);
+        });
+        const newFamilies = Array.from(familyCounts.values()).filter((count) => count === 1).length;
+        const returningFamilies = Math.max(0, familyCounts.size - newFamilies);
+        const totalFamilies = newFamilies + returningFamilies;
+        const newPercent = totalFamilies ? Math.round((newFamilies / totalFamilies) * 100) : 0;
+        const returningPercent = totalFamilies ? 100 - newPercent : 0;
+
+        const pie = document.getElementById('familyMixPie');
+        if(pie) {
+          pie.style.setProperty('--new', `${newPercent}%`);
+          pie.setAttribute('aria-label', `New families ${newPercent} percent, returning families ${returningPercent} percent`);
+        }
+        const percentEl = document.getElementById('familyNewPercent');
+        if(percentEl) percentEl.textContent = `${newPercent}%`;
+        const newEl = document.getElementById('familyNewCount');
+        if(newEl) newEl.textContent = `${newFamilies}`;
+        const returningEl = document.getElementById('familyReturningCount');
+        if(returningEl) returningEl.textContent = `${returningFamilies}`;
+      };
+
+      const resolveRequestType = (entry) => {
+        if(entry.is_recurring === true || entry.recurring === true) return 'Recurring';
+        const raw = String(entry.request_type || entry.type || '').toLowerCase();
+        if(raw.includes('recurring')) return 'Recurring';
+        if(raw.includes('one')) return 'One-time';
+        return 'One-time';
+      };
+
+      const resolveChildAge = (entry) => {
+        return entry.child_age || entry.childAge || entry.child_age_group || entry.age || 'Not specified';
+      };
+
+      const resolveHoursPerWeek = (entry) => {
+        const hours = entry.hours_per_week || entry.hoursPerWeek || entry.weekly_hours || entry.hours;
+        if(hours === undefined || hours === null || hours === '') return 'TBD';
+        return `${hours} hrs/week`;
+      };
+
+      const resolveTimeOfDay = (entry) => {
+        const raw = String(entry.time_of_day || entry.timeOfDay || '').toLowerCase();
+        if(raw.includes('morning')) return 'Mornings';
+        if(raw.includes('afternoon')) return 'Afternoons';
+        if(raw.includes('evening')) return 'Evenings';
+        if(raw.includes('mixed')) return 'Mixed';
+        const startTime = entry.start_time || (entry.start_at ? new Date(entry.start_at).toTimeString().slice(0,5) : '');
+        const minutes = minutesFromTime(startTime);
+        if(minutes !== null) {
+          if(minutes < 12 * 60) return 'Mornings';
+          if(minutes < 17 * 60) return 'Afternoons';
+          return 'Evenings';
+        }
+        return 'Mixed';
+      };
+
+      const renderAreaRequests = (requests) => {
+        const listEl = document.getElementById('areaRequestsList');
+        const countEl = document.getElementById('areaRequestsCount');
+        const rows = (requests || []);
+        if(countEl) countEl.textContent = `${rows.length} requests`;
+        if(!listEl) return;
+        if(rows.length === 0) {
+          listEl.innerHTML = '<div class="provider-requests-empty">No requests in your area yet.</div>';
+          return;
+        }
+        listEl.innerHTML = rows.map((entry) => {
+          const requestType = resolveRequestType(entry);
+          const childAge = resolveChildAge(entry);
+          const hours = resolveHoursPerWeek(entry);
+          const careType = resolveCareType(entry);
+          const careClass = careType === 'Curriculum' ? 'care-pill-curriculum' : (careType === 'Mixed' ? 'care-pill-mixed' : 'care-pill-standard');
+          const timeOfDay = resolveTimeOfDay(entry);
+          const detailsLink = entry.details_url || entry.detailsUrl || entry.link || '#';
+          return `
+            <div class="provider-requests-row provider-requests-item">
+              <div class="provider-requests-cell" data-label="Request type">${requestType}</div>
+              <div class="provider-requests-cell" data-label="Child age">${childAge}</div>
+              <div class="provider-requests-cell" data-label="Hours / week">${hours}</div>
+              <div class="provider-requests-cell" data-label="Care type"><span class="care-pill ${careClass}">${careType}</span></div>
+              <div class="provider-requests-cell" data-label="Time of day">${timeOfDay}</div>
+              <div class="provider-requests-cell provider-requests-action" data-label="Action">
+                <button class="provider-reach-btn" type="button">Reach out</button>
+                <a class="provider-details-link" href="${detailsLink}">View details</a>
+                <span class="provider-careplus-pill">Care+</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      };
+
+      const AVAILABILITY_STORAGE_KEY = 'provider_availability_v1';
+      const availabilityDays = [
+        { key: 'monday', label: 'Monday' },
+        { key: 'tuesday', label: 'Tuesday' },
+        { key: 'wednesday', label: 'Wednesday' },
+        { key: 'thursday', label: 'Thursday' },
+        { key: 'friday', label: 'Friday' },
+        { key: 'saturday', label: 'Saturday' },
+        { key: 'sunday', label: 'Sunday' }
+      ];
+      const createDefaultSlot = () => ({ start: '08:00', end: '17:00' });
+      let availabilityState = {};
+
+      const normalizeAvailability = (raw) => {
+        const normalized = {};
+        availabilityDays.forEach(({ key }) => {
+          const dayData = raw && raw[key] ? raw[key] : {};
+          const slots = Array.isArray(dayData.slots) && dayData.slots.length
+            ? dayData.slots.map((slot) => ({
+              start: slot.start || '08:00',
+              end: slot.end || '17:00'
+            }))
+            : [createDefaultSlot()];
+          normalized[key] = {
+            enabled: Boolean(dayData.enabled),
+            slots
+          };
+        });
+        return normalized;
+      };
+
+      const loadAvailability = () => {
+        try {
+          const raw = localStorage.getItem(AVAILABILITY_STORAGE_KEY);
+          if(!raw) return normalizeAvailability({});
+          return normalizeAvailability(JSON.parse(raw));
+        } catch (_err) {
+          return normalizeAvailability({});
+        }
+      };
+
+      const saveAvailability = () => {
+        localStorage.setItem(AVAILABILITY_STORAGE_KEY, JSON.stringify(availabilityState));
+      };
+
+      const renderAvailabilityEditor = () => {
+        const editor = document.getElementById('availabilityEditor');
+        if(!editor) return;
+        editor.innerHTML = availabilityDays.map(({ key, label }) => {
+          const day = availabilityState[key];
+          const disabledAttr = day.enabled ? '' : 'disabled';
+          const rowClass = day.enabled ? 'availability-day' : 'availability-day is-disabled';
+          const slotsMarkup = day.slots.map((slot, index) => {
+            return `
+              <div class="availability-slot" data-day="${key}" data-slot="${index}">
+                <label class="sr-only" for="availability-${key}-start-${index}">Start time</label>
+                <input type="time" id="availability-${key}-start-${index}" data-day="${key}" data-slot="${index}" data-field="start" value="${slot.start}" ${disabledAttr}>
+                <span class="availability-slot-sep">—</span>
+                <label class="sr-only" for="availability-${key}-end-${index}">End time</label>
+                <input type="time" id="availability-${key}-end-${index}" data-day="${key}" data-slot="${index}" data-field="end" value="${slot.end}" ${disabledAttr}>
+                <button class="availability-icon-btn availability-remove-slot" type="button" data-day="${key}" data-slot="${index}" ${disabledAttr} aria-label="Remove time slot">×</button>
+              </div>
+            `;
+          }).join('');
+          return `
+            <div class="${rowClass}" data-day="${key}">
+              <div class="availability-day-toggle">
+                <input class="availability-checkbox" type="checkbox" id="availability-${key}" data-day="${key}" ${day.enabled ? 'checked' : ''}>
+                <label for="availability-${key}">${label}</label>
+              </div>
+              <div class="availability-slots">
+                ${slotsMarkup}
+              </div>
+              <div class="availability-day-actions">
+                <button class="availability-icon-btn availability-add-slot" type="button" data-day="${key}" ${disabledAttr} aria-label="Add time slot">+</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      };
+
+      const initAvailabilityEditor = () => {
+        const editor = document.getElementById('availabilityEditor');
+        if(!editor) return;
+        availabilityState = loadAvailability();
+        renderAvailabilityEditor();
+
+        if(editor.dataset.ready === 'true') return;
+        editor.dataset.ready = 'true';
+
+        editor.addEventListener('change', (event) => {
+          const target = event.target;
+          if(!(target instanceof HTMLElement)) return;
+          if(target.classList.contains('availability-checkbox')) {
+            const dayKey = target.dataset.day;
+            if(!dayKey) return;
+            availabilityState[dayKey].enabled = target.checked;
+            const row = target.closest('.availability-day');
+            if(row) row.classList.toggle('is-disabled', !target.checked);
+            row?.querySelectorAll('input[type="time"], .availability-add-slot, .availability-remove-slot').forEach((el) => {
+              el.disabled = !target.checked;
+            });
+          }
+          if(target instanceof HTMLInputElement && target.type === 'time') {
+            const dayKey = target.dataset.day;
+            const slotIndex = Number(target.dataset.slot);
+            const field = target.dataset.field;
+            if(!dayKey || Number.isNaN(slotIndex) || !field) return;
+            if(!availabilityState[dayKey].slots[slotIndex]) return;
+            availabilityState[dayKey].slots[slotIndex][field] = target.value;
           }
         });
-        steps.forEach((step, idx)=>{
-          const label = step.querySelector('.label');
-          const desc = step.querySelector('.desc');
-          if(idx < activeIndex){
-            if(label){ label.style.color = '#2d6b42'; label.style.fontWeight = '700'; }
-            if(desc){ desc.style.color = '#2d6b42'; }
-          } else if(idx === activeIndex){
-            if(label){ label.style.color = '#06464E'; label.style.fontWeight = '700'; }
-            if(desc){ desc.style.color = '#06464E'; }
-          } else {
-            if(label){ label.style.color = '#6b7280'; label.style.fontWeight = '600'; }
-            if(desc){ desc.style.color = '#9ca3af'; }
-            if(window.matchMedia('(max-width: 640px)').matches && desc){
-              desc.style.display = 'none';
-              step.style.cursor = 'pointer';
-              step.onclick = ()=>{
-                desc.style.display = desc.style.display === 'none' ? 'block' : 'none';
-              };
+
+        editor.addEventListener('click', (event) => {
+          const target = event.target;
+          if(!(target instanceof HTMLElement)) return;
+          const addBtn = target.closest('.availability-add-slot');
+          if(addBtn) {
+            const dayKey = addBtn.dataset.day;
+            if(dayKey && availabilityState[dayKey].enabled) {
+              availabilityState[dayKey].slots.push(createDefaultSlot());
+              renderAvailabilityEditor();
             }
           }
+          const removeBtn = target.closest('.availability-remove-slot');
+          if(removeBtn) {
+            const dayKey = removeBtn.dataset.day;
+            const slotIndex = Number(removeBtn.dataset.slot);
+            if(!dayKey || Number.isNaN(slotIndex)) return;
+            if(availabilityState[dayKey].slots.length <= 1) {
+              availabilityState[dayKey].slots[0] = createDefaultSlot();
+            } else {
+              availabilityState[dayKey].slots.splice(slotIndex, 1);
+            }
+            renderAvailabilityEditor();
+          }
         });
-      })();
 
-      // Load real provider data into dashboard
-      window.addEventListener('DOMContentLoaded', async ()=>{
+        document.getElementById('availabilitySaveBtn')?.addEventListener('click', () => {
+          saveAvailability();
+          const status = document.getElementById('availabilityStatus');
+          if(status) status.textContent = 'Availability saved locally.';
+        });
+        document.getElementById('availabilityCancelBtn')?.addEventListener('click', () => {
+          availabilityState = loadAvailability();
+          renderAvailabilityEditor();
+          const status = document.getElementById('availabilityStatus');
+          if(status) status.textContent = 'Changes reverted.';
+        });
+      };
+
+      window.addEventListener('DOMContentLoaded', async () => {
         const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
         const userId = parseInt(localStorage.getItem('user_id'), 10);
         const userType = localStorage.getItem('user_type');
-        if(userType !== 'provider' || !userId) return;
+        if(!userId || userType !== 'provider') return;
 
-        const setText = (id, val)=>{ const el = document.getElementById(id); if(el) el.textContent = val; };
-        let resolvedProviderId = userId;
-        const renderRequests = (requests)=>{
-          const box = document.getElementById('requestsList');
-          if(!box) return;
-          if(!requests || requests.length === 0){
-            box.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No incoming requests yet.</p>';
-            return;
-          }
-          const pendingOnly = requests.filter(r => (r.status||'').toLowerCase() === 'pending');
-          if(pendingOnly.length === 0){
-            box.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No pending requests.</p>';
-            return;
-          }
-          box.innerHTML = pendingOnly.map(req => {
-            const statusKey = (req.status || '').toLowerCase();
-            const isPending = statusKey === 'pending';
-            const statusLabel = isPending ? 'Pending' : (statusKey === 'accepted' ? 'Accepted' : (statusKey === 'declined' ? 'Declined' : 'Needs info'));
-            const badge = isPending
-              ? 'background:#fff9e6; color:#8b6914;'
-              : (statusKey === 'declined'
-                  ? 'background:#fee; color:#991b1b;'
-                  : 'background:#eef7f2; color:#2d6b42;');
-            const start = req.start_at ? new Date(req.start_at).toLocaleString() : (req.time || '');
-            return `
-              <div style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; display: grid; gap: 6px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                  <div>
-                    <div style="font-weight:700; color:#06464E;">${req.parent_name || req.family || 'Family'}</div>
-                    <div style="font-size:12px; color:#6b7280;">${start}</div>
-                  </div>
-                  <span style="${badge} padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700;">${statusLabel}</span>
-                </div>
-                <div style="font-size:12px; color:#6b7280;">Location: ${req.location || 'TBD'} · Notes: ${req.notes || '—'}</div>
-                ${isPending ? `
-                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <button class="pulse-btn" data-id="${req.id}" data-action="accept" style="padding: 8px 12px; background: #06464E; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700;">Accept</button>
-                    <button data-id="${req.id}" data-action="decline" style="padding: 8px 12px; background: #f5f5f5; color: #666; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; font-weight: 700;">Decline</button>
-                    <button style="padding: 8px 12px; background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; font-size: 12px; font-weight: 700;">See details</button>
-                  </div>
-                ` : ''}
-              </div>
-            `;
-          }).join('');
-          box.querySelectorAll('button[data-id]').forEach(btn=>{
-            btn.addEventListener('click', async ()=>{
-              const rid = btn.getAttribute('data-id');
-              const action = btn.dataset.action || (btn.textContent.toLowerCase().includes('accept') ? 'accept' : 'decline');
-              btn.disabled = true;
-              btn.textContent = 'Updating...';
-              try{
-                const res = await fetch(`${API_BASE}/forms/request/${rid}/respond`, {
-                  method:'POST',
-                  headers:{'Content-Type':'application/json'},
-                  body: JSON.stringify({ action, provider_id: resolvedProviderId })
-                });
-                if(!res.ok) throw new Error('Failed');
-                showBanner(`Request ${action}ed`, 'success');
-                // Update UI without full reload
-                const card = btn.closest('div[style*="border: 1px solid"]');
-                if(card){
-                  const badge = card.querySelector('span');
-                  if(badge){
-                    if(action === 'accept'){
-                      badge.textContent = 'Accepted';
-                      badge.style.background = '#eef7f2';
-                      badge.style.color = '#2d6b42';
-                    } else {
-                      badge.textContent = 'Declined';
-                      badge.style.background = '#fee';
-                      badge.style.color = '#991b1b';
-                    }
-                  }
-                  const btnRow = card.querySelector('div[style*=\"flex; gap\"]');
-                  if(btnRow) btnRow.remove();
-                }
-              }catch(_err){
-                showBanner('Failed to update request', 'error');
-                btn.disabled = false;
-                btn.textContent = action === 'accept' ? 'Accept' : 'Decline';
-              }
-            });
-          });
-        };
+        initAvailabilityEditor();
 
-        const renderMessages = (messages)=>{
-          const box = document.getElementById('messagesList');
-          if(!box) return;
-          if(!messages || messages.length === 0){
-            box.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No messages yet.</p>';
-            return;
-          }
-          box.innerHTML = messages.map(msg => {
-            const initial = (msg.from || '?').charAt(0).toUpperCase();
-            return `
-              <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px; display:flex; gap:10px; align-items:flex-start;">
-                <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%,#06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initial}</div>
-                <div style="flex:1;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-weight:700; color:#06464E;">${msg.from || 'Family'}</div>
-                    <span style="font-size:12px; color:#6b7280;">${msg.time || ''}</span>
-                  </div>
-                  <p style="margin:4px 0 0 0; color:#6b7280; font-size:13px;">${msg.body || ''}</p>
-                </div>
-              </div>
-            `;
-          }).join('');
-        };
-
-        const renderAppointments = (sessions)=>{
-          const box = document.getElementById('appointmentsList');
-          if(!box) return;
-          const confirmed = (sessions || []).filter(s => (s.status || '').toLowerCase() !== 'cancelled');
-          if(confirmed.length === 0){
-            box.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No upcoming confirmed appointments.</p>';
-            return;
-          }
-          box.innerHTML = confirmed.map(s => {
-            const label = (s.status || '').toLowerCase() === 'pending' ? 'background:#fff9e6; color:#8b6914;' : 'background:#eef7f2; color:#2d6b42;';
-            const otherId = s.parent_id || s.parentId || s.parent_user_id || s.parent || s.parent_user || s.user_id;
-            const childId = s.child_id || s.child || s.childId;
-            return `
-              <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:grid; gap:4px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                  <div style="font-weight:700; color:#06464E;">${s.parent_name || 'Family'}</div>
-                  <span style="${label} padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700;">${s.status || 'Confirmed'}</span>
-                </div>
-                <div style="font-size:12px; color:#6b7280;">${s.session_date || ''} · ${s.start_time || ''} - ${s.end_time || ''}</div>
-                <div style="font-size:12px; color:#6b7280;">📍 ${s.parent_city || 'TBD'}</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                  ${otherId ? `<button class="btn small message-btn" data-other="${otherId}" data-name="${s.parent_name || 'Family'}" style="padding:8px 10px; background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:8px; font-weight:700; font-size:12px;">Message ${s.parent_name || 'family'}</button>` : ''}
-                  ${childId ? `<button class="btn secondary btn-sm update-log-btn" data-child="${childId}" style="padding:8px 10px; font-size:12px; border:1px solid #e5e7eb; color:#06464E; background:#fff; border-radius:8px;">Update log</button>` : ''}
-                </div>
-              </div>
-            `;
-          }).join('');
-          box.querySelectorAll('.message-btn').forEach(btn=>{
-            btn.addEventListener('click', ()=>{
-              const other = parseInt(btn.dataset.other,10);
-              const otherName = btn.dataset.name || 'User';
-              if(window.openChatThread && other) window.openChatThread(other, otherName);
-            });
-          });
-        };
-
-        const renderReviews = (reviews)=>{
-          const box = document.getElementById('reviewsList');
-          if(!box) return;
-          if(!reviews || reviews.length === 0){
-            box.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No reviews yet.</p>';
-            return;
-          }
-          box.innerHTML = reviews.map(r => {
-            const initial = (r.from || '?').charAt(0).toUpperCase();
-            return `
-              <div style="border:1px solid #e5e7eb; border-radius:10px; padding:12px; display:flex; gap:10px;">
-                <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700;">${initial}</div>
-                <div style="flex:1;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-weight:700; color:#06464E;">${r.from || 'Family'}</div>
-                    <div style="color:#f59e0b; font-weight:700; font-size:12px;">★ ${r.rating || '5.0'}</div>
-                  </div>
-                  <p style="margin:4px 0 0 0; color:#6b7280; font-size:13px;">${r.text || ''}</p>
-                </div>
-              </div>
-            `;
-          }).join('');
-        };
-
-        try{
+        try {
           const resp = await fetch(`${API_BASE}/forms/provider/${userId}`);
-          if(!resp.ok) throw new Error('Failed to load provider dashboard');
+          if(!resp.ok) throw new Error('Failed to load provider data');
           const data = await resp.json();
-          resolvedProviderId = data.profile?.approved ? userId : null;
-          const hero = document.querySelector('header.hero h1');
-          if(hero && data.profile?.name){
-            hero.textContent = `Welcome, ${data.profile.name}!`;
+          const profile = data.profile || {};
+          const name = profile.first_name || profile.name || '';
+
+          if(name) {
+            const welcomeName = document.getElementById('providerWelcomeName');
+            if(welcomeName) welcomeName.textContent = `, ${name}`;
+            const sidebarName = document.getElementById('providerSidebarName');
+            if(sidebarName) sidebarName.textContent = `Signed in as ${name}`;
           }
+
           const stats = data.stats || {};
-          const requests = data.requests || [];
-          const sessionsBase = data.sessions || [];
-          const acceptedAsSessions = (requests || []).filter(r => (r.status||'').toLowerCase() === 'accepted').map(r => {
-            const startDate = r.start_at ? new Date(r.start_at) : null;
-            const endDate = r.end_at ? new Date(r.end_at) : null;
-            const fallback = new Date();
-            return {
-              id: `req-${r.id}`,
-              parent_id: r.parent_id || r.user_id,
-              parent_name: r.parent_name || 'Family',
-              parent_city: r.location || '',
-              session_date: startDate ? startDate.toISOString().slice(0,10) : fallback.toISOString().slice(0,10),
-              start_time: startDate ? startDate.toTimeString().slice(0,8) : '',
-              end_time: endDate ? endDate.toTimeString().slice(0,8) : '',
-              status: 'accepted'
-            };
-          });
-          const sessions = [...sessionsBase, ...acceptedAsSessions];
-          const acceptedRequests = requests.filter(r => (r.status||'').toLowerCase() === 'accepted');
-          const syntheticSessions = acceptedRequests.map(r => {
-            const startDate = r.start_at ? new Date(r.start_at) : null;
-            const endDate = r.end_at ? new Date(r.end_at) : null;
-            const fallbackDate = new Date();
-            return {
-              id: `req-${r.id}`,
-              parent_name: r.parent_name || 'Family',
-              parent_city: r.location || '',
-              status: 'accepted',
-              session_date: startDate ? startDate.toISOString().slice(0,10) : fallbackDate.toISOString().slice(0,10),
-              start_time: startDate ? startDate.toTimeString().slice(0,8) : '',
-              end_time: endDate ? endDate.toTimeString().slice(0,8) : '',
-            };
-          });
-          const combinedSessions = [...sessions, ...syntheticSessions];
-          
-          const pendingCount = requests.filter(r => (r.status||'').toLowerCase() === 'pending').length;
-          const acceptedCount = requests.filter(r => (r.status||'').toLowerCase() === 'accepted').length;
-          
-          const today = new Date();
-          const todayStr = today.toISOString().slice(0,10);
-          const toDate = (d)=> {
-            if(!d) return null;
-            const nd = new Date(d);
-            return isNaN(nd.getTime()) ? null : nd;
-          };
-          const upcomingSessions = combinedSessions.filter(s => {
-            if((s.status||'').toLowerCase() === 'cancelled') return false;
-            const d = toDate(s.session_date);
-            return !d || d >= today;
-          });
-          const completedThisMonth = combinedSessions.filter(s => {
-            const d = toDate(s.session_date);
-            const isPast = d && d < today;
-            return ((s.status||'').toLowerCase() === 'completed') || (isPast && d.toISOString().slice(0,7) === todayStr.slice(0,7));
-          });
-          
-          const roundHours = (val)=>{
-            const quarters = Math.round(val * 2); // 0.5 hr increments
-            return (quarters / 2).toFixed(1).replace(/\.0$/,'');
-          };
+          const earnings = stats.earnings || stats.earnings_month || 0;
+          const monthHours = computeMonthlyHours(data.sessions || [], data.requests || []);
 
-          const hoursFromSessions = (list)=>{
-            return list.reduce((sum, s)=>{
-              // Prefer explicit start/end_time from sessions
-              if(s.start_time && s.end_time){
-                const [sh, sm, ss='0'] = s.start_time.split(':').map(Number);
-                const [eh, em, es='0'] = s.end_time.split(':').map(Number);
-                const startMin = sh*60 + sm + (ss/60);
-                const endMin = eh*60 + em + (es/60);
-                const dur = Math.max(0, endMin - startMin);
-                return sum + dur/60;
-              }
-              // Fallback: derive from start_at/end_at if present
-              if(s.start_at && s.end_at){
-                const st = new Date(s.start_at);
-                const en = new Date(s.end_at);
-                const dur = Math.max(0, (en - st) / (1000*60*60));
-                return sum + dur;
-              }
-              return sum;
-            }, 0);
-          };
+          const earningsEl = document.getElementById('metricMonthlyEarnings');
+          if(earningsEl) earningsEl.textContent = formatCurrency(earnings);
 
-          // Fallback hours from accepted requests (when sessions not yet created)
-          const hoursFromAcceptedRequests = ()=>{
-            return requests.reduce((sum, r)=>{
-              if((r.status||'').toLowerCase() !== 'accepted') return sum;
-              if(r.start_at && r.end_at){
-                const st = new Date(r.start_at);
-                const en = new Date(r.end_at);
-                const dur = Math.max(0, (en - st) / (1000*60*60));
-                return sum + dur;
-              }
-              // Default 1 hour if no times provided, so accepted work isn't zeroed out
-              return sum + 1;
-            }, 0);
-          };
-          
-          let hoursScheduled = hoursFromSessions(upcomingSessions);
-          let hoursCompletedMonth = hoursFromSessions(completedThisMonth);
-          if(hoursScheduled === 0){
-            hoursScheduled = hoursFromAcceptedRequests();
-          }
-
-          const activeCount = Math.max(
-            upcomingSessions.length,
-            combinedSessions.length,
-            acceptedCount,
-            stats.active || 0
-          );
-          setText('metricActive', activeCount.toString());
-          setText('metricPending', (pendingCount || stats.pending || 0).toString());
-          setText('metricHoursScheduled', roundHours(hoursScheduled));
-          setText('metricHoursTotal', roundHours(hoursCompletedMonth));
-          setText('metricEarnings', stats.earnings ? `$${stats.earnings}` : '$0');
-          setText('metricTips', stats.tips ? `$${stats.tips}` : '$0');
-          const pendingPill = document.getElementById('pendingPill');
-          if(pendingPill){
-            pendingPill.textContent = `${pendingCount} pending`;
-          }
-          renderRequests(requests);
-          renderMessages(data.messages);
-          renderAppointments(combinedSessions);
-        renderReviews(data.reviews);
-
-        // Populate messages card with last threads
-        const cgList = document.getElementById('cgMessagesList');
-        const cgUnread = document.getElementById('cgMessagesUnread');
-        const cgOpen = document.getElementById('cgMessagesOpenBtn');
-        const applyCgMessages = ()=>{
-          const threads = window.latestThreads || {};
-          const unread = window.latestUnread || 0;
-          if(cgUnread){
-            cgUnread.style.display = unread > 0 ? 'inline-block' : 'none';
-            cgUnread.textContent = `${unread} unread`;
-          }
-          if(cgList){
-            const arr = Object.values(threads);
-            if(arr.length === 0){
-              cgList.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No messages yet.</p>';
-            } else {
-              const lastTwo = arr.slice(-2);
-              cgList.innerHTML = lastTwo.map(t=>{
-                const last = t.messages[t.messages.length-1];
-                return `
-                  <div style="padding:8px 0; border-bottom:1px solid #e5e7eb;">
-                    <div style="font-weight:700; color:#06464E;">${t.other_name || 'User'}</div>
-                    <div style="font-size:12px; color:#6b7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${last ? last.body : ''}</div>
-                  </div>
-                `;
-              }).join('');
-            }
-          }
-        };
-        applyCgMessages();
-        window.addEventListener('chat-updated', applyCgMessages);
-        if(cgOpen){
-          cgOpen.addEventListener('click', ()=>{
-            if(window.showChatWidget) window.showChatWidget();
-          });
+          const hoursEl = document.getElementById('metricMonthlyHours');
+          if(hoursEl) hoursEl.textContent = formatHours(monthHours);
+          renderUpcomingBookings(data.sessions || [], data.requests || []);
+          renderAreaRequests(data.area_requests || data.areaRequests || []);
+        } catch (err) {
+          console.error('Failed to load provider metrics', err);
         }
-      }catch(err){
-        console.error('Provider dashboard load failed', err);
-      }
-    });
+      });
     </script>
   </body>
 </html>
