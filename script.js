@@ -1271,6 +1271,112 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Care+ Plan chooser (front-end only)
+  const planChooserEl = document.getElementById('care-plan-chooser');
+  if(planChooserEl){
+    const plans = {
+      basic: {
+        id: 'basic',
+        name: 'Care+ Basic',
+        price: '$39.99/month',
+        savings: 'Break even or save',
+        blurb: 'Occasional childcare, predictable pricing.',
+        anchor: '#care-basic'
+      },
+      plus: {
+        id: 'plus',
+        name: 'Care+ Plus',
+        price: '$59.99/month',
+        savings: 'Save $60–$120+/month',
+        blurb: 'Weekly childcare, steady savings with included curriculum sessions.',
+        anchor: '#care-plus'
+      },
+      premium: {
+        id: 'premium',
+        name: 'Care+ Premium',
+        price: '$89.99/month',
+        savings: 'Save $120–$180+/month',
+        blurb: 'Multiple sessions weekly, maximum value with the lowest fees and unlimited curriculum sessions.',
+        anchor: '#care-premium'
+      }
+    };
+
+    const getRecommendation = (sessions)=>{
+      const n = Number(sessions);
+      if(Number.isNaN(n) || n <= 1) return 'basic';
+      if(n === 2) return 'plus';
+      return 'premium';
+    };
+
+    const sessionsInput = document.getElementById('planSessions');
+    const sessionsValueEl = document.getElementById('planSessionsValue');
+    const pillButtons = Array.from(document.querySelectorAll('[data-session-value]'));
+    const recommendedCard = document.getElementById('planRecommendedCard');
+    const recommendedName = document.getElementById('planRecommendedName');
+    const recommendedPrice = document.getElementById('planRecommendedPrice');
+    const recommendedSavings = document.getElementById('planRecommendedSavings');
+    const recommendedCopy = document.getElementById('planRecommendedCopy');
+    const recommendedCta = document.getElementById('planRecommendedCta');
+    const altCards = [document.getElementById('planAltOne'), document.getElementById('planAltTwo')];
+
+    function renderRecommendation(sessionValue){
+      const safeValue = Math.max(0, Math.min(5, Number(sessionValue) || 0));
+      if(sessionsInput) sessionsInput.value = String(safeValue);
+      if(sessionsValueEl) sessionsValueEl.textContent = safeValue === 5 ? '5+' : String(safeValue);
+
+      pillButtons.forEach(btn=>{
+        const btnVal = Number(btn.dataset.sessionValue);
+        btn.classList.toggle('active', btnVal === safeValue);
+      });
+
+      const recId = getRecommendation(safeValue);
+      const recPlan = plans[recId];
+      if(!recPlan || !recommendedCard) return;
+
+      recommendedCard.dataset.plan = recId;
+      if(recommendedName) recommendedName.textContent = recPlan.name;
+      if(recommendedPrice) recommendedPrice.textContent = recPlan.price;
+      if(recommendedSavings) recommendedSavings.textContent = recPlan.savings;
+      if(recommendedCopy) recommendedCopy.textContent = recPlan.blurb;
+      if(recommendedCta){
+        recommendedCta.textContent = `Choose ${recPlan.name}`;
+        recommendedCta.setAttribute('href', recPlan.anchor);
+      }
+
+      const otherIds = Object.keys(plans).filter(id=> id !== recId);
+      otherIds.forEach((id, idx)=>{
+        const card = altCards[idx];
+        const plan = plans[id];
+        if(card && plan){
+          card.dataset.plan = plan.id;
+          const nameEl = card.querySelector('.plan-card__name');
+          const priceEl = card.querySelector('.plan-card__price');
+          const savingsEl = card.querySelector('.plan-card__savings');
+          const linkEl = card.querySelector('.plan-card__link');
+          if(nameEl) nameEl.textContent = plan.name;
+          if(priceEl) priceEl.textContent = plan.price;
+          if(savingsEl) savingsEl.textContent = plan.savings;
+          if(linkEl){
+            linkEl.textContent = `View ${plan.name}`;
+            linkEl.setAttribute('href', plan.anchor);
+          }
+        }
+      });
+    }
+
+    sessionsInput && sessionsInput.addEventListener('input', e=>{
+      renderRecommendation(e.target.value);
+    });
+    pillButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const val = Number(btn.dataset.sessionValue) || 0;
+        renderRecommendation(val);
+      });
+    });
+
+    renderRecommendation(sessionsInput ? sessionsInput.value : 0);
+  }
+
   // Footer contact form
   const contactForm = document.getElementById('contactForm');
   const contactResult = document.getElementById('contactResult');
