@@ -77,18 +77,62 @@
 
         <div class="provider-panels">
           <section id="panel-dashboard" class="provider-panel is-active" role="tabpanel" aria-labelledby="tab-dashboard">
-            <div class="provider-kpi-grid">
-              <div class="provider-kpi-card">
-                <p class="provider-kpi-label">Upcoming bookings</p>
-                <p id="parentUpcomingCount" class="provider-kpi-value">0</p>
-                <p class="provider-kpi-foot">Next 30 days</p>
+            <section class="provider-bookings-card parent-find-card">
+              <div class="provider-card-head">
+                <div>
+                  <h2>Find a caregiver</h2>
+                  <p class="provider-card-sub">Check availability in your city and explore trusted caregivers.</p>
+                </div>
               </div>
-              <div class="provider-kpi-card">
-                <p class="provider-kpi-label">My caregivers</p>
-                <p id="parentCaregiverCount" class="provider-kpi-value">0</p>
-                <p class="provider-kpi-foot">Caregivers you've booked with</p>
+              <div class="parent-find-form-wrap">
+                <form id="heroFindForm" class="parent-find-form">
+                  <div class="parent-find-inputs">
+                    <button type="button" id="heroFindLocationBtn" class="parent-find-location-btn" title="Use current location">
+                      <img src="Assets/findmylocation.png" alt="Use current location">
+                    </button>
+                    <select name="location" id="heroLocationInput" class="parent-find-select">
+                      <option value="">Enter your location</option>
+                      <option value="St. John's">St. John's, NL</option>
+                      <option value="Halifax">Halifax, NS</option>
+                      <option value="Saint John">Saint John, NB</option>
+                      <option value="Charlottetown">Charlottetown, PE</option>
+                      <option value="Quebec City">Quebec City, QC</option>
+                      <option value="Montreal">Montreal, QC</option>
+                      <option value="Toronto">Toronto, ON</option>
+                      <option value="Ottawa">Ottawa, ON</option>
+                      <option value="Hamilton">Hamilton, ON</option>
+                      <option value="London">London, ON</option>
+                      <option value="Winnipeg">Winnipeg, MB</option>
+                      <option value="Calgary">Calgary, AB</option>
+                      <option value="Edmonton">Edmonton, AB</option>
+                      <option value="Red Deer">Red Deer, AB</option>
+                      <option value="Lethbridge">Lethbridge, AB</option>
+                      <option value="Regina">Regina, SK</option>
+                      <option value="Saskatoon">Saskatoon, SK</option>
+                      <option value="Prince Albert">Prince Albert, SK</option>
+                      <option value="Moose Jaw">Moose Jaw, SK</option>
+                      <option value="Yorkton">Yorkton, SK</option>
+                      <option value="Swift Current">Swift Current, SK</option>
+                      <option value="Vancouver">Vancouver, BC</option>
+                      <option value="Victoria">Victoria, BC</option>
+                      <option value="Surrey">Surrey, BC</option>
+                      <option value="Burnaby">Burnaby, BC</option>
+                      <option value="Kelowna">Kelowna, BC</option>
+                      <option value="Whitehorse">Whitehorse, YT</option>
+                      <option value="Yellowknife">Yellowknife, NT</option>
+                      <option value="Iqaluit">Iqaluit, NU</option>
+                    </select>
+                    <button type="submit" class="parent-find-submit" aria-label="Search caregivers">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 8h14M8 1l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+                <p class="parent-find-meta">Check availability before you request care.</p>
+                <a class="parent-find-link" href="find-childcare.html">Browse caregivers near me</a>
               </div>
-            </div>
+            </section>
 
             <div class="provider-dashboard-grid">
               <section class="provider-bookings-card parent-bookings-card">

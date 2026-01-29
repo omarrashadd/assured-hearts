@@ -1764,6 +1764,117 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   gap:10px;
   flex-wrap:wrap;
 }
+.parent-find-card{
+  background:rgba(15,23,32,0.9);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:18px;
+}
+.parent-find-form-wrap{
+  display:grid;
+  gap:10px;
+}
+.parent-find-form{
+  margin:0;
+}
+.parent-find-inputs{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+}
+.parent-find-location-btn{
+  background:none;
+  border:none;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  opacity:0.9;
+}
+.parent-find-location-btn img{
+  width:22px;
+  height:22px;
+}
+.parent-find-select{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:#e2e8f0;
+  font-size:13px;
+  appearance:none;
+}
+.parent-find-select option{
+  color:#0f172a;
+}
+.parent-find-submit{
+  background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%);
+  border:none;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.parent-find-meta{
+  margin:0;
+  font-size:12px;
+  color:#94a3b8;
+}
+.parent-find-link{
+  color:#cfe9ef;
+  font-size:12px;
+  font-weight:700;
+  text-decoration:none;
+}
+.parent-find-link:hover{
+  color:#fff;
+}
+.parent-dashboard #heroSearchResults p{
+  color:#e2e8f0 !important;
+}
+.parent-dashboard #heroSearchResults strong{
+  color:#fff !important;
+}
+.parent-dashboard #heroSearchResults input{
+  background:rgba(15,23,32,0.9) !important;
+  border:1px solid rgba(255,255,255,0.2) !important;
+  color:#e2e8f0 !important;
+}
+.parent-dashboard #heroSearchResults .hero-card{
+  background:rgba(15,23,32,0.95) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  box-shadow:none !important;
+}
+.parent-dashboard #heroSearchResults .hero-card [style*="color:#06464E"],
+.parent-dashboard #heroSearchResults .hero-card [style*="color:#475569"],
+.parent-dashboard #heroSearchResults .hero-card [style*="color:#6b7280"]{
+  color:#e2e8f0 !important;
+}
+.parent-dashboard #heroSearchResults .hero-card a,
+.parent-dashboard #heroSearchResults .hero-card button{
+  background:rgba(255,255,255,0.08) !important;
+  border:1px solid rgba(255,255,255,0.2) !important;
+  color:#e2e8f0 !important;
+}
+.parent-dashboard #heroSearchResults .hero-card a[href^="request-childcare"]{
+  background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%) !important;
+  border:none !important;
+  color:#fff !important;
+}
+.parent-dashboard #heroSearchResults .hero-carousel-prev,
+.parent-dashboard #heroSearchResults .hero-carousel-next{
+  background:rgba(15,23,32,0.9) !important;
+  border:1px solid rgba(255,255,255,0.12) !important;
+  color:#e2e8f0 !important;
+}
 .parent-child-card{
   display:grid;
   grid-template-columns:auto 1fr;
