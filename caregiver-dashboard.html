@@ -136,21 +136,82 @@
               <section class="provider-chart-card">
                 <div class="provider-card-head">
                   <div>
-                    <h2>Families mix</h2>
-                    <p class="provider-card-sub">New families vs my families.</p>
+                    <h2>Insights</h2>
+                    <p class="provider-card-sub">Snapshot of the families you serve and your performance.</p>
                   </div>
                 </div>
-                <div class="provider-chart-wrap">
-                  <div id="familyMixPie" class="provider-pie" role="img" aria-label="New families 0 percent, returning families 0 percent">
-                    <div class="provider-pie-center">
-                      <span id="familyNewPercent" class="provider-pie-value">0%</span>
-                      <span class="provider-pie-label">New families</span>
+                <div class="provider-pie-grid">
+                  <div class="provider-mini-card">
+                    <h3>Age ranges booked</h3>
+                    <p class="provider-mini-sub">Which ages you work with the most.</p>
+                    <div class="provider-chart-wrap">
+                      <div id="ageMixPie" class="provider-pie provider-pie-ages" role="img" aria-label="Infants and toddlers 0 percent, early childhood 0 percent, school-age 0 percent">
+                        <div class="provider-pie-center">
+                          <span id="ageMixPrimary" class="provider-pie-value">0%</span>
+                          <span id="ageMixPrimaryLabel" class="provider-pie-label">Top age group</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="provider-legend">
+                      <div class="provider-legend-item"><span class="provider-dot provider-dot-ages-1"></span> Infants &amp; Toddlers 1-3 <strong id="ageMixInfants">0</strong></div>
+                      <div class="provider-legend-item"><span class="provider-dot provider-dot-ages-2"></span> Early Childhood 3-6 <strong id="ageMixEarly">0</strong></div>
+                      <div class="provider-legend-item"><span class="provider-dot provider-dot-ages-3"></span> School-Age 7-12 <strong id="ageMixSchool">0</strong></div>
+                    </div>
+                  </div>
+                  <div class="provider-mini-card">
+                    <h3>Successful bookings</h3>
+                    <p class="provider-mini-sub">Tracks cancellations vs completed bookings.</p>
+                    <div class="provider-chart-wrap">
+                      <div id="successRatePie" class="provider-pie provider-pie-success" role="img" aria-label="Success rate 0 percent, cancellations 0 percent">
+                        <div class="provider-pie-center">
+                          <span id="successRateValue" class="provider-pie-value">0%</span>
+                          <span class="provider-pie-label">Success rate</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="provider-legend">
+                      <div class="provider-legend-item"><span class="provider-dot provider-dot-success"></span> Successful <strong id="successCount">0</strong></div>
+                      <div class="provider-legend-item"><span class="provider-dot provider-dot-cancelled"></span> Cancelled <strong id="cancelCount">0</strong></div>
+                    </div>
+                  </div>
+                  <div class="provider-mini-card">
+                    <h3>Repeat families</h3>
+                    <p class="provider-mini-sub">Families who have booked you again.</p>
+                    <div class="provider-chart-wrap">
+                      <div id="repeatFamiliesPie" class="provider-pie provider-pie-repeat" role="img" aria-label="Repeat families 0 percent, new families 0 percent">
+                        <div class="provider-pie-center">
+                          <span id="repeatFamiliesPercent" class="provider-pie-value">0%</span>
+                          <span class="provider-pie-label">Repeat families</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="provider-legend">
+                      <div class="provider-legend-item"><span class="provider-dot provider-dot-repeat"></span> Repeat families <strong id="repeatFamiliesCount">0</strong></div>
+                      <div class="provider-legend-item"><span class="provider-dot provider-dot-new"></span> New families <strong id="repeatFamiliesNewCount">0</strong></div>
                     </div>
                   </div>
                 </div>
-                <div class="provider-legend">
-                  <div class="provider-legend-item"><span class="provider-dot provider-dot-new"></span> New families <strong id="familyNewCount">0</strong></div>
-                  <div class="provider-legend-item"><span class="provider-dot provider-dot-returning"></span> My families <strong id="familyReturningCount">0</strong></div>
+                <div class="provider-earnings-block">
+                  <div class="provider-card-head">
+                    <div>
+                      <h2>Earnings breakdown</h2>
+                      <p class="provider-card-sub">Where your income is coming from this month.</p>
+                    </div>
+                    <span id="earningsTotal" class="provider-card-pill">$0 total</span>
+                  </div>
+                  <div class="provider-earnings-bar" role="img" aria-label="Earnings split across curriculum, standard sessions, tips, and bonuses.">
+                    <span id="earnSegCurriculum" class="earn-seg earn-curriculum"></span>
+                    <span id="earnSegStandard" class="earn-seg earn-standard"></span>
+                    <span id="earnSegTips" class="earn-seg earn-tips"></span>
+                    <span id="earnSegBonuses" class="earn-seg earn-bonuses"></span>
+                  </div>
+                  <div id="earningsEmpty" class="provider-earnings-empty">No earnings data yet.</div>
+                  <div class="provider-earnings-grid">
+                    <div class="provider-earnings-item"><span class="provider-dot provider-dot-curriculum"></span> Curriculum sessions <strong id="earnCurriculumValue">$0</strong></div>
+                    <div class="provider-earnings-item"><span class="provider-dot provider-dot-standard"></span> Standard sessions <strong id="earnStandardValue">$0</strong></div>
+                    <div class="provider-earnings-item"><span class="provider-dot provider-dot-tips"></span> Tips <strong id="earnTipsValue">$0</strong></div>
+                    <div class="provider-earnings-item"><span class="provider-dot provider-dot-bonuses"></span> Bonuses <strong id="earnBonusesValue">$0</strong></div>
+                  </div>
                 </div>
               </section>
             </div>
@@ -180,7 +241,7 @@
               </div>
               <div id="availabilityEditor" class="availability-editor" aria-live="polite"></div>
               <div class="availability-actions">
-                <span id="availabilityStatus" class="availability-status">Changes save locally for now.</span>
+                <span id="availabilityStatus" class="availability-status">Changes save to your live profile.</span>
                 <div class="availability-buttons">
                   <button id="availabilityCancelBtn" class="availability-btn availability-btn-ghost" type="button">Cancel</button>
                   <button id="availabilitySaveBtn" class="availability-btn" type="button">Save</button>
@@ -263,8 +324,59 @@
                   </label>
                   <label class="provider-form-field">
                     <span>Languages spoken</span>
-                    <input type="text" name="languages" id="provLanguages" class="provider-input" placeholder="English, Arabic, Urdu">
-                    <small>Shown on your public profile.</small>
+                    <div class="language-input">
+                      <div id="provLanguagesChips" class="language-chips" aria-live="polite"></div>
+                      <div class="language-entry">
+                        <input type="text" id="provLanguageInput" class="provider-input" list="languageOptions" placeholder="Start typing a language">
+                        <button type="button" id="provLanguageAdd" class="language-add-btn">Add</button>
+                      </div>
+                      <input type="hidden" name="languages" id="provLanguages">
+                      <datalist id="languageOptions">
+                        <option value="Arabic"></option>
+                        <option value="Burmese"></option>
+                        <option value="Bengali"></option>
+                        <option value="Cantonese"></option>
+                        <option value="Czech"></option>
+                        <option value="Dari"></option>
+                        <option value="Dutch"></option>
+                        <option value="English"></option>
+                        <option value="Farsi"></option>
+                        <option value="French"></option>
+                        <option value="German"></option>
+                        <option value="Greek"></option>
+                        <option value="Gujarati"></option>
+                        <option value="Hausa"></option>
+                        <option value="Hebrew"></option>
+                        <option value="Hindi"></option>
+                        <option value="Italian"></option>
+                        <option value="Japanese"></option>
+                        <option value="Korean"></option>
+                        <option value="Malay"></option>
+                        <option value="Malayalam"></option>
+                        <option value="Mandarin"></option>
+                        <option value="Marathi"></option>
+                        <option value="Nepali"></option>
+                        <option value="Polish"></option>
+                        <option value="Portuguese"></option>
+                        <option value="Punjabi"></option>
+                        <option value="Romanian"></option>
+                        <option value="Russian"></option>
+                        <option value="Spanish"></option>
+                        <option value="Swedish"></option>
+                        <option value="Somali"></option>
+                        <option value="Swahili"></option>
+                        <option value="Tagalog"></option>
+                        <option value="Tamil"></option>
+                        <option value="Telugu"></option>
+                        <option value="Thai"></option>
+                        <option value="Turkish"></option>
+                        <option value="Ukrainian"></option>
+                        <option value="Urdu"></option>
+                        <option value="Vietnamese"></option>
+                        <option value="Yoruba"></option>
+                      </datalist>
+                    </div>
+                    <small>Shown on your public profile. Start typing and press Enter to add.</small>
                   </label>
                   <label class="provider-form-field">
                     <span>Profile photo URL</span>
@@ -524,30 +636,208 @@
             }).join('');
           }
         }
+      };
 
-        const familyCounts = new Map();
-        upcoming.forEach((entry) => {
-          const key = entry.parent_id || entry.parentId || entry.parent_user_id || entry.parent || entry.parent_name || entry.family_name || entry.family || entry.email || entry.id;
-          if(!key) return;
-          familyCounts.set(key, (familyCounts.get(key) || 0) + 1);
-        });
-        const newFamilies = Array.from(familyCounts.values()).filter((count) => count === 1).length;
-        const returningFamilies = Math.max(0, familyCounts.size - newFamilies);
-        const totalFamilies = newFamilies + returningFamilies;
-        const newPercent = totalFamilies ? Math.round((newFamilies / totalFamilies) * 100) : 0;
-        const returningPercent = totalFamilies ? 100 - newPercent : 0;
+      const isCancelled = (entry) => {
+        const status = String(entry?.status || '').toLowerCase();
+        return status.includes('cancel');
+      };
 
-        const pie = document.getElementById('familyMixPie');
-        if(pie) {
-          pie.style.setProperty('--new', `${newPercent}%`);
-          pie.setAttribute('aria-label', `New families ${newPercent} percent, returning families ${returningPercent} percent`);
+      const parseAgeGroup = (entry) => {
+        const rawGroup = entry.child_age_group || entry.childAgeGroup || entry.age_group || entry.ageGroup || entry.age || entry.child_age;
+        if(rawGroup === undefined || rawGroup === null) return null;
+        const asNumber = Number(rawGroup);
+        if(!Number.isNaN(asNumber)) {
+          if(asNumber <= 3) return 'infants';
+          if(asNumber <= 6) return 'early';
+          if(asNumber <= 12) return 'school';
+          return null;
         }
-        const percentEl = document.getElementById('familyNewPercent');
-        if(percentEl) percentEl.textContent = `${newPercent}%`;
-        const newEl = document.getElementById('familyNewCount');
-        if(newEl) newEl.textContent = `${newFamilies}`;
-        const returningEl = document.getElementById('familyReturningCount');
-        if(returningEl) returningEl.textContent = `${returningFamilies}`;
+        const text = String(rawGroup).toLowerCase();
+        if(text.includes('infant') || text.includes('toddler')) return 'infants';
+        if(text.includes('early')) return 'early';
+        if(text.includes('school')) return 'school';
+        return null;
+      };
+
+      const updatePie = (element, seg1, seg2, seg3, label) => {
+        if(!element) return;
+        const s1 = Math.max(0, Math.min(100, seg1));
+        const s2 = Math.max(0, Math.min(100, seg2));
+        const s3 = Math.max(0, Math.min(100, seg3));
+        element.style.setProperty('--seg-1', s1);
+        element.style.setProperty('--seg-2', s2);
+        element.style.setProperty('--seg-3', s3);
+        if(label) element.setAttribute('aria-label', label);
+      };
+
+      const renderDashboardInsights = (sessions, requests, stats = {}, insights = {}) => {
+        const ageCounts = { infants: 0, early: 0, school: 0 };
+        const ageMix = insights.ageMix;
+        if(ageMix){
+          ageCounts.infants = Number(ageMix.infants || 0);
+          ageCounts.early = Number(ageMix.early || 0);
+          ageCounts.school = Number(ageMix.school || 0);
+        } else {
+          [...(sessions || []), ...(requests || [])].forEach((entry) => {
+            const group = parseAgeGroup(entry);
+            if(group && ageCounts[group] !== undefined) ageCounts[group] += 1;
+          });
+        }
+        const ageTotal = ageCounts.infants + ageCounts.early + ageCounts.school;
+        const infantsPct = ageTotal ? Math.round((ageCounts.infants / ageTotal) * 100) : 0;
+        const earlyPct = ageTotal ? Math.round((ageCounts.early / ageTotal) * 100) : 0;
+        const schoolPct = ageTotal ? Math.max(0, 100 - infantsPct - earlyPct) : 0;
+        updatePie(
+          document.getElementById('ageMixPie'),
+          infantsPct,
+          earlyPct,
+          schoolPct,
+          `Infants and toddlers ${infantsPct} percent, early childhood ${earlyPct} percent, school-age ${schoolPct} percent`
+        );
+        const ageTop = Object.entries(ageCounts).sort((a, b) => b[1] - a[1])[0];
+        const topLabelMap = { infants: 'Infants & Toddlers', early: 'Early Childhood', school: 'School-Age' };
+        const topLabel = ageTop && ageTop[1] > 0 ? topLabelMap[ageTop[0]] : 'No data yet';
+        const topPercent = ageTotal && ageTop ? Math.round((ageTop[1] / ageTotal) * 100) : 0;
+        const agePrimary = document.getElementById('ageMixPrimary');
+        if(agePrimary) agePrimary.textContent = `${topPercent}%`;
+        const agePrimaryLabel = document.getElementById('ageMixPrimaryLabel');
+        if(agePrimaryLabel) agePrimaryLabel.textContent = topLabel;
+        const ageInfantsEl = document.getElementById('ageMixInfants');
+        if(ageInfantsEl) ageInfantsEl.textContent = `${ageCounts.infants}`;
+        const ageEarlyEl = document.getElementById('ageMixEarly');
+        if(ageEarlyEl) ageEarlyEl.textContent = `${ageCounts.early}`;
+        const ageSchoolEl = document.getElementById('ageMixSchool');
+        if(ageSchoolEl) ageSchoolEl.textContent = `${ageCounts.school}`;
+
+        const allSessions = sessions || [];
+        let cancelledCount = allSessions.filter(isCancelled).length;
+        let totalSessions = allSessions.length;
+        let successCount = Math.max(0, totalSessions - cancelledCount);
+        if(insights.success){
+          successCount = Number(insights.success.completed || 0);
+          cancelledCount = Number(insights.success.cancelled || 0);
+          totalSessions = successCount + cancelledCount;
+        }
+        const successPct = totalSessions ? Math.round((successCount / totalSessions) * 100) : 0;
+        updatePie(
+          document.getElementById('successRatePie'),
+          successPct,
+          Math.max(0, 100 - successPct),
+          0,
+          `Success rate ${successPct} percent, cancellations ${Math.max(0, 100 - successPct)} percent`
+        );
+        const successValueEl = document.getElementById('successRateValue');
+        if(successValueEl) successValueEl.textContent = `${successPct}%`;
+        const successCountEl = document.getElementById('successCount');
+        if(successCountEl) successCountEl.textContent = `${successCount}`;
+        const cancelCountEl = document.getElementById('cancelCount');
+        if(cancelCountEl) cancelCountEl.textContent = `${cancelledCount}`;
+
+        let repeatFamilies = 0;
+        let newFamilies = 0;
+        if(insights.repeatFamilies){
+          repeatFamilies = Number(insights.repeatFamilies.repeat || 0);
+          newFamilies = Number(insights.repeatFamilies.new || 0);
+        } else {
+          const familyCounts = new Map();
+          allSessions.filter((entry) => !isCancelled(entry)).forEach((entry) => {
+            const key = entry.parent_id || entry.parentId || entry.parent_user_id || entry.parent || entry.parent_name || entry.family_name || entry.family || entry.email || entry.id;
+            if(!key) return;
+            familyCounts.set(key, (familyCounts.get(key) || 0) + 1);
+          });
+          repeatFamilies = Array.from(familyCounts.values()).filter((count) => count > 1).length;
+          newFamilies = Array.from(familyCounts.values()).filter((count) => count === 1).length;
+        }
+        const totalFamilies = repeatFamilies + newFamilies;
+        const repeatPct = totalFamilies ? Math.round((repeatFamilies / totalFamilies) * 100) : 0;
+        updatePie(
+          document.getElementById('repeatFamiliesPie'),
+          repeatPct,
+          Math.max(0, 100 - repeatPct),
+          0,
+          `Repeat families ${repeatPct} percent, new families ${Math.max(0, 100 - repeatPct)} percent`
+        );
+        const repeatValueEl = document.getElementById('repeatFamiliesPercent');
+        if(repeatValueEl) repeatValueEl.textContent = `${repeatPct}%`;
+        const repeatCountEl = document.getElementById('repeatFamiliesCount');
+        if(repeatCountEl) repeatCountEl.textContent = `${repeatFamilies}`;
+        const newCountEl = document.getElementById('repeatFamiliesNewCount');
+        if(newCountEl) newCountEl.textContent = `${newFamilies}`;
+
+        const toNumber = (value) => {
+          const num = Number(value);
+          return Number.isNaN(num) ? 0 : num;
+        };
+        const resolveEarnings = (entry) => {
+          if(entry.provider_earnings_cents) return toNumber(entry.provider_earnings_cents) / 100;
+          if(entry.payment_amount_cents) return toNumber(entry.payment_amount_cents) / 100;
+          return toNumber(entry.provider_earnings || entry.earnings || entry.amount || entry.total || 0);
+        };
+        const resolveTip = (entry) => {
+          if(entry.tip_cents) return toNumber(entry.tip_cents) / 100;
+          return toNumber(entry.tip || entry.tips || 0);
+        };
+        const resolveBonus = (entry) => {
+          if(entry.bonus_cents) return toNumber(entry.bonus_cents) / 100;
+          return toNumber(entry.bonus || entry.bonus_amount || 0);
+        };
+        const resolveCare = (entry) => {
+          const raw = String(entry.care_type || entry.careType || entry.care || '').toLowerCase();
+          if(raw.includes('curriculum')) return 'curriculum';
+          if(raw.includes('mixed')) return 'mixed';
+          if(raw.includes('standard')) return 'standard';
+          return 'standard';
+        };
+        let curriculumTotal = 0;
+        let standardTotal = 0;
+        let tipsTotal = toNumber(stats.tips || 0);
+        let bonusesTotal = 0;
+        if(insights.earnings){
+          curriculumTotal = toNumber(insights.earnings.curriculumCents || 0) / 100;
+          standardTotal = toNumber(insights.earnings.standardCents || 0) / 100;
+          tipsTotal = toNumber(insights.earnings.tipsCents || 0) / 100;
+          bonusesTotal = toNumber(insights.earnings.bonusesCents || 0) / 100;
+        } else {
+          allSessions.forEach((entry) => {
+            const amount = resolveEarnings(entry);
+            const tip = resolveTip(entry);
+            const bonus = resolveBonus(entry);
+            if(amount > 0) {
+              const care = resolveCare(entry);
+              if(care === 'curriculum') curriculumTotal += amount;
+              else standardTotal += amount;
+            }
+            if(tip > 0) tipsTotal += tip;
+            if(bonus > 0) bonusesTotal += bonus;
+          });
+          if(curriculumTotal + standardTotal === 0 && toNumber(stats.earnings || 0) > 0) {
+            standardTotal = toNumber(stats.earnings || 0);
+          }
+        }
+        const totalEarnings = curriculumTotal + standardTotal + tipsTotal + bonusesTotal;
+        const setSegWidth = (id, value) => {
+          const el = document.getElementById(id);
+          if(!el) return;
+          const pct = totalEarnings ? Math.round((value / totalEarnings) * 100) : 0;
+          el.style.setProperty('--w', `${pct}%`);
+        };
+        setSegWidth('earnSegCurriculum', curriculumTotal);
+        setSegWidth('earnSegStandard', standardTotal);
+        setSegWidth('earnSegTips', tipsTotal);
+        setSegWidth('earnSegBonuses', bonusesTotal);
+        const totalEl = document.getElementById('earningsTotal');
+        if(totalEl) totalEl.textContent = `${formatCurrency(totalEarnings)} total`;
+        const currEl = document.getElementById('earnCurriculumValue');
+        if(currEl) currEl.textContent = formatCurrency(curriculumTotal);
+        const stdEl = document.getElementById('earnStandardValue');
+        if(stdEl) stdEl.textContent = formatCurrency(standardTotal);
+        const tipsEl = document.getElementById('earnTipsValue');
+        if(tipsEl) tipsEl.textContent = formatCurrency(tipsTotal);
+        const bonusEl = document.getElementById('earnBonusesValue');
+        if(bonusEl) bonusEl.textContent = formatCurrency(bonusesTotal);
+        const emptyEl = document.getElementById('earningsEmpty');
+        if(emptyEl) emptyEl.style.display = totalEarnings > 0 ? 'none' : 'block';
       };
 
       const resolveRequestType = (entry) => {
@@ -619,7 +909,6 @@
         }).join('');
       };
 
-      const AVAILABILITY_STORAGE_KEY = 'provider_availability_v1';
       const availabilityDays = [
         { key: 'monday', label: 'Monday' },
         { key: 'tuesday', label: 'Tuesday' },
@@ -631,37 +920,69 @@
       ];
       const createDefaultSlot = () => ({ start: '08:00', end: '17:00' });
       let availabilityState = {};
+      let availabilityNotes = null;
+      let availabilitySnapshot = null;
+      let availabilityUserId = null;
+      let availabilityApiBase = null;
 
-      const normalizeAvailability = (raw) => {
+      const cloneAvailability = (value) => JSON.parse(JSON.stringify(value));
+
+      const normalizeAvailabilityFromApi = (raw) => {
         const normalized = {};
         availabilityDays.forEach(({ key }) => {
-          const dayData = raw && raw[key] ? raw[key] : {};
-          const slots = Array.isArray(dayData.slots) && dayData.slots.length
-            ? dayData.slots.map((slot) => ({
-              start: slot.start || '08:00',
-              end: slot.end || '17:00'
+          const dayData = raw && raw[key] ? raw[key] : null;
+          let slots = [];
+          if(Array.isArray(dayData)) {
+            slots = dayData;
+          } else if(dayData && Array.isArray(dayData.slots)) {
+            slots = dayData.slots;
+          } else if(dayData && typeof dayData === 'object') {
+            slots = [dayData];
+          }
+          const slotList = slots.length
+            ? slots.map((slot) => ({
+              start: slot.start || slot.from || '08:00',
+              end: slot.end || slot.to || '17:00'
             }))
             : [createDefaultSlot()];
+          const enabled = dayData
+            ? (typeof dayData.enabled === 'boolean' ? dayData.enabled : slots.length > 0)
+            : false;
           normalized[key] = {
-            enabled: Boolean(dayData.enabled),
-            slots
+            enabled,
+            slots: slotList
           };
         });
         return normalized;
       };
 
-      const loadAvailability = () => {
-        try {
-          const raw = localStorage.getItem(AVAILABILITY_STORAGE_KEY);
-          if(!raw) return normalizeAvailability({});
-          return normalizeAvailability(JSON.parse(raw));
-        } catch (_err) {
-          return normalizeAvailability({});
-        }
+      const setAvailabilityFromProfile = (profile) => {
+        const rawAvailability = profile?.availability || {};
+        const parsed = typeof rawAvailability === 'string' ? JSON.parse(rawAvailability || '{}') : rawAvailability;
+        const scheduleSource = parsed?.schedule && typeof parsed.schedule === 'object' ? parsed.schedule : parsed;
+        availabilityNotes = parsed?.notes || null;
+        availabilityState = normalizeAvailabilityFromApi(scheduleSource || {});
+        availabilitySnapshot = {
+          state: cloneAvailability(availabilityState),
+          notes: availabilityNotes
+        };
       };
 
-      const saveAvailability = () => {
-        localStorage.setItem(AVAILABILITY_STORAGE_KEY, JSON.stringify(availabilityState));
+      const buildAvailabilityPayload = () => {
+        const schedule = {};
+        availabilityDays.forEach(({ key }) => {
+          const day = availabilityState[key];
+          if(!day || !day.enabled) return;
+          const slots = (day.slots || []).map((slot) => ({
+            from: slot.start || slot.from || '',
+            to: slot.end || slot.to || ''
+          })).filter((slot) => slot.from || slot.to);
+          if(slots.length) schedule[key] = slots;
+        });
+        return {
+          schedule,
+          notes: availabilityNotes || null
+        };
       };
 
       const renderAvailabilityEditor = () => {
@@ -700,10 +1021,12 @@
         }).join('');
       };
 
-      const initAvailabilityEditor = () => {
+      const initAvailabilityEditor = ({ profile, apiBase, userId } = {}) => {
         const editor = document.getElementById('availabilityEditor');
         if(!editor) return;
-        availabilityState = loadAvailability();
+        if(apiBase) availabilityApiBase = apiBase;
+        if(userId) availabilityUserId = userId;
+        setAvailabilityFromProfile(profile || {});
         renderAvailabilityEditor();
 
         if(editor.dataset.ready === 'true') return;
@@ -716,6 +1039,9 @@
             const dayKey = target.dataset.day;
             if(!dayKey) return;
             availabilityState[dayKey].enabled = target.checked;
+            if(target.checked && availabilityState[dayKey].slots.length === 0) {
+              availabilityState[dayKey].slots = [createDefaultSlot()];
+            }
             const row = target.closest('.availability-day');
             if(row) row.classList.toggle('is-disabled', !target.checked);
             row?.querySelectorAll('input[type="time"], .availability-add-slot, .availability-remove-slot').forEach((el) => {
@@ -758,13 +1084,35 @@
         });
 
         document.getElementById('availabilitySaveBtn')?.addEventListener('click', () => {
-          saveAvailability();
           const status = document.getElementById('availabilityStatus');
-          if(status) status.textContent = 'Availability saved locally.';
+          if(!availabilityUserId || !availabilityApiBase){
+            if(status) status.textContent = 'Please sign in to save availability.';
+            return;
+          }
+          if(status) status.textContent = 'Saving...';
+          fetch(`${availabilityApiBase}/forms/provider/${availabilityUserId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ availability: buildAvailabilityPayload() })
+          })
+            .then((res) => {
+              if(!res.ok) throw new Error('Save failed');
+              availabilitySnapshot = {
+                state: cloneAvailability(availabilityState),
+                notes: availabilityNotes
+              };
+              if(status) status.textContent = 'Availability saved to profile.';
+            })
+            .catch((_err) => {
+              if(status) status.textContent = 'Save failed. Try again.';
+            });
         });
         document.getElementById('availabilityCancelBtn')?.addEventListener('click', () => {
-          availabilityState = loadAvailability();
-          renderAvailabilityEditor();
+          if(availabilitySnapshot){
+            availabilityState = cloneAvailability(availabilitySnapshot.state);
+            availabilityNotes = availabilitySnapshot.notes;
+            renderAvailabilityEditor();
+          }
           const status = document.getElementById('availabilityStatus');
           if(status) status.textContent = 'Changes reverted.';
         });
@@ -776,7 +1124,7 @@
         const userType = localStorage.getItem('user_type');
         if(!userId || userType !== 'provider') return;
 
-        initAvailabilityEditor();
+        initAvailabilityEditor({ apiBase: API_BASE, userId });
 
         try {
           const resp = await fetch(`${API_BASE}/forms/provider/${userId}`);
@@ -803,6 +1151,8 @@
           if(hoursEl) hoursEl.textContent = formatHours(monthHours);
           renderUpcomingBookings(data.sessions || [], data.requests || []);
           renderAreaRequests(data.area_requests || data.areaRequests || []);
+          renderDashboardInsights(data.sessions || [], data.requests || [], stats, data.insights || {});
+          initAvailabilityEditor({ profile, apiBase: API_BASE, userId });
         } catch (err) {
           console.error('Failed to load provider metrics', err);
         }

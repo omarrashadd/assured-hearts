@@ -819,6 +819,102 @@ document.addEventListener('DOMContentLoaded', () => {
     const userIdRaw = localStorage.getItem('user_id');
     const userId = userIdRaw ? parseInt(userIdRaw, 10) : null;
     let profileApproved = false;
+    const languageInput = document.getElementById('provLanguageInput');
+    const languageAddBtn = document.getElementById('provLanguageAdd');
+    const languageChips = document.getElementById('provLanguagesChips');
+    const languagesField = document.getElementById('provLanguages');
+    const languageOptions = Array.from(document.querySelectorAll('#languageOptions option'))
+      .map(opt => String(opt.value || '').trim())
+      .filter(Boolean);
+    let selectedLanguages = [];
+
+    const normalizeLanguage = (value) => String(value || '').trim().replace(/\s+/g, ' ');
+    const resolveLanguage = (value) => {
+      const normalized = normalizeLanguage(value);
+      if(!normalized) return null;
+      const match = languageOptions.find(opt => opt.toLowerCase() === normalized.toLowerCase());
+      return match || null;
+    };
+    const parseLanguageList = (value) => {
+      if(Array.isArray(value)) return value;
+      if(typeof value !== 'string') return [];
+      const trimmed = value.trim();
+      if(!trimmed) return [];
+      if(trimmed.startsWith('[')){
+        try{
+          const parsed = JSON.parse(trimmed);
+          if(Array.isArray(parsed)) return parsed;
+        }catch(_err){
+          return trimmed.split(',');
+        }
+      }
+      return trimmed.split(',');
+    };
+    const renderLanguageChips = () => {
+      if(!languageChips || !languagesField) return;
+      languageChips.innerHTML = '';
+      const cleaned = selectedLanguages
+        .map(lang => normalizeLanguage(lang))
+        .filter(Boolean);
+      selectedLanguages = cleaned;
+      languagesField.value = cleaned.join(', ');
+      if(cleaned.length === 0){
+        languageChips.innerHTML = '<span class="language-empty">No languages selected</span>';
+        return;
+      }
+      cleaned.forEach(lang => {
+        const chip = document.createElement('span');
+        chip.className = 'language-chip';
+        chip.innerHTML = `<span>${lang}</span>`;
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.setAttribute('aria-label', `Remove ${lang}`);
+        removeBtn.innerHTML = '&times;';
+        removeBtn.addEventListener('click', () => {
+          selectedLanguages = selectedLanguages.filter(item => item.toLowerCase() !== lang.toLowerCase());
+          renderLanguageChips();
+        });
+        chip.appendChild(removeBtn);
+        languageChips.appendChild(chip);
+      });
+    };
+    const warnLanguage = (message) => {
+      if(typeof showBanner === 'function') showBanner(message, 'info');
+      if(languageInput){
+        languageInput.setCustomValidity(message);
+        languageInput.reportValidity();
+        setTimeout(() => languageInput.setCustomValidity(''), 800);
+      }
+    };
+    const addLanguage = (value) => {
+      if(!languageInput) return false;
+      const resolved = resolveLanguage(value);
+      if(!resolved){
+        warnLanguage('Please select a language from the list.');
+        return false;
+      }
+      if(selectedLanguages.some(lang => lang.toLowerCase() === resolved.toLowerCase())){
+        languageInput.value = '';
+        return true;
+      }
+      selectedLanguages.push(resolved);
+      languageInput.value = '';
+      renderLanguageChips();
+      return true;
+    };
+
+    if(languageAddBtn && languageInput){
+      languageAddBtn.addEventListener('click', () => {
+        addLanguage(languageInput.value);
+      });
+      languageInput.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          addLanguage(languageInput.value);
+        }
+      });
+    }
+    renderLanguageChips();
     if(!userId || localStorage.getItem('user_type') !== 'provider'){
       if(provStatusEl){
         provStatusEl.style.color = '#b91c1c';
@@ -846,7 +942,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('provAddr1').value = p.address_line1 || '';
             document.getElementById('provPostal').value = p.postal_code || '';
             document.getElementById('provPayoutMethod').value = p.payout_method || '';
-            document.getElementById('provLanguages').value = p.languages || '';
+            selectedLanguages = parseLanguageList(p.languages)
+              .map(lang => normalizeLanguage(lang))
+              .filter(Boolean);
+            renderLanguageChips();
             const photoField = document.getElementById('provPhotoUrl');
             if(photoField) photoField.value = p.photo_url || '';
             const aboutField = document.getElementById('provAbout');
@@ -891,6 +990,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if(!userId || Number.isNaN(userId)){
         showBanner('Please log in to update your profile.', 'info');
         return;
+      }
+      if(languageInput && languageInput.value.trim()){
+        const added = addLanguage(languageInput.value);
+        if(!added) return;
       }
       const fd = new FormData(providerProfileForm);
       const payload = Object.fromEntries(fd.entries());
@@ -1052,13 +1155,18 @@ document.addEventListener('DOMContentLoaded', () => {
           ? availability.schedule
           : availability;
         const scheduleRows = dayOrder.map((day)=>{
-          const slot = scheduleSource?.[day];
-          if(!slot) return null;
-          const fromLabel = formatTime(slot.from);
-          const toLabel = formatTime(slot.to);
-          const timeLabel = fromLabel && toLabel
-            ? `${fromLabel} - ${toLabel}`
-            : (fromLabel || toLabel || '');
+          const slotData = scheduleSource?.[day];
+          if(!slotData) return null;
+          const slots = Array.isArray(slotData)
+            ? slotData
+            : (Array.isArray(slotData.slots) ? slotData.slots : [slotData]);
+          const timeLabel = slots.map((slot)=>{
+            const fromLabel = formatTime(slot.from || slot.start);
+            const toLabel = formatTime(slot.to || slot.end);
+            return fromLabel && toLabel
+              ? `${fromLabel} - ${toLabel}`
+              : (fromLabel || toLabel || '');
+          }).filter(Boolean).join(', ');
           if(!timeLabel) return null;
           return { day: dayLabels[day] || day, time: timeLabel };
         }).filter(Boolean);
