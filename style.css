@@ -1287,6 +1287,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   border-radius:18px;
   padding:28px;
   min-height:640px;
+  min-width:0;
 }
 .provider-content-header{
   display:flex;
@@ -1542,6 +1543,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   border:1px solid rgba(255,255,255,0.08);
   border-radius:16px;
   padding:18px;
+  min-width:0;
 }
 .provider-card-head{
   display:flex;
@@ -1646,6 +1648,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
 .parent-bookings-table{
   display:grid;
   gap:8px;
+  width:100%;
 }
 .parent-bookings-body{
   display:grid;
@@ -1653,7 +1656,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
 }
 .parent-bookings-row{
   display:grid;
-  grid-template-columns:minmax(140px,1fr) minmax(170px,1.2fr) minmax(90px,0.6fr) minmax(120px,0.7fr) minmax(180px,1.2fr) minmax(110px,0.7fr);
+  grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,0.6fr) minmax(0,0.7fr) minmax(0,1.1fr) minmax(0,0.5fr);
   gap:10px;
   align-items:center;
   padding:10px 12px;
@@ -1673,6 +1676,10 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
 .parent-booking-cell{
   font-size:12px;
   color:#e2e8f0;
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .parent-booking-contact{
   color:#cbd5f5;
