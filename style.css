@@ -1596,6 +1596,45 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   font-size:12px;
   color:#e2e8f0;
 }
+.booking-child{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.booking-address-btn,
+.booking-back-btn{
+  background:rgba(103,179,194,0.2);
+  border:1px solid rgba(103,179,194,0.35);
+  color:#cfe9ef;
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+.booking-back-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.15);
+  color:#e2e8f0;
+}
+.provider-booking-address{
+  display:none;
+  grid-column:1 / -1;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.booking-address-text{
+  font-size:12px;
+  color:#e2e8f0;
+}
+.provider-bookings-item.is-address .provider-booking-cell{
+  display:none;
+}
+.provider-bookings-item.is-address .provider-booking-address{
+  display:flex;
+}
 .provider-bookings-empty{
   padding:14px 12px;
   border-radius:12px;
@@ -1603,6 +1642,221 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   border:1px dashed rgba(255,255,255,0.14);
   color:#94a3b8;
   font-size:12px;
+}
+.parent-bookings-table{
+  display:grid;
+  gap:8px;
+}
+.parent-bookings-body{
+  display:grid;
+  gap:8px;
+}
+.parent-bookings-row{
+  display:grid;
+  grid-template-columns:minmax(140px,1fr) minmax(170px,1.2fr) minmax(90px,0.6fr) minmax(120px,0.7fr) minmax(180px,1.2fr) minmax(110px,0.7fr);
+  gap:10px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:12px;
+}
+.parent-bookings-head{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:#94a3b8;
+  padding:0 12px 6px;
+}
+.parent-bookings-item{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+}
+.parent-booking-cell{
+  font-size:12px;
+  color:#e2e8f0;
+}
+.parent-booking-contact{
+  color:#cbd5f5;
+}
+.parent-booking-action{
+  display:flex;
+  justify-content:flex-end;
+}
+.parent-booking-btn{
+  background:rgba(103,179,194,0.2);
+  border:1px solid rgba(103,179,194,0.35);
+  color:#cfe9ef;
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+.parent-calendar-list{
+  margin-top:16px;
+  display:grid;
+  gap:10px;
+}
+.parent-calendar-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 14px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  color:#e2e8f0;
+}
+.parent-calendar-title{
+  font-weight:700;
+  color:#fff;
+}
+.parent-calendar-sub{
+  font-size:12px;
+  color:#94a3b8;
+}
+.parent-calendar-pill{
+  background:rgba(103,179,194,0.2);
+  color:#cde9f0;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+}
+.parent-messages-list{
+  display:grid;
+  gap:10px;
+  margin-bottom:12px;
+}
+.parent-message-item{
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.parent-message-name{
+  font-weight:700;
+  color:#fff;
+}
+.parent-message-body{
+  font-size:12px;
+  color:#94a3b8;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.parent-children-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));
+  gap:14px;
+}
+.parent-child-info{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.parent-action-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.parent-child-card{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:12px;
+  align-items:center;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:14px;
+  color:#e2e8f0;
+}
+.parent-child-avatar{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:700;
+}
+.parent-child-name{
+  font-weight:700;
+  color:#fff;
+}
+.parent-child-meta{
+  font-size:12px;
+  color:#94a3b8;
+}
+.parent-child-actions{
+  grid-column:1 / -1;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.parent-child-btn{
+  background:rgba(103,179,194,0.2);
+  border:1px solid rgba(103,179,194,0.35);
+  color:#cfe9ef;
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:11px;
+  font-weight:700;
+  text-decoration:none;
+  cursor:pointer;
+}
+.parent-child-edit{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.15);
+  color:#e2e8f0;
+}
+.parent-caregivers-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  gap:14px;
+}
+.parent-caregiver-card{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px;
+  align-items:center;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:14px;
+  color:#e2e8f0;
+}
+.parent-caregiver-avatar{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:700;
+}
+.parent-caregiver-name{
+  font-weight:700;
+  color:#fff;
+}
+.parent-caregiver-meta{
+  font-size:12px;
+  color:#94a3b8;
+}
+.parent-caregiver-contact{
+  font-size:12px;
+  color:#cbd5f5;
+}
+.parent-caregiver-btn{
+  background:rgba(103,179,194,0.2);
+  border:1px solid rgba(103,179,194,0.35);
+  color:#cfe9ef;
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
 }
 .care-pill{
   display:inline-flex;
@@ -2106,6 +2360,35 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
     text-transform:uppercase;
     letter-spacing:0.08em;
     color:#94a3b8;
+  }
+  .parent-bookings-row{
+    grid-template-columns:1fr;
+    padding:12px;
+  }
+  .parent-bookings-head{
+    display:none;
+  }
+  .parent-booking-cell{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .parent-booking-cell::before{
+    content:attr(data-label);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#94a3b8;
+  }
+  .parent-booking-action{
+    justify-content:flex-start;
+  }
+  .parent-caregiver-card{
+    grid-template-columns:auto 1fr;
+  }
+  .parent-caregiver-btn{
+    grid-column:1 / -1;
+    justify-self:flex-start;
   }
   .provider-requests-row{
     grid-template-columns:1fr;

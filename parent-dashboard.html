@@ -4,23 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Parent Dashboard - Assured Hearts</title>
-    <meta name="description" content="Manage your childcare, bookings, and children's learning." />
+    <meta name="description" content="Manage your family profile, bookings, and caregivers." />
     <link rel="stylesheet" href="style.css">
   </head>
 
-  <body>
+  <body class="provider-dashboard parent-dashboard">
     <nav class="navbar">
       <div class="nav-container">
-        <div class="logo"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
+        <div class="logo"><a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;"><img src="Assets/assured Hearts Logo.png" alt="Assured Hearts Logo"><span>Assured Hearts</span></a></div>
         <div class="nav-links">
           <a href="find-childcare.html">Find Childcare</a>
           <a href="become-provider.html">Join Our Care Network</a>
           <a href="care-process.html">Our Care Process</a>
           <a href="learning.html">At-Home Learning</a>
-        </div>
-        <div class="nav-auth">
-          <a href="parent-dashboard.html" style="display: flex; align-items: center; gap: 6px; color: #06464E; text-decoration: none; font-weight: 600;">Dashboard</a>
-          <button id="logoutBtn" class="btn-auth" style="background: #f5f5f5; color: #333;">Log out</button>
         </div>
         <button id="mobileMenuBtn" class="mobile-menu" aria-label="Open menu">
           <span></span>
@@ -40,107 +36,234 @@
       </nav>
     </div>
 
-    <header class="hero" style="padding: 24px 16px; background: linear-gradient(135deg, #f4fbfd 0%, #fff7f7 100%);">
-      <div class="container" style="max-width: 1200px;">
-        <h1 id="dashboardGreeting" style="margin: 0; font-size: clamp(24px, 5vw, 28px);">Welcome back!</h1>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;">
-          <a href="child-demographics.html" class="btn" style="padding: 10px 16px; font-weight: 700; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; text-decoration: none; border-radius: 8px;">Add Child</a>
-          <a href="request-childcare.html" class="btn secondary" style="padding: 10px 16px; font-weight: 700; border: 2px solid #06464E; background: #fff; color: #06464E; text-decoration: none; border-radius: 8px;">Book Childcare</a>
-          <a href="referral.html" class="btn outline" style="padding: 10px 16px; font-weight: 700; border: 2px solid #67B3C2; background: #fff; color: #06464E; text-decoration: none; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;">Refer a Friend <span id="referralCountBadge" style="background:#eef7f2; color:#2d6b42; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700;">0</span></a>
+    <main class="provider-shell">
+      <aside class="provider-sidebar">
+        <div class="provider-sidebar-header">
+          <span class="provider-sidebar-eyebrow">Family Portal</span>
+          <div class="provider-sidebar-title">Assured Hearts</div>
+          <div id="parentSidebarName" class="provider-sidebar-name">Signed in</div>
         </div>
-      </div>
-    </header>
 
-    <main class="container" style="padding: 24px 16px; max-width: 1200px; margin: 0 auto;">
-      
-      <section style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <nav class="provider-nav" role="tablist" aria-label="Parent dashboard sections">
+          <button id="tab-dashboard" class="provider-nav-item is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel="dashboard">Dashboard</button>
+          <button id="tab-calendar" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-calendar" data-panel="calendar">Calendar</button>
+          <button id="tab-inbox" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-inbox" data-panel="inbox">Inbox</button>
+          <button id="tab-children" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-children" data-panel="children">My Children</button>
+          <button id="tab-caregivers" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-caregivers" data-panel="caregivers">My Caregivers</button>
+          <button id="tab-curriculum" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-curriculum" data-panel="curriculum">My Curriculum</button>
+        </nav>
+
+        <div class="provider-sidebar-footer">
+          <div class="provider-upgrade-card">
+            <div class="provider-upgrade-title">Upgrade to Care+ Family Access</div>
+            <p class="provider-upgrade-copy">Unlock curriculum tools, priority matching, and family savings.</p>
+            <a class="provider-upgrade-btn" href="shop.html">Upgrade</a>
+          </div>
+          <button id="parentLogout" class="provider-logout" type="button">Log out</button>
+        </div>
+      </aside>
+
+      <section class="provider-content">
+        <header class="provider-content-header">
           <div>
-            <h2 style="margin: 0; color: #06464E; font-size: 18px; font-weight: 700;">Caregivers in your area</h2>
-            <p id="caregiverLocationHint" style="margin: 4px 0 0 0; color: #6b7280; font-size: 13px;">Based on your last search</p>
+            <p class="provider-eyebrow">Dashboard</p>
+            <h1 class="provider-title">Welcome back<span id="parentWelcomeName"></span></h1>
+            <p class="provider-subtitle">Track bookings, manage your family, and message caregivers.</p>
           </div>
-        </div>
-        <div style="position: relative; margin-top: 16px;">
-          <button id="caregiverPrevRecent" aria-label="Previous caregivers" style="position: absolute; left: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">‹</button>
-          <div id="caregiverViewportRecent" style="overflow: hidden;">
-            <div id="caregiverTrackRecent" style="display: flex; gap: 10px; transition: transform 0.2s ease; padding: 2px 2px 2px 6px;">
+          <div class="provider-header-actions">
+            <button id="openParentProfileBtn" class="provider-header-btn" type="button">My Profile</button>
+          </div>
+        </header>
+
+        <div class="provider-panels">
+          <section id="panel-dashboard" class="provider-panel is-active" role="tabpanel" aria-labelledby="tab-dashboard">
+            <div class="provider-kpi-grid">
+              <div class="provider-kpi-card">
+                <p class="provider-kpi-label">Upcoming bookings</p>
+                <p id="parentUpcomingCount" class="provider-kpi-value">0</p>
+                <p class="provider-kpi-foot">Next 30 days</p>
+              </div>
+              <div class="provider-kpi-card">
+                <p class="provider-kpi-label">My caregivers</p>
+                <p id="parentCaregiverCount" class="provider-kpi-value">0</p>
+                <p class="provider-kpi-foot">Caregivers you've booked with</p>
+              </div>
             </div>
-          </div>
-          <button id="caregiverNextRecent" aria-label="Next caregivers" style="position: absolute; right: -6px; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">›</button>
-        </div>
-        <p id="caregiverRecentEmpty" style="margin: 12px 0 0 0; color: #9ca3af; font-size: 13px; display: none;">Book a caregiver and they’ll appear here for quick re-booking.</p>
-      </section>
 
-      <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-          <h2 style="margin: 0; color: #06464E; font-size: 16px; font-weight: 600;">Manage Bookings</h2>
-          <a href="request-childcare.html" class="btn" style="padding: 8px 14px; font-size: 12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 6px; white-space: nowrap;">Book Childcare</a>
-        </div>
-        
-        <div id="requestsList" style="display: flex; flex-direction: column; gap: 10px; min-height: 60px;">
-          <p style="color: #999; text-align: center; padding: 20px; margin: 0;">Loading your bookings...</p>
-        </div>
-      </section>
-
-      <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 12px;">
-          <h2 style="margin: 0; color: #06464E; font-size: 16px; font-weight: 600;">Calendar</h2>
-          <p style="margin: 0; color: #6b7280; font-size: 12px;">Upcoming and recurring bookings</p>
-        </div>
-        <div id="parentCalendar" style="display:grid; gap:8px; min-height:60px;">
-          <p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">Loading calendar...</p>
-        </div>
-      </section>
-
-
-      <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px;">
-        
-        <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h2 style="margin:0; color:#06464E; font-size:16px; font-weight:600;">Messages</h2>
-            <span id="parentMessagesUnread" style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700; display:none;">0 unread</span>
-          </div>
-          <div id="parentMessagesList" style="display:grid; gap:8px; min-height:40px; margin-bottom:10px;">
-            <p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">Loading messages...</p>
-          </div>
-          <button id="parentMessagesOpenBtn" class="btn" style="padding: 10px 14px; font-size: 13px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 8px; width:100%;">Open messages</button>
-        </section>
-        
-        <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-            <h2 style="margin: 0; color: #06464E; font-size: 16px; font-weight: 600;">Your Children</h2>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <a href="child-demographics.html" class="btn" style="padding: 8px 14px; font-size: 12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: white; text-decoration: none; border-radius: 6px; white-space: nowrap;">Add Child</a>
-              <button id="manageChildrenBtn" class="btn secondary" type="button" style="padding: 8px 14px; font-size: 12px; border: 1px solid #06464E; background: #fff; color: #06464E; text-decoration: none; border-radius: 6px; white-space: nowrap; cursor: pointer;">Manage Children</button>
+            <div class="provider-dashboard-grid">
+              <section class="provider-bookings-card parent-bookings-card">
+                <div class="provider-card-head">
+                  <div>
+                    <h2>Upcoming bookings</h2>
+                    <p class="provider-card-sub">Confirmed sessions with your caregivers.</p>
+                  </div>
+                  <span id="parentBookingsPill" class="provider-card-pill">0 upcoming</span>
+                </div>
+                <div class="parent-bookings-table">
+                  <div class="parent-bookings-row parent-bookings-head">
+                    <div class="parent-booking-cell">Caregiver</div>
+                    <div class="parent-booking-cell">Caregiver contact</div>
+                    <div class="parent-booking-cell">Hours booked</div>
+                    <div class="parent-booking-cell">Care type</div>
+                    <div class="parent-booking-cell">Time scheduled</div>
+                    <div class="parent-booking-cell parent-booking-action">Action</div>
+                  </div>
+                  <div id="parentBookingsList" class="parent-bookings-body">
+                    <div class="provider-bookings-empty">No upcoming bookings yet.</div>
+                  </div>
+                </div>
+              </section>
             </div>
-          </div>
-          <div id="manageChildrenPicker" style="display: none; margin-bottom: 10px; background: #f8fbfc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <label for="childSelect" style="margin: 0; color: #06464E; font-weight: 600; font-size: 12px;">Choose a child to edit:</label>
-            <select id="childSelect" style="flex: 1; min-width: 180px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;">
-              <option value="">Select child</option>
-            </select>
-            <button id="editChildBtn" class="btn" type="button" style="padding: 8px 12px; font-size: 12px; border-radius: 6px;">Edit</button>
-          </div>
-          
-          <div id="childrenList" style="display: flex; flex-direction: column; gap: 10px; min-height: 60px;">
-            <p style="color: #999; text-align: center; padding: 20px; margin: 0;">Loading your children...</p>
-          </div>
-        </section>
+          </section>
 
-      </div>
+          <section id="panel-calendar" class="provider-panel" role="tabpanel" aria-labelledby="tab-calendar" hidden>
+            <div class="provider-panel-card">
+              <h2>Calendar</h2>
+              <p>Upcoming and recurring bookings.</p>
+              <div id="parentCalendarList" class="parent-calendar-list">
+                <div class="provider-bookings-empty">No upcoming bookings yet.</div>
+              </div>
+            </div>
+          </section>
 
-      <section style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-        <h2 style="margin: 0 0 12px 0; color: #06464E; font-size: 16px; font-weight: 600;">Learning Progress</h2>
-        
-        <div id="learningProgress" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
-          <p style="color: #999; text-align: center; padding: 20px; margin: 0;">Loading children's progress...</p>
+          <section id="panel-inbox" class="provider-panel" role="tabpanel" aria-labelledby="tab-inbox" hidden>
+            <div class="provider-panel-card">
+              <div class="provider-card-head">
+                <div>
+                  <h2>Inbox</h2>
+                  <p class="provider-card-sub">Stay in touch with caregivers and support.</p>
+                </div>
+                <span id="parentMessagesUnread" class="provider-card-pill" style="display:none;">0 unread</span>
+              </div>
+              <div id="parentMessagesList" class="parent-messages-list">
+                <div class="provider-bookings-empty">No messages yet.</div>
+              </div>
+              <button id="parentMessagesOpenBtn" class="provider-header-btn" type="button">Open messages</button>
+            </div>
+          </section>
+
+          <section id="panel-children" class="provider-panel" role="tabpanel" aria-labelledby="tab-children" hidden>
+            <div class="provider-panel-card">
+              <div class="provider-card-head">
+                <div>
+                  <h2>My children</h2>
+                  <p class="provider-card-sub">Manage child profiles and booking preferences.</p>
+                </div>
+                <div class="parent-action-row">
+                  <a class="provider-header-btn" href="child-demographics.html">Add child</a>
+                </div>
+              </div>
+              <div id="parentChildrenList" class="parent-children-grid">
+                <div class="provider-bookings-empty">No children added yet.</div>
+              </div>
+            </div>
+          </section>
+
+          <section id="panel-caregivers" class="provider-panel" role="tabpanel" aria-labelledby="tab-caregivers" hidden>
+            <div class="provider-panel-card">
+              <div class="provider-card-head">
+                <div>
+                  <h2>My caregivers</h2>
+                  <p class="provider-card-sub">Caregivers you have booked before.</p>
+                </div>
+              </div>
+              <div id="parentCaregiversList" class="parent-caregivers-grid">
+                <div class="provider-bookings-empty">No caregivers yet.</div>
+              </div>
+            </div>
+          </section>
+
+          <section id="panel-curriculum" class="provider-panel" role="tabpanel" aria-labelledby="tab-curriculum" hidden>
+            <div class="provider-panel-card">
+              <h2>My curriculum</h2>
+              <p>Access curriculum tools, activities, and learning guides here.</p>
+            </div>
+          </section>
+
+          <section id="panel-profile" class="provider-panel" role="tabpanel" aria-labelledby="tab-dashboard" hidden>
+            <div class="provider-panel-card provider-profile-card">
+              <div class="provider-card-head provider-profile-head">
+                <div>
+                  <h2>My profile</h2>
+                  <p class="provider-card-sub">Update your family contact details and preferences.</p>
+                </div>
+                <button id="parentProfileBackBtn" class="provider-header-btn provider-header-btn-ghost" type="button">Back to Dashboard</button>
+              </div>
+              <form id="parentProfileForm" class="provider-profile-form">
+                <div class="provider-form-grid">
+                  <label class="provider-form-field">
+                    <span>Full name</span>
+                    <input type="text" id="parentName" name="name" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Email (login)</span>
+                    <input type="email" id="parentEmail" name="email" class="provider-input" readonly>
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Phone</span>
+                    <input type="tel" id="parentPhone" name="phone" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Subscription</span>
+                    <input type="text" id="parentSubscription" name="subscription_type" class="provider-input" readonly>
+                  </label>
+                </div>
+
+                <div class="provider-form-grid">
+                  <label class="provider-form-field">
+                    <span>Address line 1</span>
+                    <input type="text" id="parentAddress1" name="address_line1" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Address line 2</span>
+                    <input type="text" id="parentAddress2" name="address_line2" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>City</span>
+                    <input type="text" id="parentCity" name="city" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Province/State</span>
+                    <input type="text" id="parentProvince" name="province" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Postal/ZIP</span>
+                    <input type="text" id="parentPostal" name="postal_code" class="provider-input">
+                  </label>
+                </div>
+
+                <div class="provider-form-grid">
+                  <label class="provider-form-field">
+                    <span>Emergency contact name</span>
+                    <input type="text" id="parentEmergencyName" name="emergency_contact_name" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Emergency contact phone</span>
+                    <input type="tel" id="parentEmergencyPhone" name="emergency_contact_phone" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Spouse contact name</span>
+                    <input type="text" id="parentSpouseName" name="spouse_name" class="provider-input">
+                  </label>
+                  <label class="provider-form-field">
+                    <span>Spouse contact phone</span>
+                    <input type="tel" id="parentSpousePhone" name="spouse_phone" class="provider-input">
+                  </label>
+                </div>
+
+                <div class="provider-form-actions">
+                  <button class="provider-header-btn" type="submit">Save changes</button>
+                  <span id="parentProfileStatus" class="provider-form-status"></span>
+                </div>
+              </form>
+            </div>
+          </section>
         </div>
       </section>
-
     </main>
 
-    <footer style="background: #06464E; color: white; padding: 16px 24px; text-align: center; margin-top: 32px; font-size: 12px;">
-      <p style="margin: 0;">© 2025 Assured Hearts. All rights reserved.</p>
+    <footer style="background:#06464E; color:white; padding:32px 24px; text-align:center; margin-top:48px;">
+      <p style="margin:0;">© 2025 Assured Hearts. All rights reserved.</p>
     </footer>
 
     <script src="script.js"></script>
@@ -148,557 +271,406 @@
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
       const userId = parseInt(localStorage.getItem('user_id'), 10) || null;
 
-      function baseCaregivers(){
-        return [
-          { id: 'amina-khalid', name: 'Amina Khalid', initials: 'AK', info: '5 yrs • CPR • Islamic stories', quote: 'Love teaching duas and story time after Asr.', rating: 4.9, reviews: 28 },
-          { id: 'sara-malik', name: 'Sara Malik', initials: 'SM', info: '4 yrs • ECE • Crafts', quote: 'Hands-on activities and positive routines are my jam.', rating: 4.8, reviews: 19 },
-          { id: 'nadia-rahman', name: 'Nadia Rahman', initials: 'NR', info: '3 yrs • First Aid • Qur’an basics', quote: 'Gentle approach, reading, and outdoor play whenever possible.', rating: 4.7, reviews: 22 },
-          { id: 'layla-yusuf', name: 'Layla Yusuf', initials: 'LY', info: '6 yrs • Montessori inspired', quote: 'Building confidence through choice-based play and kindness.', rating: 5.0, reviews: 31 },
-          { id: 'fatima-noor', name: 'Fatima Noor', initials: 'FN', info: '4 yrs • Arts & Quran', quote: 'Meet me to talk through routines and expectations.', rating: 4.9, reviews: 17 },
-          { id: 'hana-ali', name: 'Hana Ali', initials: 'HA', info: '5 yrs • Outdoors & STEM', quote: 'Meet for a quick intro call—happy to share references.', rating: 4.8, reviews: 21 }
-        ];
-      }
+      const showNotice = (message, type) => {
+        if(typeof window.showBanner === 'function') {
+          window.showBanner(message, type || 'info');
+        } else {
+          alert(message);
+        }
+      };
 
-      function renderCaregiverTrack(trackId, viewportId, prevId, nextId, caregivers, opts={}){
-        const track = document.getElementById(trackId);
-        const viewport = document.getElementById(viewportId);
-        const prevBtn = document.getElementById(prevId);
-        const nextBtn = document.getElementById(nextId);
-        if(!track || !viewport || !prevBtn || !nextBtn) return;
-        const favorites = JSON.parse(localStorage.getItem('favorite_caregivers') || '[]');
-        track.innerHTML = caregivers.map(c => {
-          const isFav = favorites.includes(c.id);
-          const starColor = isFav ? '#f59e0b' : '#d1d5db';
-          const favLabel = isFav ? 'Favorited' : 'Add to favorites';
-          const firstName = c.name.split(' ')[0] || c.name;
-          const sessionCount = opts.sessionCounts ? (opts.sessionCounts[c.id] || 0) : null;
-          const sessionsRow = opts.showSessions ? `<div style="color:#06464E; font-weight:700; font-size:12px;">${sessionCount} sessions</div>` : '';
-          const meetBadge = opts.meet ? `<span style="background:#eef7f2; color:#2d6b42; padding:2px 8px; border-radius: 999px; font-size:11px; font-weight:700; align-self:flex-start;">Meet</span>` : '';
-          const availability = c.availability ? (typeof c.availability === 'string' ? JSON.parse(c.availability) : c.availability) : {};
-          let availabilityTag = '';
-          if(availability.status === 'immediate') availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius: 999px; font-size:11px; font-weight:700; align-self:flex-start;">Available immediately</span>';
-          if(availability.status === 'next24') availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius: 999px; font-size:11px; font-weight:700; align-self:flex-start;">Available in next 24h</span>';
-          const availabilityDetail = availabilityTag ? availabilityTag : '';
-          const profileHref = `caregiver-profile.html?provider_id=${encodeURIComponent(c.id)}&provider_name=${encodeURIComponent(c.name)}`;
-          const bookHref = `request-childcare.html?provider_id=${encodeURIComponent(c.id)}&provider_name=${encodeURIComponent(c.name)}`;
+      const activateParentPanel = (panelId) => {
+        const navItems = Array.from(document.querySelectorAll('.provider-nav-item'));
+        const panels = Array.from(document.querySelectorAll('.provider-panel'));
+        const navTarget = panelId === 'profile' ? 'dashboard' : panelId;
+        navItems.forEach((btn) => {
+          const isActive = btn.dataset.panel === navTarget;
+          btn.classList.toggle('is-active', isActive);
+          btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        panels.forEach((panel) => {
+          const isActive = panel.id === `panel-${panelId}`;
+          panel.classList.toggle('is-active', isActive);
+          panel.hidden = !isActive;
+        });
+      };
+
+      document.querySelectorAll('.provider-nav-item').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if(btn.dataset.panel) activateParentPanel(btn.dataset.panel);
+        });
+        btn.addEventListener('keydown', (event) => {
+          if(event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            btn.click();
+          }
+        });
+      });
+
+      const initialPanel = window.location.hash.replace('#', '');
+      activateParentPanel(initialPanel || 'dashboard');
+
+      document.getElementById('openParentProfileBtn')?.addEventListener('click', () => {
+        window.location.hash = 'profile';
+        activateParentPanel('profile');
+      });
+      document.getElementById('parentProfileBackBtn')?.addEventListener('click', () => {
+        window.location.hash = 'dashboard';
+        activateParentPanel('dashboard');
+      });
+
+      const logoutHandler = () => {
+        if(confirm('Are you sure you want to log out?')) {
+          localStorage.removeItem('user_id');
+          localStorage.removeItem('user_type');
+          window.location.href = 'index.html';
+        }
+      };
+      document.getElementById('parentLogout')?.addEventListener('click', logoutHandler);
+
+      const toDate = (value) => {
+        if(!value) return null;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      };
+
+      const minutesFromTime = (timeStr) => {
+        if(!timeStr) return null;
+        const parts = timeStr.split(':').map(Number);
+        if(parts.length < 2 || parts.some((p) => Number.isNaN(p))) return null;
+        return (parts[0] * 60) + parts[1];
+      };
+
+      const durationHours = (entry) => {
+        if(entry.start_time && entry.end_time) {
+          const start = minutesFromTime(entry.start_time);
+          const end = minutesFromTime(entry.end_time);
+          if(start === null || end === null) return 0;
+          return Math.max(0, (end - start) / 60);
+        }
+        if(entry.start_at && entry.end_at) {
+          const start = new Date(entry.start_at);
+          const end = new Date(entry.end_at);
+          if(Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
+          return Math.max(0, (end - start) / (1000 * 60 * 60));
+        }
+        return 0;
+      };
+
+      const formatDateLabel = (date) => date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+
+      const formatTimeLabel = (timeStr) => {
+        if(!timeStr) return '';
+        const parts = timeStr.split(':').map(Number);
+        if(parts.length < 2 || parts.some((p) => Number.isNaN(p))) return timeStr;
+        const base = new Date();
+        base.setHours(parts[0], parts[1], 0, 0);
+        return base.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' });
+      };
+
+      const formatScheduleLabel = (entry) => {
+        if(entry.start_at && entry.end_at) {
+          const start = toDate(entry.start_at);
+          const end = toDate(entry.end_at);
+          if(!start || !end) return 'TBD';
+          return `${formatDateLabel(start)} ${start.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })} - ${end.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })}`;
+        }
+        if(entry.session_date) {
+          const date = toDate(entry.session_date);
+          if(!date) return 'TBD';
+          if(entry.start_time && entry.end_time) {
+            return `${formatDateLabel(date)} ${formatTimeLabel(entry.start_time)} - ${formatTimeLabel(entry.end_time)}`;
+          }
+          return formatDateLabel(date);
+        }
+        return 'TBD';
+      };
+
+      const formatCareType = (value) => {
+        const raw = String(value || '').toLowerCase();
+        if(raw.includes('curriculum')) return 'Curriculum';
+        if(raw.includes('mixed')) return 'Mixed';
+        if(raw.includes('standard')) return 'Standard';
+        return 'Standard';
+      };
+
+      const renderUpcomingBookings = (sessions) => {
+        const listEl = document.getElementById('parentBookingsList');
+        const countEl = document.getElementById('parentBookingsPill');
+        const kpiCount = document.getElementById('parentUpcomingCount');
+        if(!listEl) return;
+        const now = new Date();
+        const upcoming = (sessions || []).filter((entry) => {
+          const status = String(entry.status || '').toLowerCase();
+          if(status.includes('cancel')) return false;
+          const start = entry.start_at ? new Date(entry.start_at) : null;
+          if(start) return start >= now;
+          if(entry.session_date) {
+            const date = toDate(entry.session_date);
+            return date ? date >= new Date(now.toDateString()) : false;
+          }
+          return false;
+        });
+        if(countEl) countEl.textContent = `${upcoming.length} upcoming`;
+        if(kpiCount) kpiCount.textContent = String(upcoming.length);
+        if(upcoming.length === 0) {
+          listEl.innerHTML = '<div class="provider-bookings-empty">No upcoming bookings yet.</div>';
+          return;
+        }
+        listEl.innerHTML = upcoming.slice(0, 6).map((entry) => {
+          const contactBits = [entry.provider_email, entry.provider_phone].filter(Boolean).join(' · ');
+          const hours = durationHours(entry);
+          const hoursLabel = hours ? `${hours.toFixed(1).replace(/\.0$/, '')} hrs` : 'TBD';
+          const careType = formatCareType(entry.care_type);
+          const providerName = entry.provider_name || 'Caregiver';
+          const schedule = formatScheduleLabel(entry);
+          const contactLabel = contactBits || 'Contact not available';
+          const providerId = entry.provider_id || entry.provider_user_id || '';
           return `
-          <div style="flex: 0 0 220px; background: #f9fbfc; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">${c.initials}</div>
-              <div style="flex:1;">
-                <p style="margin: 0; color: #06464E; font-weight: 700; font-size: 13px;">${c.name}</p>
-                <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 11px;">${c.info}</p>
+            <div class="parent-bookings-row parent-bookings-item">
+              <div class="parent-booking-cell" data-label="Caregiver">${providerName}</div>
+              <div class="parent-booking-cell" data-label="Caregiver contact">
+                <span class="parent-booking-contact">${contactLabel}</span>
               </div>
-              <button class="fav-btn" data-caregiver="${c.id}" style="background: none; border: 1px solid #e5e7eb; border-radius: 999px; padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-size: 11px; color: #06464E;">
-                <span class="star" style="color: ${starColor}; font-size: 12px;">★</span>${favLabel}
-              </button>
+              <div class="parent-booking-cell" data-label="Hours booked">${hoursLabel}</div>
+              <div class="parent-booking-cell" data-label="Care type">${careType}</div>
+              <div class="parent-booking-cell" data-label="Time scheduled">${schedule}</div>
+              <div class="parent-booking-cell parent-booking-action" data-label="Action">
+                <button class="parent-booking-btn" data-id="${providerId}" data-name="${providerName}">Message</button>
+              </div>
             </div>
-            ${meetBadge}
-            ${availabilityDetail}
-            ${sessionsRow}
-            <div style="display: flex; align-items: center; gap: 6px; color: #f59e0b; font-weight: 700; font-size: 12px;">
-              ★ ${c.rating.toFixed(1)} <span style="color:#6b7280; font-weight: 500;">(${c.reviews} reviews)</span>
-            </div>
-            <p style="margin: 0; color: #111; font-size: 12px;">“${c.quote}”</p>
-            <div style="display: flex; gap: 6px; margin-top: 2px; flex-wrap: wrap;">
-              <button class="btn secondary message-btn" data-caregiver="${c.id}" data-name="${c.name}" style="flex: 1; min-width: 110px; padding: 9px 10px; font-size: 11px; font-weight: 700; border: 1px solid #06464E; background: #fff; color: #06464E; border-radius: 7px;">Message ${firstName}</button>
-              <button class="btn book-btn" data-book="${bookHref}" style="flex: 1; min-width: 110px; padding: 9px 10px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color: #fff; border: none; border-radius: 7px;">Book with ${firstName}</button>
-              <button class="btn secondary profile-btn" data-profile="${profileHref}" style="flex:1; min-width:110px; padding:9px 10px; font-size:11px; font-weight:700; border:1px solid #e5e7eb; background:#fff; color:#06464E; border-radius:7px;">See ${firstName}'s profile</button>
-            </div>
-          </div>
-        `;
+          `;
         }).join('');
-        const scrollBy = 280;
-        prevBtn.addEventListener('click', ()=> viewport.scrollBy({ left: -scrollBy, behavior: 'smooth' }));
-        nextBtn.addEventListener('click', ()=> viewport.scrollBy({ left: scrollBy, behavior: 'smooth' }));
 
-        // Favorite toggles
-        track.querySelectorAll('.fav-btn').forEach(btn => {
-          btn.addEventListener('click', ()=>{
-            const id = btn.getAttribute('data-caregiver');
-            if(!id) return;
-            let favs = new Set(JSON.parse(localStorage.getItem('favorite_caregivers') || '[]'));
-            if(favs.has(id)){
-              favs.delete(id);
-            } else {
-              favs.add(id);
-            }
-            localStorage.setItem('favorite_caregivers', JSON.stringify(Array.from(favs)));
-            renderCaregivers();
-          });
-        });
-
-        // Book -> redirect to request page for that caregiver
-        track.querySelectorAll('.book-btn').forEach(btn => {
-          btn.addEventListener('click', ()=>{
-            const href = btn.getAttribute('data-book');
-            if(href) window.location.href = href;
-          });
-        });
-
-        // Profile -> view caregiver profile
-        track.querySelectorAll('.profile-btn').forEach(btn=>{
-          btn.addEventListener('click', ()=>{
-            const href = btn.getAttribute('data-profile');
-            if(href) window.location.href = href;
-          });
-        });
-
-        // Message -> open chat
-        track.querySelectorAll('.message-btn').forEach(btn=>{
-          btn.addEventListener('click', (ev)=>{
-            ev.preventDefault();
-            const id = btn.getAttribute('data-caregiver');
-            const otherName = btn.dataset.name || 'Caregiver';
-            if(window.showChatWidget && id){
-              window.showChatWidget(id, otherName);
-            } else {
-              // fallback to login if chat widget not available
-              const loginModal = document.getElementById('loginModal');
-              if(loginModal) loginModal.classList.remove('hidden');
+        listEl.querySelectorAll('.parent-booking-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const otherId = parseInt(btn.getAttribute('data-id'), 10);
+            const otherName = btn.getAttribute('data-name') || 'Caregiver';
+            if(otherId && window.showChatWidget) {
+              window.showChatWidget(otherId, otherName);
+            } else if(otherId && window.openChatThread) {
+              window.openChatThread(otherId, otherName);
             }
           });
         });
-      }
+      };
 
-      async function renderCaregivers(){
-        const location = localStorage.getItem('last_search_location') || 'your area';
-        const hint = document.getElementById('caregiverLocationHint');
-        if(hint) hint.textContent = `Based on your last search in ${location}`;
-
-        async function loadProviders(){
-          try{
-            const resp = await fetch(`${API_BASE}/forms/providers`);
-            if(!resp.ok) return [];
-            const data = await resp.json();
-            return (data.providers || []).map(p=>({
-              id: String(p.user_id || p.id),
-              name: p.name || 'Caregiver',
-              initials: (p.name || 'CG').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase(),
-              info: p.city || '',
-              rating: p.rating || 4.8,
-              reviews: p.reviews || 12,
-              sessions: p.sessions || 0,
-              bio: p.bio || 'Trusted caregiver in your area.',
-              quote: p.bio || 'Trusted caregiver in your area.',
-              interest: p.city || location,
-              rate: p.rate || '',
-              availability: p.availability || null,
-              weekly_hours: p.weekly_hours || null
-            }));
-          }catch(err){
-            console.warn('Provider fetch failed, using fallback', err);
-            return [];
-          }
-        }
-
-        let all = await loadProviders();
-        if(!all || all.length === 0){
-          all = baseCaregivers();
-        }
-
-        const sessionCounts = JSON.parse(localStorage.getItem('caregiver_sessions') || '{}');
-        const favorites = JSON.parse(localStorage.getItem('favorite_caregivers') || '[]').map(String);
-
-        // Sort: favorites first, then by rating desc
-        all.sort((a,b)=>{
-          const aFav = favorites.includes(String(a.id)) ? 1 : 0;
-          const bFav = favorites.includes(String(b.id)) ? 1 : 0;
-          if(aFav !== bFav) return bFav - aFav;
-          const ar = Number(a.rating || 0);
-          const br = Number(b.rating || 0);
-          return br - ar;
-        });
-
-        const emptyText = document.getElementById('caregiverRecentEmpty');
-        if(emptyText) emptyText.style.display = all.length ? 'none' : 'block';
-        renderCaregiverTrack('caregiverTrackRecent','caregiverViewportRecent','caregiverPrevRecent','caregiverNextRecent', all, { meet:false, showSessions:true, sessionCounts });
-      }
-
-      function initManageChildrenPicker(children){
-        const btn = document.getElementById('manageChildrenBtn');
-        const picker = document.getElementById('manageChildrenPicker');
-        const select = document.getElementById('childSelect');
-        const editBtn = document.getElementById('editChildBtn');
-        if(!btn || !picker || !select || !editBtn) return;
-        btn.onclick = ()=>{
-          picker.style.display = picker.style.display === 'flex' ? 'none' : 'flex';
-        };
-        select.innerHTML = '<option value=\"\">Select child</option>';
-        children.forEach(c=>{
-          if(!c.id) return;
-          const opt = document.createElement('option');
-          opt.value = c.id;
-          opt.textContent = c.name || 'Unnamed Child';
-          select.appendChild(opt);
-        });
-        editBtn.onclick = ()=>{
-          const id = select.value;
-          if(!id) return showBanner('Please select a child to edit', 'info');
-          localStorage.setItem('child_to_edit', id);
-          window.location.href = 'child-demographics.html';
-        };
-      }
-
-      async function loadParentDashboard() {
-        const storedUserId = localStorage.getItem('user_id');
-        const userName = localStorage.getItem('user_name');
-
-        if(userName) {
-          document.getElementById('dashboardGreeting').textContent = `Welcome back, ${userName}!`;
-        }
-        if(!storedUserId) {
-          showBanner('Please log in to view your dashboard.', 'info');
-          setTimeout(()=> window.location.href = 'account-signup.html', 1200);
+      const renderCalendar = (sessions) => {
+        const listEl = document.getElementById('parentCalendarList');
+        if(!listEl) return;
+        if(!sessions || sessions.length === 0) {
+          listEl.innerHTML = '<div class="provider-bookings-empty">No upcoming bookings yet.</div>';
           return;
         }
+        const upcoming = sessions.slice().sort((a, b) => {
+          const aDate = toDate(a.start_at || a.session_date);
+          const bDate = toDate(b.start_at || b.session_date);
+          return (aDate?.getTime() || 0) - (bDate?.getTime() || 0);
+        });
+        listEl.innerHTML = upcoming.slice(0, 8).map((entry) => {
+          const providerName = entry.provider_name || 'Caregiver';
+          const schedule = formatScheduleLabel(entry);
+          return `
+            <div class="parent-calendar-item">
+              <div>
+                <div class="parent-calendar-title">${providerName}</div>
+                <div class="parent-calendar-sub">${schedule}</div>
+              </div>
+              <span class="parent-calendar-pill">${formatCareType(entry.care_type)}</span>
+            </div>
+          `;
+        }).join('');
+      };
 
-        const userIdNum = parseInt(storedUserId) || null;
-        const familyId = localStorage.getItem('family_id') || (userIdNum ? `family_${userIdNum}` : null);
-        const cachedChildren = JSON.parse(localStorage.getItem('child_cache') || '[]').filter(c => !userIdNum || c.parent_id === userIdNum);
+      const renderChildren = (children) => {
+        const listEl = document.getElementById('parentChildrenList');
+        if(!listEl) return;
+        if(!children || children.length === 0) {
+          listEl.innerHTML = '<div class="provider-bookings-empty">No children added yet.</div>';
+          return;
+        }
+        listEl.innerHTML = children.map((child) => {
+          const name = [child.first_name, child.last_name].filter(Boolean).join(' ') || 'Child';
+          const initials = name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+          const ageLabel = child.age ? `${child.age} yrs` : 'Age not set';
+          return `
+            <div class="parent-child-card">
+              <div class="parent-child-avatar">${initials}</div>
+              <div class="parent-child-info">
+                <div class="parent-child-name">${name}</div>
+                <div class="parent-child-meta">${ageLabel}</div>
+              </div>
+              <div class="parent-child-actions">
+                <button class="parent-child-btn parent-child-edit" data-id="${child.id}">Edit</button>
+                <a class="parent-child-btn" href="request-childcare.html?child_id=${encodeURIComponent(child.id)}">Book with ${name.split(' ')[0] || 'child'}</a>
+              </div>
+            </div>
+          `;
+        }).join('');
 
-        const normalizeChild = (c)=>{
-          const rawId = c.id ?? c.child_id;
-          const parsedId = rawId !== undefined && rawId !== null && !Number.isNaN(parseInt(rawId)) ? parseInt(rawId) : null;
-          if(!parsedId) return null;
-          return {
-            id: parsedId,
-            name: ((c.first_name || '') + (c.last_name ? ` ${c.last_name}` : '')).trim() || c.name || 'Child',
-            parent_id: c.parent_id || c.user_id || userIdNum || null,
-            age: c.age !== undefined && c.age !== null ? c.age : null,
-            frequency: c.frequency || '',
-            preferred_schedule: c.preferred_schedule || '',
-            special_needs: c.special_needs || ''
+        listEl.querySelectorAll('.parent-child-edit').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const childId = btn.getAttribute('data-id');
+            if(childId) {
+              localStorage.setItem('child_to_edit', childId);
+              window.location.href = 'child-demographics.html';
+            }
+          });
+        });
+      };
+
+      const renderCaregivers = (sessions) => {
+        const listEl = document.getElementById('parentCaregiversList');
+        if(!listEl) return;
+        const caregivers = new Map();
+        (sessions || []).forEach((entry) => {
+          const id = entry.provider_id || entry.provider_user_id;
+          if(!id) return;
+          caregivers.set(id, {
+            id,
+            name: entry.provider_name || 'Caregiver',
+            email: entry.provider_email || '',
+            phone: entry.provider_phone || '',
+            city: entry.provider_city || '',
+            province: entry.provider_province || ''
+          });
+        });
+        const items = Array.from(caregivers.values());
+        const countEl = document.getElementById('parentCaregiverCount');
+        if(countEl) countEl.textContent = String(items.length);
+        if(items.length === 0) {
+          listEl.innerHTML = '<div class="provider-bookings-empty">No caregivers yet.</div>';
+          return;
+        }
+        listEl.innerHTML = items.map((c) => {
+          const initials = c.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+          const location = [c.city, c.province].filter(Boolean).join(', ');
+          const contact = [c.email, c.phone].filter(Boolean).join(' · ') || 'Contact not available';
+          return `
+            <div class="parent-caregiver-card">
+              <div class="parent-caregiver-avatar">${initials}</div>
+              <div class="parent-caregiver-info">
+                <div class="parent-caregiver-name">${c.name}</div>
+                <div class="parent-caregiver-meta">${location || 'Location not set'}</div>
+                <div class="parent-caregiver-contact">${contact}</div>
+              </div>
+              <button class="parent-caregiver-btn" data-id="${c.id}" data-name="${c.name}">Message</button>
+            </div>
+          `;
+        }).join('');
+
+        listEl.querySelectorAll('.parent-caregiver-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const otherId = parseInt(btn.getAttribute('data-id'), 10);
+            const otherName = btn.getAttribute('data-name') || 'Caregiver';
+            if(otherId && window.showChatWidget) {
+              window.showChatWidget(otherId, otherName);
+            } else if(otherId && window.openChatThread) {
+              window.openChatThread(otherId, otherName);
+            }
+          });
+        });
+      };
+
+      const fillProfileForm = (profile) => {
+        document.getElementById('parentSidebarName').textContent = profile?.name ? `Signed in as ${profile.name}` : 'Signed in';
+        const firstName = profile?.name ? profile.name.split(' ')[0] : '';
+        document.getElementById('parentWelcomeName').textContent = firstName ? `, ${firstName}` : '';
+        if(profile?.name) localStorage.setItem('user_name', profile.name);
+        const setVal = (id, value) => {
+          const el = document.getElementById(id);
+          if(el) el.value = value || '';
+        };
+        setVal('parentName', profile?.name);
+        setVal('parentEmail', profile?.email);
+        setVal('parentPhone', profile?.phone);
+        setVal('parentAddress1', profile?.address_line1);
+        setVal('parentAddress2', profile?.address_line2);
+        setVal('parentCity', profile?.city);
+        setVal('parentProvince', profile?.province);
+        setVal('parentPostal', profile?.postal_code);
+        setVal('parentEmergencyName', profile?.emergency_contact_name);
+        setVal('parentEmergencyPhone', profile?.emergency_contact_phone);
+        setVal('parentSpouseName', profile?.spouse_name);
+        setVal('parentSpousePhone', profile?.spouse_phone);
+        const subscription = profile?.subscription_type || (profile?.is_premium ? 'Care+ Premium' : 'Standard');
+        setVal('parentSubscription', subscription);
+      };
+
+      const hookProfileSave = () => {
+        const form = document.getElementById('parentProfileForm');
+        const statusEl = document.getElementById('parentProfileStatus');
+        if(!form) return;
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          if(!userId) {
+            showNotice('Please log in to update your profile.', 'info');
+            return;
+          }
+          const payload = {
+            name: document.getElementById('parentName')?.value?.trim() || null,
+            phone: document.getElementById('parentPhone')?.value?.trim() || null,
+            city: document.getElementById('parentCity')?.value?.trim() || null,
+            province: document.getElementById('parentProvince')?.value?.trim() || null,
+            address_line1: document.getElementById('parentAddress1')?.value?.trim() || null,
+            address_line2: document.getElementById('parentAddress2')?.value?.trim() || null,
+            postal_code: document.getElementById('parentPostal')?.value?.trim() || null,
+            emergency_contact_name: document.getElementById('parentEmergencyName')?.value?.trim() || null,
+            emergency_contact_phone: document.getElementById('parentEmergencyPhone')?.value?.trim() || null,
+            spouse_name: document.getElementById('parentSpouseName')?.value?.trim() || null,
+            spouse_phone: document.getElementById('parentSpousePhone')?.value?.trim() || null
           };
-        };
-
-        const renderChildrenSection = (childrenListEl, learningEl, kids)=>{
-          if(kids.length === 0) {
-            childrenListEl.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No children added yet. <a href="child-demographics.html" style="color: #67B3C2; font-weight: 600;">Add a child</a></p>';
-            learningEl.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">Add children to track learning progress</p>';
-            return;
+          if(statusEl) {
+            statusEl.textContent = 'Saving...';
+            statusEl.style.color = '#9ca3af';
           }
-          childrenListEl.innerHTML = kids.map(child => {
-            const ageNum = child.age !== undefined && child.age !== null ? Number(child.age) : NaN;
-            const ageStr = Number.isFinite(ageNum) ? `${ageNum} yrs` : '';
-            const childName = child.name || 'Child';
-            const initial = childName.charAt(0).toUpperCase();
-            return `
-              <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; gap: 12px;">
-                <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 0;">
-                  <div style="width: 28px; height: 28px; background: #111; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 12px; color: #fff;">${initial}</div>
-                  <div style="flex: 1; min-width: 0;">
-                    <p style="margin: 0; color: #06464E; font-weight: 500; word-break: break-word;">${childName}</p>
-                    ${ageStr ? `<p style="margin: 2px 0 0 0; color: #999; font-size: 12px; word-break: break-word;">Age: ${ageStr}</p>` : ''}
-                    ${child.frequency ? `<p style="margin: 2px 0 0 0; color: #999; font-size: 12px; word-break: break-word;">${child.frequency}</p>` : ''}
-                  </div>
-                </div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-left:auto;">
-                  <a href="child-profile.html?child_id=${child.id}" style="color: #06464E; font-weight: 600; text-decoration: none; font-size: 12px; white-space: nowrap; padding: 8px; border:1px solid #e5e7eb; border-radius:6px; background:#f8fbfc;">View profile</a>
-                  <a href="child-demographics.html" style="color: #67B3C2; font-weight: 600; text-decoration: none; font-size: 12px; white-space: nowrap; padding: 8px;">Edit</a>
-                </div>
-              </div>
-            `;
-          }).join('');
-
-          learningEl.innerHTML = kids.map(child => {
-            const childName = child.name || 'Unnamed Child';
-            const initial = childName.charAt(0).toUpperCase();
-            return `
-              <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; text-align: center;">
-                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; margin: 0 auto 8px;">${initial}</div>
-                <p style="margin: 0 0 4px 0; color: #06464E; font-weight: 500; font-size: 13px;">${childName}</p>
-                <p style="margin: 0 0 8px 0; color: #999; font-size: 12px;">Track progress</p>
-                <a href="learning.html" style="color: #06464E; font-weight: 600; text-decoration: none; font-size: 12px; padding: 8px; display: inline-block;">View →</a>
-              </div>
-            `;
-          }).join('');
-        };
-
-        try{
-          const resp = await fetch(`${API_BASE}/forms/parent/${userId}`);
-          if(!resp.ok) throw new Error('Failed to load dashboard');
-          const data = await resp.json();
-
-          const requests = Array.isArray(data.requests) ? data.requests : [];
-          const childSource = Array.isArray(data.children) ? data.children :
-                              Array.isArray(data.child_profiles) ? data.child_profiles :
-                              Array.isArray(data.kids) ? data.kids : [];
-          const normalizedSource = childSource.map(normalizeChild).filter(Boolean);
-          const normalizedCache = cachedChildren.map(normalizeChild).filter(Boolean);
-          const mergedChildren = [];
-          const seenKeys = new Set();
-          const keyFor = (c)=> `${c.id || ''}|${c.parent_id || ''}`;
-          [...normalizedSource, ...normalizedCache].forEach(c=>{
-            const k = keyFor(c);
-            if(seenKeys.has(k)) return;
-            seenKeys.add(k);
-            mergedChildren.push(c);
-          });
-
-          const requestsList = document.getElementById('requestsList');
-          if(requests.length === 0) {
-            requestsList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; margin: 0;">No bookings yet. <a href="request-childcare.html" style="color: #67B3C2; font-weight: 600;">Book childcare</a></p>';
-          } else {
-            requestsList.innerHTML = requests.map(request => {
-              const statusColors = {
-                pending: { bg: '#fff9e6', color: '#8b6914', text: 'Pending' },
-                matched: { bg: '#eef7f2', color: '#2d6b42', text: 'Matched' },
-                accepted: { bg: '#eef7f2', color: '#2d6b42', text: 'Accepted' },
-                confirmed: { bg: '#eef7f2', color: '#2d6b42', text: 'Confirmed' },
-                cancelled: { bg: '#fee', color: '#991b1b', text: 'Cancelled' }
-              };
-              const statusKey = (request.status || '').toLowerCase();
-              const status = statusColors[statusKey] || statusColors.pending;
-              const paymentStatus = (request.payment_status || '').toLowerCase();
-              const isPaid = ['paid','succeeded'].includes(paymentStatus);
-              let pricingSnapshot = request.pricing_snapshot || null;
-              if(pricingSnapshot && typeof pricingSnapshot === 'string'){
-                try{ pricingSnapshot = JSON.parse(pricingSnapshot); }catch(_err){ pricingSnapshot = null; }
-              }
-              const storedTotalCents = request.payment_amount_cents || pricingSnapshot?.total_booking_cents;
-              const storedHourlyCents = request.hourly_rate_cents || pricingSnapshot?.total_hourly_cents;
-              let amountLabel = storedTotalCents ? `$${(storedTotalCents / 100).toFixed(2)}` : '';
-              if(!amountLabel && storedHourlyCents){
-                if(request.start_at && request.end_at){
-                  const start = new Date(request.start_at);
-                  const end = new Date(request.end_at);
-                  const diffMs = end - start;
-                  const hours = Number.isFinite(diffMs) && diffMs > 0 ? diffMs / 36e5 : 1;
-                  const total = Math.round(storedHourlyCents * Math.max(1, hours));
-                  amountLabel = `$${(total / 100).toFixed(2)}`;
-                } else {
-                  amountLabel = `$${(storedHourlyCents / 100).toFixed(2)}/hr`;
-                }
-              }
-              if(!amountLabel) amountLabel = '$--';
-              const isPayable = statusKey === 'accepted' && !isPaid;
-              const payLabel = `Pay with Stripe ${amountLabel}`;
-              const dateStr = new Date(request.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-              const canCancel = statusKey === 'pending' || statusKey === 'matched';
-              const otherId = request.provider_user_id || request.provider_id || request.provider;
-              return `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: start; gap: 12px;">
-                  <div style="flex: 1; min-width: 0;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
-                      <p style="margin: 0; color: #06464E; font-weight: 500; font-size: 14px;">${request.location || 'Location not specified'}</p>
-                      <span style="background: ${status.bg}; color: ${status.color}; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap;">${status.text}</span>
-                      ${isPaid ? '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; white-space:nowrap;">Paid</span>' : ''}
-                    </div>
-                    <p style="margin: 0; color: #999; font-size: 12px;">Submitted ${dateStr}</p>
-                  </div>
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                    ${isPayable ? `<button class="pay-request-btn" data-id="${request.id}" style="background: #06464E; color: #fff; border: 1px solid #06464E; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer;">${payLabel}</button>` : ''}
-                    ${otherId ? `<button class="message-caregiver-btn" data-other="${otherId}" data-name="${request.provider_name || 'Caregiver'}" style="background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer;">Message ${request.provider_name || 'caregiver'}</button>` : ''}
-                    ${canCancel ? `<button class="cancel-request-btn" data-id="${request.id}" style="background: #fff; color: #991b1b; border: 1px solid #991b1b; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">Cancel</button>` : ''}
-                  </div>
-                </div>
-              `;
-            }).join('');
-          }
-
-          // Calendar snapshot
-          const calendarEl = document.getElementById('parentCalendar');
-          if(calendarEl){
-            const isUpcoming = (r)=>{
-              const start = r.start_at ? new Date(r.start_at) : null;
-              if(!start) return false;
-              return start >= new Date();
-            };
-            const calEvents = requests.filter(r=>{
-              const statusKey = (r.status || '').toLowerCase();
-              return ['accepted','confirmed'].includes(statusKey) && isUpcoming(r);
-            }).slice(0,12);
-            if(calEvents.length === 0){
-              calendarEl.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No upcoming bookings yet.</p>';
-            } else {
-              calendarEl.innerHTML = calEvents.map(r=>{
-                const start = r.start_at ? new Date(r.start_at) : null;
-                const end = r.end_at ? new Date(r.end_at) : null;
-                const dateStr = start ? start.toLocaleDateString('en-US', { month:'short', day:'numeric' }) : 'Date TBD';
-                const timeStr = start ? start.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' }) : '';
-                const endStr = end ? end.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' }) : '';
-                const recurring = r.recurring ? '<span style=\"background:#eef7f2; color:#2d6b42; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;\">Recurring</span>' : '';
-                return `
-                  <div style="border:1px solid #e5e7eb; border-radius:8px; padding:10px; display:flex; justify-content:space-between; gap:8px; align-items:center;">
-                    <div>
-                      <div style="font-weight:700; color:#06464E; font-size:13px;">${r.provider_name || 'Caregiver'}</div>
-                      <div style="color:#6b7280; font-size:12px;">${dateStr} ${timeStr ? '· ' + timeStr : ''}${endStr ? ' - ' + endStr : ''}</div>
-                      <div style="color:#6b7280; font-size:12px;">${r.location || 'Location TBD'}</div>
-                    </div>
-                    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">${recurring}</div>
-                  </div>
-                `;
-              }).join('');
-            }
-          }
-
-          requestsList.querySelectorAll('.cancel-request-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-              const id = btn.getAttribute('data-id');
-              if(!id) return;
-              btn.disabled = true;
-              btn.textContent = 'Cancelling...';
-              try {
-                const res = await fetch(`${API_BASE}/forms/request/${id}/cancel`, { method: 'POST' });
-                if(res.ok) {
-                  btn.textContent = 'Cancelled';
-                  btn.style.background = '#fee';
-                  btn.style.color = '#991b1b';
-                  setTimeout(loadParentDashboard, 800);
-                } else {
-                  btn.textContent = 'Failed';
-                  btn.disabled = false;
-                }
-              } catch(e) {
-                btn.textContent = 'Failed';
-                btn.disabled = false;
-              }
-            });
-          });
-
-          requestsList.querySelectorAll('.message-caregiver-btn').forEach(btn=>{
-            btn.addEventListener('click', ()=>{
-              const other = parseInt(btn.dataset.other,10);
-              const otherName = btn.dataset.name || 'User';
-              if(window.openChatThread && other) window.openChatThread(other, otherName);
-            });
-          });
-
-          requestsList.querySelectorAll('.pay-request-btn').forEach(btn=>{
-            btn.addEventListener('click', ()=>{
-              const requestId = btn.getAttribute('data-id');
-              if(!requestId) return;
-              startCheckout(requestId, btn);
-            });
-          });
-
-          const childrenList = document.getElementById('childrenList');
-          const learningProgress = document.getElementById('learningProgress');
-          renderChildrenSection(childrenList, learningProgress, mergedChildren);
-          initManageChildrenPicker(mergedChildren);
-          // Update referral badge from backend profile if present
-          const badge = document.getElementById('referralCountBadge');
-          if(badge){
-            const fromProfile = data.profile?.referrals_count;
-            if(fromProfile !== undefined && fromProfile !== null){
-              badge.textContent = String(fromProfile);
-              localStorage.setItem('referrals_sent_count', String(fromProfile));
-            }
-          }
-
-      } catch(err) {
-        console.error('Dashboard error:', err);
-        showBanner('Error loading dashboard', 'error');
-        const childrenList = document.getElementById('childrenList');
-        const learningProgress = document.getElementById('learningProgress');
-        const kids = cachedChildren.map(normalizeChild);
-        renderChildrenSection(childrenList, learningProgress, kids);
-        initManageChildrenPicker(kids);
-      }
-    }
-
-      async function startCheckout(requestId, triggerBtn){
-        if(!userId){
-          showBanner('Please sign in to complete checkout.', 'info');
-          return;
-        }
-        const btn = triggerBtn || null;
-        const originalText = btn ? btn.textContent : '';
-        if(btn){
-          btn.disabled = true;
-          btn.textContent = 'Redirecting...';
-        }
-        try{
-          const res = await fetch(`${API_BASE}/payments/checkout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, requestId })
-          });
-          const data = await res.json();
-          if(!res.ok) throw new Error(data.error || 'Checkout failed');
-          if(data.paid){
-            showBanner('Payment already completed.', 'success');
-            loadParentDashboard();
-            return;
-          }
-          if(!data.url) throw new Error('Checkout URL missing.');
-          window.location.href = data.url;
-        }catch(err){
-          console.error('Checkout error:', err);
-          showBanner(err.message || 'Failed to start checkout.', 'error');
-          if(btn){
-            btn.disabled = false;
-            btn.textContent = originalText;
-          }
-        }
-      }
-
-      async function handleCheckoutReturn(){
-        const params = new URLSearchParams(window.location.search);
-        const status = params.get('checkout');
-        if(!status) return;
-        const cleanUrl = window.location.pathname;
-        if(status === 'cancel'){
-          showBanner('Checkout canceled. You can try again anytime.', 'info');
-          window.history.replaceState({}, document.title, cleanUrl);
-          return;
-        }
-        if(status === 'success'){
-          const sessionId = params.get('session_id');
-          if(!sessionId){
-            showBanner('Checkout completed. Refreshing…', 'info');
-            loadParentDashboard();
-            window.history.replaceState({}, document.title, cleanUrl);
-            return;
-          }
-          try{
-            const res = await fetch(`${API_BASE}/payments/checkout/confirm`, {
-              method: 'POST',
+          try {
+            const res = await fetch(`${API_BASE}/forms/parent/${userId}`, {
+              method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ sessionId, userId })
+              body: JSON.stringify(payload)
             });
             const data = await res.json();
-            if(!res.ok) throw new Error(data.error || 'Payment confirmation failed');
-            if(data.paid){
-              showBanner('Payment confirmed. Thank you!', 'success');
-            } else {
-              showBanner('Payment pending. We will update shortly.', 'info');
+            if(!res.ok) throw new Error(data.error || 'Save failed');
+            fillProfileForm(data.profile || payload);
+            if(statusEl) {
+              statusEl.textContent = 'Saved';
+              statusEl.style.color = '#34d399';
             }
-            loadParentDashboard();
-          }catch(err){
-            console.error('Checkout confirm error:', err);
-            showBanner(err.message || 'Failed to confirm payment.', 'error');
-          } finally {
-            window.history.replaceState({}, document.title, cleanUrl);
+            showNotice('Profile saved.', 'success');
+          } catch (err) {
+            if(statusEl) {
+              statusEl.textContent = 'Save failed. Try again.';
+              statusEl.style.color = '#f87171';
+            }
+            showNotice('Could not save profile. Please try again.', 'error');
           }
-        }
-      }
+        });
+      };
 
-      // Messages card hookup
-      (function(){
+      const hookInboxPreview = () => {
         const listEl = document.getElementById('parentMessagesList');
         const unreadEl = document.getElementById('parentMessagesUnread');
         const openBtn = document.getElementById('parentMessagesOpenBtn');
-        const apply = ()=>{
+        const apply = () => {
           const threads = window.latestThreads || {};
           const unread = window.latestUnread || 0;
           if(unreadEl){
-            unreadEl.style.display = unread > 0 ? 'inline-block' : 'none';
+            unreadEl.style.display = unread > 0 ? 'inline-flex' : 'none';
             unreadEl.textContent = `${unread} unread`;
           }
           if(listEl){
             const arr = Object.values(threads);
             if(arr.length === 0){
-              listEl.innerHTML = '<p style="margin:0; padding:8px; color:#6b7280; font-size:13px;">No messages yet.</p>';
+              listEl.innerHTML = '<div class="provider-bookings-empty">No messages yet.</div>';
             } else {
               const lastTwo = arr.slice(-2);
               listEl.innerHTML = lastTwo.map(t=>{
                 const last = t.messages[t.messages.length-1];
                 return `
-                  <div style="padding:8px 0; border-bottom:1px solid #e5e7eb;">
-                    <div style="font-weight:700; color:#06464E;">${t.other_name || 'User'}</div>
-                    <div style="font-size:12px; color:#6b7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${last ? last.body : ''}</div>
+                  <div class="parent-message-item">
+                    <div class="parent-message-name">${t.other_name || 'User'}</div>
+                    <div class="parent-message-body">${last ? last.body : ''}</div>
                   </div>
                 `;
               }).join('');
@@ -712,24 +684,36 @@
             if(window.showChatWidget) window.showChatWidget();
           });
         }
-      })();
+      };
 
-      // Load dashboard on page load
-      window.addEventListener('DOMContentLoaded', ()=> {
-        renderCaregivers();
-        loadParentDashboard();
-        // Load referral count badge from localStorage
-        const badge = document.getElementById('referralCountBadge');
-        if(badge){
-          const count = parseInt(localStorage.getItem('referrals_sent_count') || '0', 10) || 0;
-          badge.textContent = String(count);
+      const loadParentDashboard = async () => {
+        if(!userId){
+          showNotice('Please log in to view your dashboard.', 'info');
+          setTimeout(() => window.location.href = 'account-signup.html', 1200);
+          return;
         }
-      });
+        try {
+          const res = await fetch(`${API_BASE}/forms/parent/${userId}`);
+          if(!res.ok) throw new Error('Failed to load dashboard');
+          const data = await res.json();
+          const profile = data.profile || {};
+          const children = Array.isArray(data.children) ? data.children : [];
+          const sessions = Array.isArray(data.sessions) ? data.sessions : [];
+          fillProfileForm(profile);
+          renderUpcomingBookings(sessions);
+          renderCalendar(sessions);
+          renderChildren(children);
+          renderCaregivers(sessions);
+        } catch (err) {
+          console.error('Parent dashboard load failed', err);
+          showNotice('Unable to load dashboard data.', 'error');
+        }
+      };
 
-      // Handle logout
-      document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        localStorage.clear();
-        window.location.href = 'index.html';
+      window.addEventListener('DOMContentLoaded', () => {
+        hookProfileSave();
+        hookInboxPreview();
+        loadParentDashboard();
       });
     </script>
   </body>

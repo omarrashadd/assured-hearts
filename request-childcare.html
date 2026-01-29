@@ -188,6 +188,7 @@
       const params = new URLSearchParams(window.location.search);
       const providerIdParam = params.get('provider_id');
       const providerNameParam = params.get('provider_name');
+      const childIdParam = params.get('child_id');
       const submitRequestBtn = document.getElementById('submitRequestBtn');
       const childSelect = document.getElementById('childSelect');
       const newChildBtn = document.getElementById('newChildBtn');
@@ -222,6 +223,7 @@
       const recurringDayInputs = ()=> Array.from(document.querySelectorAll('.recurring-day'));
       let selectedProviderId = providerIdParam ? parseInt(providerIdParam,10) : null;
       let selectedProviderName = providerNameParam || '';
+      const selectedChildId = childIdParam ? parseInt(childIdParam, 10) : null;
       const favoriteIds = new Set(JSON.parse(localStorage.getItem('favorite_caregivers') || '[]').map(String));
       
       let allChildren = [];
@@ -442,8 +444,15 @@
           .then(data => {
             allChildren = data.children || [];
             const profile = data.profile || {};
-            if(profile.city || profile.province){
-              homeAddress = [profile.city, profile.province].filter(Boolean).join(', ');
+            const addressParts = [
+              profile.address_line1,
+              profile.address_line2,
+              profile.city,
+              profile.province,
+              profile.postal_code
+            ].filter(Boolean);
+            if(addressParts.length){
+              homeAddress = addressParts.join(', ');
             }
             isMember = !!profile.is_premium;
             const savedLocations = JSON.parse(localStorage.getItem('saved_locations') || '[]');
@@ -470,6 +479,13 @@
             if(allChildren.length > 0){
               childSelect.innerHTML = '<option value="">-- Select a child --</option>' + 
                 allChildren.map((child) => `<option value="${child.id}">${child.first_name || child.name || 'Unnamed Child'}</option>`).join('');
+              if(selectedChildId){
+                const selectedChild = allChildren.find((child) => parseInt(child.id, 10) === selectedChildId);
+                if(selectedChild){
+                  childSelect.value = String(selectedChild.id);
+                  populateChildDetails(selectedChild, true);
+                }
+              }
             } else {
               childSelect.innerHTML = '<option value="">No children yet</option>';
             }
