@@ -847,14 +847,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('provPostal').value = p.postal_code || '';
             document.getElementById('provPayoutMethod').value = p.payout_method || '';
             document.getElementById('provLanguages').value = p.languages || '';
-            document.getElementById('provCerts').value = p.certifications || '';
+            const photoField = document.getElementById('provPhotoUrl');
+            if(photoField) photoField.value = p.photo_url || '';
+            const aboutField = document.getElementById('provAbout');
+            if(aboutField) aboutField.value = p.about || '';
+            const cprField = document.getElementById('provCprCertified');
+            if(cprField) cprField.value = typeof p.cpr_certified === 'boolean' ? String(p.cpr_certified) : '';
+            const insuranceField = document.getElementById('provCaregiverInsurance');
+            if(insuranceField) insuranceField.value = typeof p.caregiver_insurance === 'boolean' ? String(p.caregiver_insurance) : '';
             const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
-            document.getElementById('provAvailabilityNotes').value = availability.notes || '';
+            const availabilityNotesEl = document.getElementById('provAvailabilityNotes');
+            if(availabilityNotesEl){
+              availabilityNotesEl.value = availability.notes || '';
+            }
             const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
             days.forEach(day=>{
               const checkbox = document.querySelector(`input[data-day="${day}"]`);
               const fromInput = document.querySelector(`input[data-day-from="${day}"]`);
               const toInput = document.querySelector(`input[data-day-to="${day}"]`);
+              if(!checkbox || !fromInput || !toInput) return;
               const dayVal = availability[day];
               if(dayVal){
                 checkbox.checked = true;
@@ -888,19 +899,30 @@ document.addEventListener('DOMContentLoaded', () => {
       payload.name = [first, last].filter(Boolean).join(' ') || payload.name || null;
       // Remove unused address_line2 from payload if present
       delete payload.address_line2;
-      const availability = { notes: document.getElementById('provAvailabilityNotes').value || null };
-      const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
-      days.forEach(day=>{
-        const checked = document.querySelector(`input[data-day="${day}"]`)?.checked;
-        if(checked){
-          const fromVal = document.querySelector(`input[data-day-from="${day}"]`)?.value || '';
-          const toVal = document.querySelector(`input[data-day-to="${day}"]`)?.value || '';
-          availability[day] = { from: fromVal, to: toVal };
-        }
-      });
-      payload.availability = availability;
+      const availabilityNotesEl = document.getElementById('provAvailabilityNotes');
+      const hasAvailabilityInputs = availabilityNotesEl || document.querySelector('input[data-day="monday"]');
+      if(hasAvailabilityInputs){
+        const availability = { notes: availabilityNotesEl ? availabilityNotesEl.value || null : null };
+        const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+        days.forEach(day=>{
+          const checked = document.querySelector(`input[data-day="${day}"]`)?.checked;
+          if(checked){
+            const fromVal = document.querySelector(`input[data-day-from="${day}"]`)?.value || '';
+            const toVal = document.querySelector(`input[data-day-to="${day}"]`)?.value || '';
+            availability[day] = { from: fromVal, to: toVal };
+          }
+        });
+        payload.availability = availability;
+      }
+      const boolFromSelect = (val) => {
+        if(val === 'true') return true;
+        if(val === 'false') return false;
+        return null;
+      };
+      if(payload.cpr_certified !== undefined) payload.cpr_certified = boolFromSelect(payload.cpr_certified);
+      if(payload.caregiver_insurance !== undefined) payload.caregiver_insurance = boolFromSelect(payload.caregiver_insurance);
       // Clean empty strings to null so COALESCE works and avoid updating immutable fields
-      ['first_name','last_name','phone','city','province','address_line1','postal_code','payout_method','languages','certifications'].forEach(k=>{
+      ['first_name','last_name','phone','city','province','address_line1','postal_code','payout_method','languages','about','photo_url'].forEach(k=>{
         if(payload[k] !== undefined && payload[k] !== null && payload[k].trim() === ''){
           payload[k] = null;
         }
@@ -951,7 +973,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cgNameEl = document.getElementById('cgName');
     const cgMetaEl = document.getElementById('cgMeta');
     const cgBioEl = document.getElementById('cgBio');
-    const cgExpEl = document.getElementById('cgExperience');
+    const cgPhoto = document.getElementById('cgPhoto');
+    const cgInitials = document.getElementById('cgInitials');
     const cgCertsEl = document.getElementById('cgCerts');
     const cgAvailText = document.getElementById('cgAvailText');
     const cgAvailNotes = document.getElementById('cgAvailNotes');
@@ -981,11 +1004,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const province = p.province || '';
         const locationLabel = [city, province].filter(Boolean).join(', ');
         cgMetaEl.textContent = locationLabel || 'Trusted caregiver';
-        cgBioEl.textContent = p.certifications || 'Certifications on file.';
-        const ageGroups = Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (p.age_groups || 'Age groups on file.');
-        cgExpEl.textContent = ageGroups;
+        cgBioEl.textContent = p.about || 'About information not provided yet.';
         const initials = (p.name || 'CG').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-        cgAvatar.textContent = initials;
+        if(cgInitials) cgInitials.textContent = initials;
+        const photoUrl = p.photo_url || p.photoUrl || '';
+        if(photoUrl && cgPhoto){
+          cgPhoto.src = photoUrl;
+          cgPhoto.addEventListener('error', () => cgAvatar.classList.remove('has-photo'), { once: true });
+          cgAvatar.classList.add('has-photo');
+        } else {
+          cgAvatar.classList.remove('has-photo');
+        }
         const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
         const statusMap = {
           immediate: 'Available immediately',
@@ -1049,9 +1078,10 @@ document.addEventListener('DOMContentLoaded', () => {
           if(cgAvailList) cgAvailList.innerHTML = '';
           if(cgAvailNotes) cgAvailNotes.textContent = availability.notes || '';
         }
-        const certs = [];
-        if(p.has_cpr) certs.push('CPR certified');
-        if(certs.length === 0) certs.push('Certifications pending');
+        const certs = [
+          `CPR: ${p.cpr_certified ? 'Yes' : 'No'}`,
+          `Caregiver insurance: ${p.caregiver_insurance ? 'Yes' : 'No'}`
+        ];
         cgCertsEl.innerHTML = certs.map(c=> `<li>${c}</li>`).join('');
         cgContact.innerHTML = `
           <div>${p.email || 'Email on file'}</div>
