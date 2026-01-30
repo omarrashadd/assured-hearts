@@ -573,12 +573,48 @@
         return 'Standard';
       };
 
+      const formatChildDisplay = (entry) => {
+        const raw = entry.child_names || entry.child_name || entry.childName || entry.child || '';
+        let names = [];
+        if(Array.isArray(raw)) {
+          names = raw;
+        } else {
+          names = String(raw || '').split(',').map((name) => name.trim()).filter(Boolean);
+        }
+        if(names.length === 0) {
+          const first = entry.child_first_name || entry.childFirstName || '';
+          const last = entry.child_last_name || entry.childLastName || '';
+          const fallback = `${first} ${last}`.trim();
+          return { label: fallback || 'Child', count: fallback ? 1 : 0 };
+        }
+        if(names.length === 1) return { label: names[0], count: 1 };
+        return { label: `${names[0]} +${names.length - 1}`, count: names.length };
+      };
+
+      const resolveFamilyLabel = (entry) => {
+        let lastName = entry.family_last_name || entry.child_last_name || entry.childLastName || '';
+        if(!lastName) {
+          const parentName = entry.parent_name || entry.parentName || entry.family_name || entry.family || '';
+          const parts = String(parentName || '').trim().split(/\s+/);
+          lastName = parts.length ? parts[parts.length - 1] : '';
+        }
+        if(!lastName) return 'Family';
+        return lastName;
+      };
+
+      const resolveBookingAddress = (entry) => {
+        return entry.location || entry.address || entry.booking_address || entry.address_line1 || '';
+      };
+
       const buildUpcomingBookings = (sessions, requests) => {
         const acceptedRequests = (requests || [])
           .filter((req) => (req.status || '').toLowerCase() === 'accepted')
           .map((req) => ({
             id: req.id ? `req-${req.id}` : `req-${Math.random().toString(36).slice(2)}`,
             child_name: req.child_name || req.childName || req.child,
+            child_first_name: req.child_first_name || req.childFirstName,
+            child_last_name: req.child_last_name || req.childLastName,
+            family_last_name: req.family_last_name || req.child_last_name || req.childLastName,
             parent_name: req.parent_name || req.parentName || req.family_name || req.family,
             parent_id: req.parent_id || req.parentId || req.parent_user_id || req.parent,
             start_at: req.start_at,
@@ -587,7 +623,8 @@
             start_time: req.start_time,
             end_time: req.end_time,
             care_type: req.care_type || req.careType || req.care,
-            status: req.status || 'accepted'
+            status: req.status || 'accepted',
+            location: req.location || req.address || req.booking_address || null
           }));
         const combined = [...(sessions || []), ...acceptedRequests];
         const upcoming = combined.filter((entry) => {
@@ -616,25 +653,49 @@
             listEl.innerHTML = '<div class="provider-bookings-empty">No upcoming bookings yet.</div>';
           } else {
             listEl.innerHTML = upcoming.map((entry) => {
-              const childName = entry.child_name || entry.childName || entry.child || 'Child';
-              const rawFamily = entry.parent_name || entry.family_name || entry.family || 'Family';
-              const familyLabel = String(rawFamily).toLowerCase().includes('family') ? rawFamily : `${rawFamily}'s family`;
+              const childDisplay = formatChildDisplay(entry);
+              const familyLabel = resolveFamilyLabel(entry);
               const hoursValue = durationHours(entry);
               const hoursLabel = hoursValue ? `${formatHours(hoursValue)} hrs` : 'TBD';
               const careLabel = resolveCareType(entry);
               const careClass = careLabel === 'Curriculum' ? 'care-pill-curriculum' : 'care-pill-standard';
               const timeLabel = formatScheduleLabel(entry);
+              const addressLabel = resolveBookingAddress(entry) || 'Address not provided';
               return `
                 <div class="provider-bookings-row provider-bookings-item">
-                  <div class="provider-booking-cell" data-label="Child">${childName}</div>
+                  <div class="provider-booking-cell" data-label="Child">
+                    <div class="booking-child">
+                      <span>${childDisplay.label}</span>
+                      <button class="booking-address-btn" type="button">View address</button>
+                    </div>
+                  </div>
                   <div class="provider-booking-cell" data-label="Family">${familyLabel}</div>
                   <div class="provider-booking-cell" data-label="Hours booked">${hoursLabel}</div>
                   <div class="provider-booking-cell" data-label="Care type"><span class="care-pill ${careClass}">${careLabel}</span></div>
                   <div class="provider-booking-cell" data-label="Time scheduled">${timeLabel}</div>
+                  <div class="provider-booking-cell provider-booking-address" data-label="Address">
+                    <span class="booking-address-text">${addressLabel}</span>
+                    <button class="booking-back-btn" type="button">Go back</button>
+                  </div>
                 </div>
               `;
             }).join('');
           }
+        }
+        if(listEl && !listEl.dataset.addressBound) {
+          listEl.addEventListener('click', (event) => {
+            const viewBtn = event.target.closest('.booking-address-btn');
+            if(viewBtn) {
+              const row = viewBtn.closest('.provider-bookings-item');
+              if(row) row.classList.add('is-address');
+            }
+            const backBtn = event.target.closest('.booking-back-btn');
+            if(backBtn) {
+              const row = backBtn.closest('.provider-bookings-item');
+              if(row) row.classList.remove('is-address');
+            }
+          });
+          listEl.dataset.addressBound = 'true';
         }
       };
 

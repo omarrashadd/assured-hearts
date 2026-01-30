@@ -194,22 +194,237 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Lightweight sample caregivers fallback
-  const baseCaregivers = ()=> ([
-    { id: 'cg1', name: 'Amina Khalid', city: 'Regina', bio: 'Experienced caregiver, CPR certified.' },
-    { id: 'cg2', name: 'Nadia Rahman', city: 'Regina', bio: 'ECE background, weekend availability.' }
-  ]);
-
   async function renderHeroProviders(location, isSignedIn, container){
     try{
-      const resp = await fetch(`${API_BASE}/forms/providers`);
+      if(!location){
+        container.innerHTML = `
+          <div style="text-align:left;">
+            <p style="color:#333; margin:0;"><strong>Please choose a city to see caregivers.</strong></p>
+          </div>
+        `;
+        return;
+      }
+      const resp = await fetch(`${API_BASE}/forms/providers?city=${encodeURIComponent(location)}`);
       let providers = [];
       if(resp.ok){
         const data = await resp.json();
         providers = Array.isArray(data.providers) ? data.providers : [];
       }
       if(providers.length === 0){
-        providers = baseCaregivers();
+        container.innerHTML = `
+          <div style="text-align:left;">
+            <p style="color:#333; margin:0 0 6px 0;"><strong>Caregivers are available in ${location}, but profiles are still loading.</strong></p>
+            <p style="color:#6b7280; margin:0;">Please try again in a moment.</p>
+          </div>
+        `;
+        return;
+      }
+      const isParentDashboard = document.body.classList.contains('parent-dashboard');
+      if(isParentDashboard){
+        const userId = localStorage.getItem('user_id') || 'guest';
+        const savedKey = `saved_caregivers_${userId}`;
+        let savedIds = [];
+        const selectedRange = window.parentSelectedTimeRange || null;
+        const parseTimeToMinutes = (value)=>{
+          if(!value) return null;
+          const raw = String(value).trim();
+          const ampmMatch = raw.match(/(am|pm)/i);
+          const clean = raw.replace(/[^0-9:]/g, '');
+          const parts = clean.split(':');
+          if(parts.length < 2) return null;
+          let hours = parseInt(parts[0], 10);
+          let mins = parseInt(parts[1], 10);
+          if(Number.isNaN(hours) || Number.isNaN(mins)) return null;
+          if(ampmMatch){
+            const isPm = ampmMatch[0].toLowerCase() === 'pm';
+            if(hours === 12) hours = isPm ? 12 : 0;
+            else if(isPm) hours += 12;
+          }
+          return hours * 60 + mins;
+        };
+        const matchesSelectedTime = (availability)=>{
+          if(!selectedRange || selectedRange.startMinutes == null || selectedRange.endMinutes == null) return false;
+          if(!availability) return false;
+          const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+          const dateKey = selectedRange.date ? days[new Date(`${selectedRange.date}T00:00:00`).getDay()] : null;
+          const daysToCheck = dateKey ? [dateKey] : days;
+          return daysToCheck.some((day)=>{
+            const dayAvailability = availability[day];
+            if(!dayAvailability) return false;
+            const slots = Array.isArray(dayAvailability) ? dayAvailability : [dayAvailability];
+            return slots.some((slot)=>{
+              if(!slot || !slot.from || !slot.to) return false;
+              const fromMinutes = parseTimeToMinutes(slot.from);
+              const toMinutes = parseTimeToMinutes(slot.to);
+              if(fromMinutes == null || toMinutes == null) return false;
+              return selectedRange.startMinutes >= fromMinutes && selectedRange.endMinutes <= toMinutes;
+            });
+          });
+        };
+        if(Array.isArray(window.parentSavedCaregivers)){
+          savedIds = window.parentSavedCaregivers.map(String);
+        } else {
+          try{
+            savedIds = JSON.parse(localStorage.getItem(savedKey) || '[]').map(String);
+          }catch(_err){
+            savedIds = [];
+          }
+        }
+        const normalizeProviders = providers.map((p, idx)=> {
+          const displayName = p.name || `Caregiver ${idx + 1}`;
+          const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() || 'CG';
+          const pid = String(p.user_id || p.id || '');
+          const city = p.city || location;
+          const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
+          const matchesSelected = matchesSelectedTime(availability);
+          let availabilityText = 'Availability not provided';
+          if(availability.status === 'immediate') availabilityText = 'Available immediately';
+          if(availability.status === 'next24') availabilityText = 'Available in the next 24 hours';
+          const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'request-childcare.html';
+          const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
+          const certText = p.certifications || 'Certifications on file';
+          const ageGroups = Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (typeof p.age_groups === 'string' ? p.age_groups : 'Age groups on file');
+          return {
+            id: pid,
+            displayName,
+            initials,
+            city,
+            availabilityText,
+            certText,
+            ageGroups,
+            matchesSelected,
+            bookLink,
+            profileLink
+          };
+        });
+
+        const persistSaved = (ids)=>{
+          const unique = Array.from(new Set(ids));
+          savedIds = unique;
+          localStorage.setItem(savedKey, JSON.stringify(unique));
+          if(Array.isArray(window.parentSavedCaregivers)) window.parentSavedCaregivers = unique;
+          if(typeof window.updateParentSavedCaregivers === 'function'){
+            window.updateParentSavedCaregivers(unique);
+          }
+        };
+
+        const buildRow = (p, isSaved)=> `
+          <div class="parent-provider-row" data-provider="${p.id}" data-profile="${p.profileLink}" tabindex="0">
+            <div class="parent-provider-main">
+              <div class="parent-provider-avatar">${p.initials}</div>
+              <div class="parent-provider-body">
+                <div class="parent-provider-top">
+                  <div>
+                    <div class="parent-provider-name">${p.displayName}</div>
+                    <div class="parent-provider-meta">${p.city} · ${p.certText}</div>
+                  </div>
+                  <button type="button" class="parent-provider-save${isSaved ? ' is-saved' : ''}" data-action="save" aria-pressed="${isSaved ? 'true' : 'false'}">${isSaved ? 'Saved' : 'Save'}</button>
+                </div>
+                <div class="parent-provider-tags">
+                  ${p.matchesSelected ? '<span class="parent-provider-tag highlight">Available for your selected time</span>' : ''}
+                  <span>${p.availabilityText}</span>
+                  <span>${p.ageGroups}</span>
+                </div>
+              </div>
+            </div>
+            <div class="parent-provider-actions">
+              <a class="parent-provider-btn primary" href="${p.bookLink}">Book</a>
+              <button type="button" class="parent-provider-btn ghost" data-action="message" data-provider="${p.id}" data-name="${p.displayName}">Message</button>
+            </div>
+          </div>
+        `;
+
+        const renderList = (list, emptyText)=> {
+          if(list.length === 0){
+            return `<div class="parent-provider-empty">${emptyText}</div>`;
+          }
+          return list.map(p => buildRow(p, savedIds.includes(p.id))).join('');
+        };
+
+        const renderParentResults = (activeTab = 'all')=>{
+          const sorter = (a, b) => Number(b.matchesSelected) - Number(a.matchesSelected);
+          const allProviders = selectedRange ? normalizeProviders.slice().sort(sorter) : normalizeProviders;
+          const savedProviders = selectedRange
+            ? normalizeProviders.filter(p => savedIds.includes(p.id)).sort(sorter)
+            : normalizeProviders.filter(p => savedIds.includes(p.id));
+          const tabProviders = activeTab === 'saved' ? savedProviders : allProviders;
+          const tabTitle = activeTab === 'saved' ? 'Saved caregivers' : (activeTab === 'ideal' ? 'Ideal matches' : 'Browse all');
+          const emptyText = activeTab === 'saved'
+            ? 'No saved caregivers yet. Tap Save to keep caregivers here.'
+            : 'No caregivers available in this city yet.';
+
+          container.innerHTML = `
+            <div class="parent-results-wrap">
+              <div class="parent-results-tabs" role="tablist" aria-label="Caregiver results">
+                <button class="parent-results-tab${activeTab === 'all' ? ' is-active' : ''}" type="button" data-tab="all">Browse all <span class="parent-results-count">${allProviders.length}</span></button>
+                <button class="parent-results-tab${activeTab === 'ideal' ? ' is-active' : ''}" type="button" data-tab="ideal">Ideal matches <span class="parent-results-count">${allProviders.length}</span></button>
+                <button class="parent-results-tab${activeTab === 'saved' ? ' is-active' : ''}" type="button" data-tab="saved">Saved <span class="parent-results-count">${savedProviders.length}</span></button>
+              </div>
+              <div class="parent-results-header">
+                <div>
+                  <div class="parent-results-title">${tabTitle}</div>
+                  <div class="parent-results-sub">${allProviders.length} caregivers available near ${location}</div>
+                </div>
+                <button class="parent-results-close" type="button">Close</button>
+              </div>
+              <div class="parent-results-list">
+                ${renderList(tabProviders, emptyText)}
+              </div>
+            </div>
+          `;
+
+          container.querySelectorAll('.parent-results-tab').forEach(btn=>{
+            btn.addEventListener('click', ()=>{
+              renderParentResults(btn.dataset.tab || 'all');
+            });
+          });
+          const closeBtn = container.querySelector('.parent-results-close');
+          if(closeBtn){
+            closeBtn.addEventListener('click', ()=>{
+              container.remove();
+              if(heroFindForm) heroFindForm.reset();
+            });
+          }
+          container.querySelectorAll('.parent-provider-row').forEach(row=>{
+            row.addEventListener('click', (e)=>{
+              if(e.target.closest('button') || e.target.closest('a')) return;
+              const profile = row.dataset.profile;
+              if(profile && profile !== '#'){
+                row.classList.add('is-pressed');
+                setTimeout(()=> row.classList.remove('is-pressed'), 180);
+                window.location.href = profile;
+              }
+            });
+            row.addEventListener('keydown', (e)=>{
+              if(e.key !== 'Enter') return;
+              const profile = row.dataset.profile;
+              if(profile && profile !== '#') window.location.href = profile;
+            });
+          });
+          container.querySelectorAll('.parent-provider-save').forEach(btn=>{
+            btn.addEventListener('click', (e)=>{
+              e.preventDefault();
+              const row = btn.closest('.parent-provider-row');
+              const pid = row ? row.dataset.provider : '';
+              if(!pid) return;
+              const isSaved = savedIds.includes(pid);
+              const updated = isSaved ? savedIds.filter(id => id !== pid) : [...savedIds, pid];
+              persistSaved(updated);
+              renderParentResults(activeTab);
+            });
+          });
+          container.querySelectorAll('.parent-provider-btn[data-action="message"]').forEach(btn=>{
+            btn.addEventListener('click', (e)=>{
+              e.preventDefault();
+              const pid = btn.dataset.provider;
+              const name = btn.dataset.name || 'Caregiver';
+              if(window.showChatWidget && pid) window.showChatWidget(pid, name);
+            });
+          });
+        };
+
+        renderParentResults();
+        return;
       }
       const caregiversHTML = providers.map((p, idx)=> {
         const displayName = p.name || 'Caregiver ' + (idx + 1);
@@ -301,96 +516,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }catch(err){
       console.error('Provider fetch failed', err);
-      const caregiversHTML = baseCaregivers().map((p, idx)=> {
-        const displayName = p.name || 'Caregiver ' + (idx + 1);
-        const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() || 'CG';
-        const city = p.city || location;
-        const pid = p.user_id || p.id || '';
-        const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
-        let availabilityTag = '';
-        let availabilityText = 'Availability not provided';
-        if(availability.status === 'immediate'){
-          availabilityTag = '<span style="background:#ecfdf3; color:#166534; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available immediately</span>';
-          availabilityText = 'Available immediately';
-        }
-        if(availability.status === 'next24'){
-          availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
-          availabilityText = 'Available in the next 24 hours';
-        }
-        const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'request-childcare.html';
-        const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
-        const certText = p.certifications || 'Certifications on file';
-        const ageGroups = Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (typeof p.age_groups === 'string' ? p.age_groups : 'Age groups on file');
-        return `
-          <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
-            <div style="display:flex; gap:12px; align-items:center;">
-              <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">${initials}</div>
-              <div>
-                <div style="font-weight:700; color:#06464E; font-size:15px;">${displayName}</div>
-                <div style="font-size:12px; color:#6b7280;">${city || 'Location on file'}</div>
-              </div>
-            </div>
-            ${availabilityTag}
-            <div style="font-size:12px; color:#475569;"><strong>Availability:</strong> ${availabilityText}</div>
-            <div style="font-size:12px; color:#475569;"><strong>Certifications:</strong> ${certText}</div>
-            <div style="font-size:12px; color:#475569;"><strong>Age groups:</strong> ${ageGroups}</div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
-              <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${displayName.split(' ')[0]}</a>
-              <a class="btn secondary" href="${profileLink}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">View profile</a>
-              <button class="btn secondary hero-message-btn" data-other="${pid}" data-name="${displayName}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">Message ${displayName.split(' ')[0]}</button>
-            </div>
-          </div>
-        `;
-      }).join('');
       container.innerHTML = `
         <div style="text-align:left;">
-          <p style="color:#333; margin:0 0 8px 0;"><strong>${baseCaregivers().length} caregiver(s) available in ${location}</strong></p>
-          <div class="hero-carousel" style="position:relative; padding:0 12px;">
-            <button type="button" class="hero-carousel-prev" style="position:absolute; left:-6px; top:40%; transform:translateY(-50%); background:#fff; border:1px solid #e5e7eb; border-radius:50%; width:32px; height:32px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.08);">‹</button>
-            <div class="hero-cards" style="display:flex; gap:12px; overflow-x:auto; padding:6px 6px 6px 0; scroll-behavior:smooth;">
-              ${caregiversHTML}
-            </div>
-            <button type="button" class="hero-carousel-next" style="position:absolute; right:-6px; top:40%; transform:translateY(-50%); background:#fff; border:1px solid #e5e7eb; border-radius:50%; width:32px; height:32px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.08);">›</button>
-          </div>
-          <button id="heroCloseResultsBtn" type="button" style="margin-top: 8px; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; text-decoration: underline;">Close</button>
-        </div>`;
-      const closeBtn = container.querySelector('#heroCloseResultsBtn');
-      closeBtn && closeBtn.addEventListener('click', ()=>{
-        container.remove();
-        heroFindForm.reset();
-      });
-      const track = container.querySelector('.hero-cards');
-      const prevBtn = container.querySelector('.hero-carousel-prev');
-      const nextBtn = container.querySelector('.hero-carousel-next');
-      if(track && prevBtn && nextBtn){
-        const scrollBy = 320;
-        prevBtn.addEventListener('click', ()=> track.scrollBy({ left: -scrollBy, behavior: 'smooth' }));
-        nextBtn.addEventListener('click', ()=> track.scrollBy({ left: scrollBy, behavior: 'smooth' }));
-      }
-      container.querySelectorAll('.hero-card').forEach(card=>{
-        const profile = card.dataset.profile;
-        if(profile && profile !== '#'){
-          card.addEventListener('click', (e)=>{
-            if(e.target.closest('button') || e.target.closest('a')) return;
-            window.location.href = profile;
-          });
-        }
-      });
-      container.querySelectorAll('.hero-message-btn').forEach(btn=>{
-        btn.addEventListener('click', (ev)=>{
-          ev.preventDefault();
-          const other = btn.dataset.other;
-          const otherName = btn.dataset.name || 'Caregiver';
-          if(!isSignedIn){
-            const loginModal = document.getElementById('loginModal');
-            if(loginModal) loginModal.classList.remove('hidden');
-            return;
-          }
-          if(window.showChatWidget && other) window.showChatWidget(other, otherName);
-        });
-      });
+          <p style="color:#333; margin:0 0 6px 0;"><strong>Unable to load caregivers right now.</strong></p>
+          <p style="color:#6b7280; margin:0;">Please try again shortly.</p>
+        </div>
+      `;
     }
   }
+  window.renderHeroProviders = renderHeroProviders;
 
   // Caregiver dashboard: allow updating child logs from appointments
   const cgAppointmentsList = document.getElementById('appointmentsList');
@@ -600,14 +734,20 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Move results inside the form's container before the "or" text
       const formContainer = heroFindForm.parentElement;
-      const orText = formContainer.querySelector('[style*="color: #999"]');
-      if(orText) {
+      const orText = formContainer ? formContainer.querySelector('[style*="color: #999"]') : null;
+      if(orText && !newResultsDiv.contains(orText) && orText.parentElement) {
         orText.parentElement.insertBefore(newResultsDiv, orText);
       }
 
       if(hasAvailable){
         // Fetch actual providers and show cards
         renderHeroProviders(location, isSignedIn, newResultsDiv);
+        setTimeout(()=>{
+          const preview = newResultsDiv.querySelector('#heroPreview');
+          if(preview && preview.textContent && preview.textContent.toLowerCase().includes('loading')){
+            renderHeroProviders(location, isSignedIn, newResultsDiv);
+          }
+        }, 350);
       } else {
         const waitlistBtn = newResultsDiv.querySelector('#heroJoinWaitlistBtn');
         const closeBtn = newResultsDiv.querySelector('#heroCloseResultsBtn');
