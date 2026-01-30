@@ -77,11 +77,39 @@
 
         <div class="provider-panels">
           <section id="panel-dashboard" class="provider-panel is-active" role="tabpanel" aria-labelledby="tab-dashboard">
-            <section class="provider-bookings-card parent-find-card">
+            <section class="parent-time-card">
+              <div class="parent-time-header">
+                <div class="parent-time-title">What time are you looking for childcare?</div>
+                <div class="parent-time-sub">We’ll check your saved caregivers first.</div>
+              </div>
+              <form id="savedAvailabilityForm" class="parent-time-form">
+                <div class="parent-time-field parent-time-field--full">
+                  <span>Date</span>
+                  <div class="parent-time-date-row" role="group" aria-label="Choose a date">
+                    <button type="button" class="parent-date-btn" data-date="today">Today</button>
+                    <button type="button" class="parent-date-btn" data-date="tomorrow">Tomorrow</button>
+                    <span class="parent-date-or">or</span>
+                    <input type="date" id="savedAvailabilityDate" required aria-label="Custom date">
+                  </div>
+                </div>
+                <label class="parent-time-field">
+                  <span>Start</span>
+                  <select id="savedAvailabilityStart" required></select>
+                </label>
+                <label class="parent-time-field">
+                  <span>End</span>
+                  <select id="savedAvailabilityEnd" required></select>
+                </label>
+                <button type="submit" class="parent-time-submit">Search</button>
+                <div id="savedAvailabilitySummary" class="parent-time-summary parent-time-field--full"></div>
+              </form>
+              <div id="savedAvailabilityResults" class="parent-saved-results" aria-live="polite"></div>
+            </section>
+
+            <section class="provider-bookings-card parent-find-card parent-search-card">
               <div class="provider-card-head">
                 <div>
-                  <h2>Find a caregiver</h2>
-                  <p class="provider-card-sub">Check availability in your city and explore trusted caregivers.</p>
+                  <h2>Browse More Muslim Caregivers</h2>
                 </div>
               </div>
               <div class="parent-find-form-wrap">
@@ -208,7 +236,7 @@
               <div class="provider-card-head">
                 <div>
                   <h2>My caregivers</h2>
-                  <p class="provider-card-sub">Caregivers you have booked before.</p>
+                  <p class="provider-card-sub">Caregivers you have booked or saved.</p>
                 </div>
               </div>
               <div id="parentCaregiversList" class="parent-caregivers-grid">
@@ -314,12 +342,33 @@
     <script>
       const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
       const userId = parseInt(localStorage.getItem('user_id'), 10) || null;
+      const savedCaregiversKey = userId ? `saved_caregivers_${userId}` : 'saved_caregivers_guest';
 
       const showNotice = (message, type) => {
         if(typeof window.showBanner === 'function') {
           window.showBanner(message, type || 'info');
         } else {
           alert(message);
+        }
+      };
+
+      window.updateParentSavedCaregivers = async (savedIds = []) => {
+        if(!userId) return;
+        try{
+          await fetch(`${API_BASE}/forms/parent/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ saved_caregivers: savedIds })
+          });
+          if(Array.isArray(savedIds)){
+            window.parentSavedCaregivers = savedIds.map(String);
+            localStorage.setItem(savedCaregiversKey, JSON.stringify(savedIds));
+            if(Array.isArray(window.parentDashboardSessions)){
+              renderCaregivers(window.parentDashboardSessions, savedIds);
+            }
+          }
+        }catch(err){
+          console.error('Failed to save caregivers list', err);
         }
       };
 
@@ -563,15 +612,38 @@
         });
       };
 
-      const renderCaregivers = (sessions) => {
+      const fetchProviderProfile = async (providerId) => {
+        if(!providerId) return null;
+        try{
+          const resp = await fetch(`${API_BASE}/forms/provider/${encodeURIComponent(providerId)}`);
+          if(!resp.ok) return null;
+          const data = await resp.json();
+          const profile = data.profile || {};
+          return {
+            id: profile.provider_id || profile.id || providerId,
+            name: profile.name || 'Caregiver',
+            email: profile.email || '',
+            phone: profile.phone || '',
+            city: profile.city || '',
+            province: profile.province || '',
+            availability: profile.availability || null
+          };
+        }catch(err){
+          console.warn('Failed to load saved caregiver profile', err);
+          return null;
+        }
+      };
+
+      const renderCaregivers = async (sessions, savedIds = []) => {
         const listEl = document.getElementById('parentCaregiversList');
         if(!listEl) return;
+        const savedSet = new Set((savedIds || window.parentSavedCaregivers || []).map((id) => String(id)));
         const caregivers = new Map();
         (sessions || []).forEach((entry) => {
           const id = entry.provider_id || entry.provider_user_id;
           if(!id) return;
-          caregivers.set(id, {
-            id,
+          caregivers.set(String(id), {
+            id: String(id),
             name: entry.provider_name || 'Caregiver',
             email: entry.provider_email || '',
             phone: entry.provider_phone || '',
@@ -579,7 +651,26 @@
             province: entry.provider_province || ''
           });
         });
-        const items = Array.from(caregivers.values());
+        const missingSaved = Array.from(savedSet).filter((id) => id && !caregivers.has(id));
+        if(missingSaved.length > 0){
+          const savedProfiles = await Promise.all(missingSaved.map(fetchProviderProfile));
+          savedProfiles.filter(Boolean).forEach((profile) => {
+            caregivers.set(String(profile.id), {
+              id: String(profile.id),
+              name: profile.name,
+              email: profile.email,
+              phone: profile.phone,
+              city: profile.city,
+              province: profile.province
+            });
+          });
+        }
+        const items = Array.from(caregivers.values()).sort((a, b) => {
+          const aSaved = savedSet.has(String(a.id));
+          const bSaved = savedSet.has(String(b.id));
+          if(aSaved === bSaved) return 0;
+          return aSaved ? -1 : 1;
+        });
         const countEl = document.getElementById('parentCaregiverCount');
         if(countEl) countEl.textContent = String(items.length);
         if(items.length === 0) {
@@ -616,11 +707,268 @@
         });
       };
 
+      const parseTimeToMinutes = (value) => {
+        if(!value) return null;
+        const raw = String(value).trim();
+        const ampmMatch = raw.match(/(am|pm)/i);
+        const clean = raw.replace(/[^0-9:]/g, '');
+        const parts = clean.split(':');
+        if(parts.length < 2) return null;
+        let hours = parseInt(parts[0], 10);
+        let mins = parseInt(parts[1], 10);
+        if(Number.isNaN(hours) || Number.isNaN(mins)) return null;
+        if(ampmMatch){
+          const isPm = ampmMatch[0].toLowerCase() === 'pm';
+          if(hours === 12) hours = isPm ? 12 : 0;
+          else if(isPm) hours += 12;
+        }
+        return hours * 60 + mins;
+      };
+
+      const dayNames = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+
+      const isAvailableForWindow = (availability, dayKey, startMinutes, endMinutes) => {
+        if(!availability || startMinutes === null || endMinutes === null) return false;
+        const daysToCheck = dayKey ? [dayKey] : dayNames;
+        return daysToCheck.some((day) => {
+          const dayAvailability = availability[day];
+          if(!dayAvailability) return false;
+          const slots = Array.isArray(dayAvailability) ? dayAvailability : [dayAvailability];
+          return slots.some(slot => {
+            if(!slot || !slot.from || !slot.to) return false;
+            const fromMinutes = parseTimeToMinutes(slot.from);
+            const toMinutes = parseTimeToMinutes(slot.to);
+            if(fromMinutes === null || toMinutes === null) return false;
+            return startMinutes >= fromMinutes && endMinutes <= toMinutes;
+          });
+        });
+      };
+
+      const hookSavedAvailabilitySearch = () => {
+        const form = document.getElementById('savedAvailabilityForm');
+        const dateInput = document.getElementById('savedAvailabilityDate');
+        const startInput = document.getElementById('savedAvailabilityStart');
+        const endInput = document.getElementById('savedAvailabilityEnd');
+        const resultsEl = document.getElementById('savedAvailabilityResults');
+        const summaryEl = document.getElementById('savedAvailabilitySummary');
+        const locationInput = document.getElementById('heroLocationInput');
+        if(!form || !dateInput || !startInput || !endInput || !resultsEl) return;
+        const quickDateButtons = form.querySelectorAll('.parent-date-btn');
+        const buildTimeOptions = (select, maxMinutes) => {
+          if(!select) return;
+          select.innerHTML = '<option value="">Select</option>';
+          const start = 6 * 60;
+          const end = maxMinutes;
+          for(let minutes = start; minutes <= end; minutes += 30){
+            const hours24 = Math.floor(minutes / 60);
+            const mins = String(minutes % 60).padStart(2, '0');
+            const value = `${String(hours24).padStart(2, '0')}:${mins}`;
+            let label;
+            if(hours24 === 24){
+              label = `12:${mins} AM`;
+            } else {
+              const period = hours24 >= 12 ? 'PM' : 'AM';
+              const hours12Raw = hours24 % 12;
+              const hours12 = hours12Raw === 0 ? 12 : hours12Raw;
+              label = `${hours12}:${mins} ${period}`;
+            }
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = label;
+            select.appendChild(option);
+          }
+        };
+        buildTimeOptions(startInput, 23 * 60 + 30);
+        buildTimeOptions(endInput, 24 * 60);
+        const toLocalDateString = (value) => {
+          const yyyy = value.getFullYear();
+          const mm = String(value.getMonth() + 1).padStart(2, '0');
+          const dd = String(value.getDate()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd}`;
+        };
+        const setQuickDate = (mode) => {
+          const date = new Date();
+          if(mode === 'tomorrow') date.setDate(date.getDate() + 1);
+          dateInput.value = toLocalDateString(date);
+          quickDateButtons.forEach(btn => {
+            btn.classList.toggle('is-active', btn.dataset.date === mode);
+          });
+          updateSummary();
+        };
+        quickDateButtons.forEach(btn => {
+          btn.addEventListener('click', () => setQuickDate(btn.dataset.date));
+        });
+        dateInput.addEventListener('change', () => {
+          quickDateButtons.forEach(btn => btn.classList.remove('is-active'));
+          updateSummary();
+        });
+        const updateSummary = () => {
+          if(!summaryEl) return;
+          const dateVal = dateInput.value;
+          const startVal = startInput.value;
+          const endVal = endInput.value;
+          if(!dateVal || !startVal || !endVal){
+            summaryEl.textContent = '';
+            return;
+          }
+          const startMinutes = parseTimeToMinutes(startVal);
+          const endMinutes = parseTimeToMinutes(endVal);
+          if(startMinutes === null || endMinutes === null || endMinutes <= startMinutes){
+            summaryEl.textContent = 'Select a valid time window.';
+            return;
+          }
+          const hours = (endMinutes - startMinutes) / 60;
+          const hoursLabel = Number.isInteger(hours) ? `${hours} hours` : `${hours.toFixed(1)} hours`;
+          const dateLabel = new Date(`${dateVal}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          summaryEl.textContent = `You are booking for ${hoursLabel} on ${dateLabel}.`;
+        };
+        startInput.addEventListener('change', updateSummary);
+        endInput.addEventListener('change', updateSummary);
+        const ensureLocation = () => {
+          if(!locationInput || locationInput.value) return;
+          const fallbackCity = localStorage.getItem('parent_city') || localStorage.getItem('last_search_location') || '';
+          if(!fallbackCity) return;
+          const match = Array.from(locationInput.options || []).find(option =>
+            option.value === fallbackCity || option.textContent.includes(fallbackCity)
+          );
+          if(match) locationInput.value = match.value;
+        };
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const dateVal = dateInput.value;
+          const startVal = startInput.value;
+          const endVal = endInput.value;
+          if(!dateVal || !startVal || !endVal){
+            showNotice('Please choose a date and time window.', 'info');
+            return;
+          }
+          const startMinutes = parseTimeToMinutes(startVal);
+          const endMinutes = parseTimeToMinutes(endVal);
+          if(startMinutes === null || endMinutes === null || endMinutes <= startMinutes){
+            resultsEl.innerHTML = '<div class="parent-provider-empty">Please enter a valid time window.</div>';
+            return;
+          }
+          const dayKey = dayNames[new Date(`${dateVal}T00:00:00`).getDay()];
+          window.parentSelectedTimeRange = { startMinutes, endMinutes, date: dateVal };
+          window.parentSelectedDate = dateVal;
+
+          const savedIds = (window.parentSavedCaregivers || []).map(String);
+          if(savedIds.length === 0){
+            resultsEl.innerHTML = `
+              <div class="parent-provider-empty">
+                You don’t have saved caregivers yet.<br>
+                Would you like to browse more Muslim caregivers in your area?
+                <div class="parent-empty-actions">
+                  <button type="button" class="parent-provider-btn primary" id="searchAllCaregiversBtn">Yes, show caregivers</button>
+                  <button type="button" class="parent-provider-btn ghost" id="dismissSavedSearchBtn">Not now</button>
+                </div>
+              </div>
+            `;
+            const btn = document.getElementById('searchAllCaregiversBtn');
+            if(btn){
+              btn.addEventListener('click', () => {
+                ensureLocation();
+                if(locationInput && locationInput.value && document.getElementById('heroFindForm')){
+                  document.getElementById('heroFindForm').requestSubmit();
+                } else {
+                  showNotice('Choose a city on the right to search all caregivers.', 'info');
+                }
+              });
+            }
+            const dismiss = document.getElementById('dismissSavedSearchBtn');
+            dismiss && dismiss.addEventListener('click', () => {
+              resultsEl.innerHTML = '';
+            });
+            return;
+          }
+
+          const profiles = await Promise.all(savedIds.map(fetchProviderProfile));
+          const available = profiles.filter(Boolean).filter(p => {
+            const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
+            return isAvailableForWindow(availability, dayKey, startMinutes, endMinutes);
+          });
+
+          if(available.length === 0){
+            resultsEl.innerHTML = `
+              <div class="parent-provider-empty">
+                No saved caregivers are available at that time.<br>
+                Would you like to browse more Muslim caregivers in your area?
+                <div class="parent-empty-actions">
+                  <button type="button" class="parent-provider-btn primary" id="searchAllCaregiversBtn">Yes, show caregivers</button>
+                  <button type="button" class="parent-provider-btn ghost" id="dismissSavedSearchBtn">Not now</button>
+                </div>
+              </div>
+            `;
+            const btn = document.getElementById('searchAllCaregiversBtn');
+            if(btn){
+              btn.addEventListener('click', () => {
+                ensureLocation();
+                if(locationInput && locationInput.value && document.getElementById('heroFindForm')){
+                  document.getElementById('heroFindForm').requestSubmit();
+                } else {
+                  showNotice('Choose a city on the right to search all caregivers.', 'info');
+                }
+              });
+            }
+            const dismiss = document.getElementById('dismissSavedSearchBtn');
+            dismiss && dismiss.addEventListener('click', () => {
+              resultsEl.innerHTML = '';
+            });
+            return;
+          }
+
+          const rows = available.map((p) => {
+            const displayName = p.name || 'Caregiver';
+            const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+            const profileLink = `caregiver-profile.html?provider_id=${encodeURIComponent(p.id)}`;
+            const bookLink = `request-childcare.html?provider_id=${encodeURIComponent(p.id)}&provider_name=${encodeURIComponent(displayName)}`;
+            return `
+              <div class="parent-provider-row" data-profile="${profileLink}">
+                <div class="parent-provider-main">
+                  <div class="parent-provider-avatar">${initials}</div>
+                  <div class="parent-provider-body">
+                    <div class="parent-provider-name">${displayName}</div>
+                    <div class="parent-provider-meta">From your saved caregivers · Available for your selected time</div>
+                  </div>
+                </div>
+                <div class="parent-provider-actions">
+                  <a class="parent-provider-btn primary" href="${bookLink}">Book</a>
+                  <button type="button" class="parent-provider-btn ghost" data-action="message" data-provider="${p.id}" data-name="${displayName}">Message</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          resultsEl.innerHTML = `
+            <div class="parent-results-title" style="margin-bottom:8px;">From your saved caregivers</div>
+            <div class="parent-results-list">${rows}</div>
+          `;
+
+          resultsEl.querySelectorAll('.parent-provider-row').forEach(row=>{
+            row.addEventListener('click', (evt)=>{
+              if(evt.target.closest('button') || evt.target.closest('a')) return;
+              const profile = row.dataset.profile;
+              if(profile) window.location.href = profile;
+            });
+          });
+          resultsEl.querySelectorAll('.parent-provider-btn[data-action="message"]').forEach(btn=>{
+            btn.addEventListener('click', (evt)=>{
+              evt.preventDefault();
+              const pid = btn.dataset.provider;
+              const name = btn.dataset.name || 'Caregiver';
+              if(window.showChatWidget && pid) window.showChatWidget(pid, name);
+            });
+          });
+        });
+      };
+
       const fillProfileForm = (profile) => {
         document.getElementById('parentSidebarName').textContent = profile?.name ? `Signed in as ${profile.name}` : 'Signed in';
         const firstName = profile?.name ? profile.name.split(' ')[0] : '';
         document.getElementById('parentWelcomeName').textContent = firstName ? `, ${firstName}` : '';
         if(profile?.name) localStorage.setItem('user_name', profile.name);
+        if(profile?.city) localStorage.setItem('parent_city', profile.city);
         const setVal = (id, value) => {
           const el = document.getElementById(id);
           if(el) el.value = value || '';
@@ -639,6 +987,13 @@
         setVal('parentSpousePhone', profile?.spouse_phone);
         const subscription = profile?.subscription_type || (profile?.is_premium ? 'Care+ Premium' : 'Standard');
         setVal('parentSubscription', subscription);
+        const locationSelect = document.getElementById('heroLocationInput');
+        if(locationSelect && profile?.city){
+          const match = Array.from(locationSelect.options).find(option =>
+            option.value === profile.city || option.textContent.includes(profile.city)
+          );
+          if(match) locationSelect.value = match.value;
+        }
       };
 
       const hookProfileSave = () => {
@@ -743,11 +1098,27 @@
           const profile = data.profile || {};
           const children = Array.isArray(data.children) ? data.children : [];
           const sessions = Array.isArray(data.sessions) ? data.sessions : [];
+          const savedFromProfile = Array.isArray(profile.saved_caregivers)
+            ? profile.saved_caregivers.map(String)
+            : [];
+          let savedLocal = [];
+          try{
+            savedLocal = JSON.parse(localStorage.getItem(savedCaregiversKey) || '[]').map(String);
+          }catch(_err){
+            savedLocal = [];
+          }
+          const mergedSaved = savedFromProfile.length ? savedFromProfile : savedLocal;
+          window.parentSavedCaregivers = mergedSaved;
+          localStorage.setItem(savedCaregiversKey, JSON.stringify(mergedSaved));
+          if(!savedFromProfile.length && savedLocal.length){
+            updateParentSavedCaregivers(savedLocal);
+          }
+          window.parentDashboardSessions = sessions;
           fillProfileForm(profile);
           renderUpcomingBookings(sessions);
           renderCalendar(sessions);
           renderChildren(children);
-          renderCaregivers(sessions);
+          await renderCaregivers(sessions, mergedSaved);
         } catch (err) {
           console.error('Parent dashboard load failed', err);
           showNotice('Unable to load dashboard data.', 'error');
@@ -758,6 +1129,7 @@
         hookProfileSave();
         hookInboxPreview();
         loadParentDashboard();
+        hookSavedAvailabilitySearch();
       });
     </script>
   </body>
