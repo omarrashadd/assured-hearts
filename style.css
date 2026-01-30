@@ -1852,6 +1852,15 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   padding:8px 10px;
   font-size:13px;
 }
+.parent-time-field select{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.18);
+  color:#e2e8f0;
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:13px;
+  min-width:140px;
+}
 .parent-time-submit{
   background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%);
   border:none;
@@ -1861,6 +1870,11 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   font-weight:700;
   font-size:12px;
   cursor:pointer;
+}
+.parent-time-summary{
+  font-size:12px;
+  color:#9ca3af;
+  margin-top:-2px;
 }
 .parent-saved-results{
   display:grid;

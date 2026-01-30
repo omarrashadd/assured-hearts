@@ -780,6 +780,8 @@
         };
         buildTimeOptions(startInput, 23 * 60 + 30);
         buildTimeOptions(endInput, 24 * 60);
+        const todayBtn = Array.from(quickDateButtons).find(btn => btn.dataset.date === 'today');
+        if(todayBtn){ todayBtn.click(); }
         const toLocalDateString = (value) => {
           const yyyy = value.getFullYear();
           const mm = String(value.getMonth() + 1).padStart(2, '0');
@@ -814,7 +816,7 @@
           const startMinutes = parseTimeToMinutes(startVal);
           const endMinutes = parseTimeToMinutes(endVal);
           if(startMinutes === null || endMinutes === null || endMinutes <= startMinutes){
-            summaryEl.textContent = 'Select a valid time window.';
+            summaryEl.textContent = '';
             return;
           }
           const hours = (endMinutes - startMinutes) / 60;
