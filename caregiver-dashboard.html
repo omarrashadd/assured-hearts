@@ -762,12 +762,16 @@
         const id = parseInt(requestId, 10);
         if(!id) return;
         try{
+          if(!providerApiBase){
+            throw new Error('Booking service is unavailable. Please refresh and try again.');
+          }
           const resp = await fetch(`${providerApiBase}/forms/request/${id}/cancel`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reason, cancelled_by: 'provider' })
           });
-          if(!resp.ok) throw new Error('Cancel failed');
+          const data = await resp.json().catch(() => ({}));
+          if(!resp.ok) throw new Error(data.error || `Cancel failed (${resp.status})`);
           const idx = providerRequestsCache.findIndex((req) => Number(req.id) === id);
           if(idx > -1) {
             providerRequestsCache[idx] = {
@@ -779,7 +783,8 @@
           renderAreaRequests(providerRequestsCache);
           renderDashboardInsights(providerRequestsCache, providerStatsCache);
         } catch (err) {
-          alert('Could not cancel the booking. Please try again.');
+          console.error('Cancel booking failed:', err);
+          alert(err.message || 'Could not cancel the booking. Please try again.');
         }
       };
 
