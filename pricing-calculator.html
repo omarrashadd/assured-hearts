@@ -321,6 +321,16 @@
         { code: 'SK', name: 'Saskatchewan' },
         { code: 'YT', name: 'Yukon' }
       ];
+      const FALLBACK_AGE_GROUPS = [
+        { id: 'infants-toddlers', label: 'Infants & Toddlers', min: 1, max: 3 },
+        { id: 'early-childhood', label: 'Early Childhood', min: 4, max: 6 },
+        { id: 'school-age', label: 'School-Age', min: 7, max: 12 }
+      ];
+      const FALLBACK_BASE_RATES = {
+        'infants-toddlers': 2800,
+        'early-childhood': 2600,
+        'school-age': 2500
+      };
 
       const baseRatesTable = document.getElementById('baseRatesTable');
       const ageGroupsWrap = document.getElementById('ageGroupsWrap');
@@ -359,9 +369,35 @@
         return (num / 100).toFixed(2);
       }
 
+      function resolveAgeGroups(config) {
+        const groups = Array.isArray(config?.age_groups) ? config.age_groups : [];
+        if(groups.length) return groups;
+        return FALLBACK_AGE_GROUPS.map(group => ({ ...group }));
+      }
+
+      function hasRateValues(entry) {
+        if(Number.isFinite(Number(entry))) return true;
+        if(!entry || typeof entry !== 'object') return false;
+        return Object.values(entry).some(value => Number.isFinite(Number(value)));
+      }
+
+      function resolveRateCents(entry, groupId, fallbackEntry) {
+        if(Number.isFinite(Number(entry))) return Math.round(Number(entry));
+        const safe = entry && typeof entry === 'object' ? entry : {};
+        const fallback = fallbackEntry && typeof fallbackEntry === 'object' ? fallbackEntry : {};
+        const direct = safe[groupId];
+        if(Number.isFinite(Number(direct))) return Math.round(Number(direct));
+        const fallbackKey = safe.default ?? safe.basic ?? safe.curriculum;
+        if(Number.isFinite(Number(fallbackKey))) return Math.round(Number(fallbackKey));
+        const fallbackDirect = fallback[groupId] ?? fallback.default ?? fallback.basic ?? fallback.curriculum;
+        if(Number.isFinite(Number(fallbackDirect))) return Math.round(Number(fallbackDirect));
+        return 0;
+      }
+
       function renderBaseRates(config) {
         const rates = config?.base_rates || {};
-        const ageGroups = Array.isArray(config?.age_groups) ? config.age_groups : [];
+        const ageGroups = resolveAgeGroups(config);
+        const defaultEntry = hasRateValues(rates?.default) ? rates.default : FALLBACK_BASE_RATES;
         const headerCols = ageGroups.map((group) => {
           const min = group.min ?? '';
           const max = group.max ?? '';
@@ -369,9 +405,9 @@
           return `<th>${group.label || group.id} ${rangeLabel ? `<span style="color:#94a3b8; font-weight:500;">(${rangeLabel})</span>` : ''}</th>`;
         }).join('');
         const rows = PROVINCES.map((p) => {
-          const entry = rates[p.code] || rates.default || {};
+          const entry = rates[p.code] || rates.default || defaultEntry;
           const cells = ageGroups.map((group) => {
-            const value = centsToDollars(entry[group.id] || 0);
+            const value = centsToDollars(resolveRateCents(entry, group.id, defaultEntry));
             return `<td><input type="number" step="0.01" class="base-rate" data-group="${group.id}" value="${value}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>`;
           }).join('');
           return `
@@ -396,7 +432,7 @@
 
       function renderAgeGroups(config) {
         if(!ageGroupsWrap) return;
-        const groups = Array.isArray(config?.age_groups) ? config.age_groups : [];
+        const groups = resolveAgeGroups(config);
         if(groups.length === 0){
           ageGroupsWrap.innerHTML = '<div class="status-text">No age groups configured yet.</div>';
           return;
