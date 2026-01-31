@@ -310,6 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const bookLink = pid ? `parent-dashboard.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'parent-dashboard.html';
             const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
             const certText = p.certifications || 'Certifications on file';
+            const sessionCountRaw = p.session_count ?? p.sessions_count ?? p.total_sessions ?? p.completed_sessions ?? p.session_total ?? p.sessions;
+            const sessionCount = Array.isArray(sessionCountRaw) ? sessionCountRaw.length : (Number(sessionCountRaw) || 0);
             return {
               id: pid,
               displayName,
@@ -320,6 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
               matchesSelected,
               bookLink,
               profileLink,
+              sessionCount,
               verifyIcons: renderVerifyIcons(p, true)
             };
           });
@@ -341,21 +344,32 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="parent-provider-body">
                 <div class="parent-provider-top">
                   <div>
-                    <div class="parent-provider-name">${p.displayName}</div>
+                    <div class="parent-provider-name-row">
+                      <div class="parent-provider-name">${p.displayName}</div>
+                      ${p.verifyIcons}
+                    </div>
                     <div class="parent-provider-meta">${p.city} · ${p.certText}</div>
                   </div>
-                  <button type="button" class="parent-provider-save${isSaved ? ' is-saved' : ''}" data-action="save" aria-pressed="${isSaved ? 'true' : 'false'}">${isSaved ? 'Saved' : 'Save'}</button>
+                  <div class="parent-provider-save-wrap">
+                    <button type="button" class="parent-provider-save${isSaved ? ' is-saved' : ''}" data-action="save" aria-pressed="${isSaved ? 'true' : 'false'}">
+                      <svg class="save-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="currentColor"/>
+                      </svg>
+                      <span class="save-label">${isSaved ? 'Saved' : 'Save'}</span>
+                    </button>
+                    <div class="parent-provider-session-count">${p.sessionCount === 1 ? '1 session' : `${p.sessionCount} sessions`}</div>
+                  </div>
                 </div>
             <div class="parent-provider-tags">
               ${p.matchesSelected ? '<span class="parent-provider-tag highlight">Available for your selected time</span>' : ''}
               <span>${p.availabilityText}</span>
             </div>
-            ${p.verifyIcons}
           </div>
         </div>
             <div class="parent-provider-actions">
-              <a class="parent-provider-btn primary" href="${p.bookLink}" data-action="book" data-provider="${p.id}" data-name="${p.displayName}">Book</a>
+              <a class="parent-provider-btn ghost" href="${p.profileLink}" data-action="profile" data-provider="${p.id}">View profile</a>
               <button type="button" class="parent-provider-btn ghost" data-action="message" data-provider="${p.id}" data-name="${p.displayName}">Message</button>
+              <a class="parent-provider-btn primary" href="${p.bookLink}" data-action="book" data-provider="${p.id}" data-name="${p.displayName}">Book</a>
             </div>
           </div>
         `;
