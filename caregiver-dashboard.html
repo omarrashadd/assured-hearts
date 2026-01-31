@@ -54,7 +54,10 @@
         </nav>
 
         <div class="provider-sidebar-footer">
-          <button id="providerLogout" class="provider-logout" type="button">Log out</button>
+          <div class="provider-sidebar-actions">
+            <button id="providerLogout" class="provider-logout" type="button">Log out</button>
+            <button id="providerCurriculumBtn" class="provider-curriculum-btn" type="button">Curriculum Library</button>
+          </div>
         </div>
       </aside>
 
@@ -465,6 +468,10 @@
         }
       };
       document.getElementById('providerLogout')?.addEventListener('click', logoutHandler);
+      document.getElementById('providerCurriculumBtn')?.addEventListener('click', () => {
+        window.location.hash = 'curriculum';
+        activateProviderPanel('curriculum');
+      });
 
       const formatCurrency = (value) => {
         const num = Number(value);
