@@ -1679,7 +1679,33 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(()=> mobileMenu.classList.add('hidden'), 360);
   }
 
-  mobileMenuBtn && mobileMenuBtn.addEventListener('click', openMobileMenu);
+  const isDashboard = document.body.classList.contains('provider-dashboard');
+  const mobileMenuBadge = mobileMenuBtn ? mobileMenuBtn.querySelector('.mobile-menu-badge') : null;
+  const updateMobileBadge = (count)=>{
+    if(!mobileMenuBadge || !mobileMenuBtn) return;
+    const unread = Number(count) || 0;
+    mobileMenuBadge.textContent = '';
+    mobileMenuBadge.style.display = unread > 0 ? 'inline-flex' : 'none';
+    mobileMenuBtn.setAttribute('aria-label', unread > 0 ? `Open messages (${unread} unread)` : 'Open messages');
+  };
+  if(mobileMenuBtn){
+    if(isDashboard){
+      mobileMenuBtn.addEventListener('click', () => {
+        if(typeof window.showChatWidget === 'function'){
+          window.showChatWidget();
+          return;
+        }
+        const inboxTab = document.querySelector('[data-panel="inbox"]');
+        if(inboxTab) inboxTab.click();
+      });
+      if(typeof window.latestUnread === 'number') updateMobileBadge(window.latestUnread);
+      window.addEventListener('chat-updated', (event) => {
+        updateMobileBadge(event?.detail?.unread);
+      });
+    } else {
+      mobileMenuBtn.addEventListener('click', openMobileMenu);
+    }
+  }
   mobileMenuClose && mobileMenuClose.addEventListener('click', closeMobileMenu);
   mobileMenu && mobileMenu.addEventListener('click', e=>{ if(e.target === mobileMenu) closeMobileMenu(); });
 
@@ -2275,28 +2301,56 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   const modal = document.createElement('div');
   modal.id = 'chatModal';
+  modal.className = 'chat-modal';
   Object.assign(modal.style, {
     position:'fixed', bottom:'70px', right:'20px', width:'360px', maxHeight:'70vh', background:'#fff',
     border:'1px solid #e5e7eb', borderRadius:'12px', boxShadow:'0 12px 30px rgba(0,0,0,0.18)',
-    display:'none', zIndex:'9999'
+    display:'none', zIndex:'9999', overflow:'hidden'
   });
   modal.innerHTML = `
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; border-bottom:1px solid #e5e7eb;">
-      <div style="font-weight:700; color:#06464E;">Messages</div>
-      <div style="font-size:11px; color:#b91c1c;">Chats are monitored</div>
-      <button id="chatCloseBtn" style="border:none; background:none; font-size:18px; cursor:pointer; color:#6b7280;">×</button>
-    </div>
-    <div style="display:flex; height:300px;">
-      <div id="chatThreads" style="width:40%; border-right:1px solid #e5e7eb; overflow-y:auto;"></div>
-      <div style="flex:1; display:flex; flex-direction:column;">
-        <div id="chatHistory" style="flex:1; padding:10px; overflow-y:auto; background:#f9fafb;"></div>
-        <div style="padding:10px; border-top:1px solid #e5e7eb;">
-          <textarea id="chatInput" rows="2" style="width:100%; resize:none; padding:8px; border:1px solid #e5e7eb; border-radius:8px;" placeholder="Type a message..."></textarea>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; gap:8px;">
-            <span id="chatStatus" style="font-size:11px; color:#6b7280;"></span>
-            <button id="chatBookBtn" style="background:#eef2ff; color:#4338ca; border:1px solid #e0e7ff; border-radius:6px; padding:6px 10px; font-weight:700; font-size:12px; display:none;">Book</button>
-            <button id="chatSendBtn" style="background:#06464E; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-weight:700;">Send</button>
+    <div class="chat-shell">
+      <div class="chat-list-view">
+        <div class="chat-list-header">
+          <div class="chat-list-title">Messages</div>
+          <button id="chatCloseBtn" class="chat-icon-btn chat-close-btn" type="button" aria-label="Close messages">&times;</button>
+        </div>
+        <div id="chatThreads" class="chat-threads"></div>
+      </div>
+      <div class="chat-convo-view">
+        <div class="chat-convo-header">
+          <button id="chatBackBtn" class="chat-icon-btn chat-back-btn" type="button" aria-label="Back to messages">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="chat-user">
+            <div id="chatActiveAvatar" class="chat-avatar">AH</div>
+            <div class="chat-user-meta">
+              <div id="chatActiveName" class="chat-user-name">Messages</div>
+              <div id="chatActiveSub" class="chat-user-sub">Select a chat</div>
+            </div>
           </div>
+          <a id="chatCallBtn" class="chat-icon-btn chat-call-btn is-disabled" href="#" aria-label="Call" aria-disabled="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6.6 2.5h3.1l1 4-2 1a12 12 0 006 6l1-2 4 1v3.1a1 1 0 0 1-1 1C9.6 16.6 3.4 10.4 2.5 3.5a1 1 0 0 1 1-1z" fill="currentColor"/>
+            </svg>
+          </a>
+        </div>
+        <div id="chatHistory" class="chat-history"></div>
+        <div class="chat-composer">
+          <button id="chatPhotoBtn" class="chat-icon-btn chat-photo-btn" type="button" aria-label="Send photo">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 6l1.5-2h7L17 6h3a2 2 0 0 1 2 2v9a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V8a2 2 0 0 1 2-2h3z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+              <circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </button>
+          <input id="chatPhotoInput" class="chat-photo-input" type="file" accept="image/*" capture="environment">
+          <textarea id="chatInput" class="chat-input" rows="1" placeholder="Message..."></textarea>
+          <button id="chatSendBtn" class="chat-send-btn" type="button">Send</button>
+        </div>
+        <div class="chat-status-row">
+          <span id="chatStatus" class="chat-status"></span>
+          <button id="chatBookBtn" class="chat-book-btn" type="button">Book</button>
         </div>
       </div>
     </div>
@@ -2310,42 +2364,166 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const sendBtn = modal.querySelector('#chatSendBtn');
   const statusEl = modal.querySelector('#chatStatus');
   const bookBtn = modal.querySelector('#chatBookBtn');
+  const closeBtn = modal.querySelector('#chatCloseBtn');
+  const backBtn = modal.querySelector('#chatBackBtn');
+  const callBtn = modal.querySelector('#chatCallBtn');
+  const photoBtn = modal.querySelector('#chatPhotoBtn');
+  const photoInput = modal.querySelector('#chatPhotoInput');
+  const activeAvatar = modal.querySelector('#chatActiveAvatar');
+  const activeName = modal.querySelector('#chatActiveName');
+  const activeSub = modal.querySelector('#chatActiveSub');
   const userType = localStorage.getItem('user_type') || '';
 
+  const getInitials = (value)=>{
+    const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
+    const letters = parts.map(part=> part[0]).join('').slice(0,2).toUpperCase();
+    return letters || 'AH';
+  };
+
+  const sanitizePhone = (value)=>{
+    return String(value || '').replace(/[^\d+]/g, '');
+  };
+
+  const formatThreadTime = (value)=>{
+    if(!value) return '';
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())) return '';
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if(mins < 1) return 'now';
+    if(mins < 60) return `${mins}m`;
+    const hours = Math.floor(mins / 60);
+    if(hours < 24) return `${hours}h`;
+    return date.toLocaleDateString('en-CA', { month:'short', day:'numeric' });
+  };
+
+  const formatThreadStatus = (value)=>{
+    if(!value) return '';
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())) return '';
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if(mins < 5) return 'Active now';
+    if(mins < 60) return `Active ${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if(hours < 24) return `Active ${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `Active ${days}d ago`;
+  };
+
+  const extractPhone = (msg)=>{
+    if(!msg) return '';
+    return msg.other_phone || msg.other_phone_number || msg.other_contact_phone || msg.phone || '';
+  };
+
+  const extractPhoto = (msg)=>{
+    if(!msg) return '';
+    return msg.other_photo || msg.other_photo_url || msg.photo_url || msg.avatar_url || msg.other_avatar || '';
+  };
+
+  const setChatView = (view)=>{
+    modal.classList.toggle('chat-modal--thread', view === 'thread');
+  };
+
+  const setModalOpen = (open)=>{
+    modal.style.display = open ? 'block' : 'none';
+    if(open){
+      setChatView(activeThread ? 'thread' : 'list');
+      updateActiveHeader();
+    }
+  };
+
   launcher.addEventListener('click', ()=>{
-    modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
-    if(modal.style.display === 'block' && activeThread){
+    const isOpen = modal.style.display === 'block';
+    setModalOpen(!isOpen);
+    if(!isOpen && activeThread){
       markRead(activeThread);
     }
   });
-  modal.querySelector('#chatCloseBtn').addEventListener('click', ()=> modal.style.display = 'none');
+  closeBtn && closeBtn.addEventListener('click', ()=> setModalOpen(false));
+  backBtn && backBtn.addEventListener('click', ()=> setChatView('list'));
+  callBtn && callBtn.addEventListener('click', (event)=>{
+    if(callBtn.classList.contains('is-disabled')){
+      event.preventDefault();
+    }
+  });
+  if(photoBtn && photoInput){
+    photoBtn.addEventListener('click', ()=>{
+      if(!activeThread) return;
+      photoInput.click();
+    });
+    photoInput.addEventListener('change', ()=>{
+      if(!photoInput.files || photoInput.files.length === 0) return;
+      statusEl.textContent = 'Photo selected';
+      setTimeout(()=>{ statusEl.textContent = ''; }, 1200);
+      photoInput.value = '';
+    });
+  }
 
-  // Expose opener so other buttons can launch a thread
-  window.openChatThread = (otherId, otherName)=>{
+  const updateActiveHeader = ()=>{
+    const thread = activeThread ? threads[activeThread] : null;
+    const name = thread?.other_name || 'Messages';
+    const last = thread?.messages ? thread.messages[thread.messages.length - 1] : null;
+    const lastTime = last?.created_at || last?.createdAt || null;
+    if(activeName) activeName.textContent = name;
+    if(activeSub) {
+      activeSub.textContent = activeThread ? (formatThreadStatus(lastTime) || 'Active recently') : 'Select a chat';
+    }
+    if(activeAvatar){
+      const avatarUrl = thread?.other_photo || thread?.photo_url || thread?.avatar_url || thread?.other_avatar || '';
+      if(avatarUrl){
+        activeAvatar.innerHTML = `<img src="${avatarUrl}" alt="">`;
+      } else {
+        activeAvatar.textContent = getInitials(name);
+      }
+    }
+    if(callBtn){
+      const phone = sanitizePhone(thread?.other_phone);
+      if(phone){
+        callBtn.href = `tel:${phone}`;
+        callBtn.classList.remove('is-disabled');
+        callBtn.setAttribute('aria-disabled','false');
+      } else {
+        callBtn.href = '#';
+        callBtn.classList.add('is-disabled');
+        callBtn.setAttribute('aria-disabled','true');
+      }
+    }
+  };
+
+  const openThread = (otherId, otherName)=>{
     if(!otherId) return;
     activeThread = parseInt(otherId,10);
-    modal.style.display = 'block';
+    setModalOpen(true);
     if(!threads[activeThread]){
       threads[activeThread] = { other_id: activeThread, other_name: otherName || 'User', messages: [] };
     }
     if(otherName && threads[activeThread]) threads[activeThread].other_name = otherName;
     renderThreads();
     renderHistory(activeThread);
+    updateActiveHeader();
+    setChatView('thread');
     markRead(activeThread);
     updateBookButton();
   };
 
+  // Expose opener so other buttons can launch a thread
+  window.openChatThread = (otherId, otherName)=>{
+    openThread(otherId, otherName);
+  };
+
   // Allow dashboards to open the chat widget
   window.showChatWidget = (otherId, otherName)=>{
-    modal.style.display = 'block';
+    setModalOpen(true);
     if(otherId){
-      activeThread = parseInt(otherId,10);
-      if(!threads[activeThread]) threads[activeThread] = { other_id: activeThread, other_name: otherName || 'User', messages: [] };
-      if(otherName && threads[activeThread]) threads[activeThread].other_name = otherName;
-      renderThreads();
-      renderHistory(activeThread);
-      markRead(activeThread);
+      openThread(otherId, otherName);
+      return;
     }
+    updateActiveHeader();
+    renderThreads();
+    if(activeThread) renderHistory(activeThread);
   };
 
   async function fetchMessages(){
@@ -2368,12 +2546,29 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const msgs = data.messages || [];
       msgs.forEach(m=>{
         const key = m.other_id;
-        if(!threads[key]) threads[key] = { other_id: key, other_name: m.other_name || 'User', messages: [] };
+        if(!threads[key]) {
+          threads[key] = {
+            other_id: key,
+            other_name: m.other_name || 'User',
+            other_phone: extractPhone(m) || '',
+            other_photo: extractPhoto(m) || '',
+            messages: []
+          };
+        } else {
+          if(m.other_name && threads[key].other_name === 'User') threads[key].other_name = m.other_name;
+          if(!threads[key].other_phone && extractPhone(m)) threads[key].other_phone = extractPhone(m);
+          if(!threads[key].other_photo && extractPhoto(m)) threads[key].other_photo = extractPhoto(m);
+        }
         threads[key].messages.push(m);
       });
+      if(activeThread && !threads[activeThread]){
+        activeThread = null;
+        setChatView('list');
+      }
       renderThreads();
       updateBadge();
       if(activeThread) renderHistory(activeThread);
+      updateActiveHeader();
       const evt = new CustomEvent('chat-updated', { detail: { threads, unread: (function(){
         return Object.values(threads).reduce((sum, t)=> sum + t.messages.filter(m => m.receiver_id === uid && !m.read_at).length, 0);
       })() } });
@@ -2400,22 +2595,35 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   function renderThreads(){
     if(!threadsEl) return;
-    const arr = Object.values(threads);
-    if(arr.length === 0){
-      threadsEl.innerHTML = '<p style="padding:10px; color:#6b7280; font-size:12px;">No messages yet.</p>';
-      historyEl.innerHTML = '<p style="padding:10px; color:#6b7280; font-size:12px;">Select a thread to start chatting.</p>';
+    const entries = Object.values(threads).map((thread)=>{
+      const last = thread.messages[thread.messages.length - 1];
+      const timeValue = last?.created_at || last?.createdAt || null;
+      const timeSort = timeValue ? new Date(timeValue).getTime() : 0;
+      const unreadCount = thread.messages.filter(m => m.receiver_id === userId && !m.read_at).length;
+      return { thread, last, timeValue, timeSort, unreadCount };
+    }).sort((a, b)=> b.timeSort - a.timeSort);
+    if(entries.length === 0){
+      threadsEl.innerHTML = '<div class="chat-empty">No messages yet.</div>';
+      historyEl.innerHTML = '<div class="chat-empty">Select a conversation to start chatting.</div>';
       return;
     }
-    threadsEl.innerHTML = arr.map(t=>{
-      const last = t.messages[t.messages.length-1];
-      const unread = t.messages.some(m => m.receiver_id === userId && !m.read_at);
+    threadsEl.innerHTML = entries.map(({ thread, last, timeValue, unreadCount })=>{
+      const name = thread.other_name || 'User';
+      const preview = last?.body || 'Start a conversation.';
+      const avatarUrl = thread.other_photo || '';
+      const timeLabel = formatThreadTime(timeValue);
+      const isActive = activeThread == thread.other_id;
       return `
-        <div class="chat-thread" data-id="${t.other_id}" style="padding:10px; border-bottom:1px solid #e5e7eb; cursor:pointer; background:${activeThread==t.other_id?'#eef2ff':'#fff'};">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:700; color:#06464E;">${t.other_name || 'User'}</span>
-            ${unread ? '<span style="background:#f87171; color:#fff; border-radius:999px; padding:2px 6px; font-size:11px;">●</span>' : ''}
+        <div class="chat-thread${isActive ? ' is-active' : ''}${unreadCount ? ' is-unread' : ''}" data-id="${thread.other_id}">
+          <div class="chat-thread-avatar">${avatarUrl ? `<img src="${avatarUrl}" alt="">` : getInitials(name)}</div>
+          <div class="chat-thread-body">
+            <div class="chat-thread-top">
+              <span class="chat-thread-name">${name}</span>
+              <span class="chat-thread-time">${timeLabel}</span>
+            </div>
+            <div class="chat-thread-preview">${preview}</div>
           </div>
-          <div style="font-size:12px; color:#6b7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${last ? last.body : ''}</div>
+          ${unreadCount ? '<span class="chat-thread-unread" aria-hidden="true"></span>' : ''}
         </div>
       `;
     }).join('');
@@ -2424,7 +2632,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
         activeThread = parseInt(el.dataset.id,10);
         renderThreads();
         renderHistory(activeThread);
+        updateActiveHeader();
+        setChatView('thread');
         markRead(activeThread);
+        updateBookButton();
       });
     });
   }
@@ -2433,18 +2644,27 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(!historyEl) return;
     const thread = threads[otherId];
     if(!thread){
-      historyEl.innerHTML = '<p style="padding:10px; color:#6b7280; font-size:12px;">No messages yet.</p>';
+      historyEl.innerHTML = '<div class="chat-empty">No messages yet.</div>';
       return;
     }
+    if(thread.messages.length === 0){
+      historyEl.innerHTML = '<div class="chat-empty">No messages yet.</div>';
+      return;
+    }
+    const name = thread.other_name || 'User';
+    const avatarUrl = thread.other_photo || '';
+    const avatarInner = avatarUrl ? `<img src="${avatarUrl}" alt="">` : getInitials(name);
     historyEl.innerHTML = thread.messages.map(m=>{
       const mine = m.sender_id === userId;
-      const readText = mine ? (m.read_at ? 'Read' : 'Sent') : '';
+      const imageUrl = m.image_url || m.photo_url || m.image || '';
+      const body = m.body || '';
+      const bodyHtml = body ? `<div class="chat-message-text">${body}</div>` : '';
+      const imageHtml = imageUrl ? `<img src="${imageUrl}" class="chat-message-image" alt="Photo">` : '';
+      const avatarHtml = !mine ? `<div class="chat-message-avatar">${avatarInner}</div>` : '';
       return `
-        <div style="margin-bottom:8px; display:flex; ${mine?'justify-content:flex-end;':''}">
-          <div style="max-width:80%; background:${mine?'#06464E':'#e5e7eb'}; color:${mine?'#fff':'#111'}; padding:8px 10px; border-radius:10px; font-size:13px;">
-            <div>${m.body}</div>
-            <div style="font-size:10px; color:${mine?'#d1fae5':'#6b7280'}; text-align:right;">${readText}</div>
-          </div>
+        <div class="chat-message ${mine ? 'is-mine' : 'is-theirs'}">
+          ${avatarHtml}
+          <div class="chat-bubble">${imageHtml}${bodyHtml}</div>
         </div>
       `;
     }).join('');
