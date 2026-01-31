@@ -47,18 +47,13 @@
         <nav class="provider-nav" role="tablist" aria-label="Provider dashboard sections">
           <button id="tab-dashboard" class="provider-nav-item is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel="dashboard">Dashboard</button>
           <button id="tab-calendar" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-calendar" data-panel="calendar">Calendar</button>
-          <button id="tab-inbox" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-inbox" data-panel="inbox">Inbox</button>
+          <button id="tab-inbox" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-inbox" data-panel="inbox">Messages</button>
           <button id="tab-availability" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-availability" data-panel="availability">Availability</button>
           <button id="tab-families" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-families" data-panel="families">My Families</button>
           <button id="tab-curriculum" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-curriculum" data-panel="curriculum">Curriculum Library</button>
         </nav>
 
         <div class="provider-sidebar-footer">
-          <div class="provider-upgrade-card">
-            <div class="provider-upgrade-title">Upgrade to Care+ Provider Access</div>
-            <p class="provider-upgrade-copy">Unlock priority visibility, curriculum tools, and premium scheduling.</p>
-            <a class="provider-upgrade-btn" href="shop.html">Upgrade</a>
-          </div>
           <button id="providerLogout" class="provider-logout" type="button">Log out</button>
         </div>
       </aside>
@@ -103,7 +98,7 @@
                     <div class="provider-booking-cell">Child</div>
                     <div class="provider-booking-cell">Family</div>
                     <div class="provider-booking-cell">Hours booked</div>
-                    <div class="provider-booking-cell">Care type</div>
+                    <div class="provider-booking-cell">Estimated earnings</div>
                     <div class="provider-booking-cell">Time scheduled</div>
                   </div>
                   <div id="upcomingBookingsList" class="provider-bookings-body">
@@ -114,22 +109,21 @@
               <section class="provider-requests-card">
                 <div class="provider-card-head">
                   <div>
-                    <h2>Requests in your area</h2>
-                    <p class="provider-card-sub">Browse new family requests near you.</p>
+                    <h2>My requests</h2>
+                    <p class="provider-card-sub">Requests sent to you.</p>
                   </div>
                   <span id="areaRequestsCount" class="provider-card-pill">0 requests</span>
                 </div>
                 <div class="provider-requests-table">
                   <div class="provider-requests-row provider-requests-head">
-                    <div class="provider-requests-cell">Request type</div>
-                    <div class="provider-requests-cell">Child age</div>
-                    <div class="provider-requests-cell">Hours / week</div>
-                    <div class="provider-requests-cell">Care type</div>
-                    <div class="provider-requests-cell">Time of day</div>
-                    <div class="provider-requests-cell provider-requests-action">Action</div>
+                    <div class="provider-requests-cell">Child</div>
+                    <div class="provider-requests-cell">Family</div>
+                    <div class="provider-requests-cell">Hours requested</div>
+                    <div class="provider-requests-cell">Estimated earnings</div>
+                    <div class="provider-requests-cell">Status</div>
                   </div>
                   <div id="areaRequestsList" class="provider-requests-body">
-                    <div class="provider-requests-empty">No requests in your area yet.</div>
+                    <div class="provider-requests-empty">No requests yet.</div>
                   </div>
                 </div>
               </section>
@@ -199,16 +193,14 @@
                     </div>
                     <span id="earningsTotal" class="provider-card-pill">$0 total</span>
                   </div>
-                  <div class="provider-earnings-bar" role="img" aria-label="Earnings split across curriculum, standard sessions, tips, and bonuses.">
-                    <span id="earnSegCurriculum" class="earn-seg earn-curriculum"></span>
-                    <span id="earnSegStandard" class="earn-seg earn-standard"></span>
+                  <div class="provider-earnings-bar" role="img" aria-label="Earnings split across sessions, tips, and bonuses.">
+                    <span id="earnSegSessions" class="earn-seg earn-sessions"></span>
                     <span id="earnSegTips" class="earn-seg earn-tips"></span>
                     <span id="earnSegBonuses" class="earn-seg earn-bonuses"></span>
                   </div>
                   <div id="earningsEmpty" class="provider-earnings-empty">No earnings data yet.</div>
                   <div class="provider-earnings-grid">
-                    <div class="provider-earnings-item"><span class="provider-dot provider-dot-curriculum"></span> Curriculum sessions <strong id="earnCurriculumValue">$0</strong></div>
-                    <div class="provider-earnings-item"><span class="provider-dot provider-dot-standard"></span> Standard sessions <strong id="earnStandardValue">$0</strong></div>
+                    <div class="provider-earnings-item"><span class="provider-dot provider-dot-sessions"></span> Session earnings <strong id="earnSessionsValue">$0</strong></div>
                     <div class="provider-earnings-item"><span class="provider-dot provider-dot-tips"></span> Tips <strong id="earnTipsValue">$0</strong></div>
                     <div class="provider-earnings-item"><span class="provider-dot provider-dot-bonuses"></span> Bonuses <strong id="earnBonusesValue">$0</strong></div>
                   </div>
@@ -226,8 +218,17 @@
 
           <section id="panel-inbox" class="provider-panel" role="tabpanel" aria-labelledby="tab-inbox" hidden>
             <div class="provider-panel-card">
-              <h2>Inbox</h2>
-              <p>Your conversations with families will appear here.</p>
+              <div class="provider-card-head">
+                <div>
+                  <h2>Messages</h2>
+                  <p class="provider-card-sub">Stay connected with families and support.</p>
+                </div>
+                <span id="providerMessagesUnread" class="provider-card-pill" style="display:none;">0 unread</span>
+              </div>
+              <div id="providerMessagesList" class="parent-messages-list">
+                <div class="provider-bookings-empty">No messages yet.</div>
+              </div>
+              <button id="providerMessagesOpenBtn" class="provider-header-btn" type="button">Open messages</button>
             </div>
           </section>
 
@@ -385,22 +386,13 @@
                 </div>
 
                 <div class="provider-form-grid">
-                  <label class="provider-form-field">
-                    <span>CPR certification</span>
-                    <select name="cpr_certified" id="provCprCertified" class="provider-input">
-                      <option value="">Select</option>
-                      <option value="true">Yes</option>
-                      <option value="false">No</option>
-                    </select>
-                  </label>
-                  <label class="provider-form-field">
-                    <span>Caregiver insurance</span>
-                    <select name="caregiver_insurance" id="provCaregiverInsurance" class="provider-input">
-                      <option value="">Select</option>
-                      <option value="true">Yes</option>
-                      <option value="false">No</option>
-                    </select>
-                  </label>
+                  <div class="provider-form-field">
+                    <span>Verification (read only)</span>
+                    <div class="provider-verify-row" id="provVerifyRow">
+                      <!-- badges injected via script -->
+                    </div>
+                    <small style="color:#9ca3af;">Updated by Assured Hearts after manual verification.</small>
+                  </div>
                   <label class="provider-form-field provider-form-field-wide">
                     <span>About</span>
                     <textarea name="about" id="provAbout" class="provider-textarea" rows="4" placeholder="Share a short introduction for families..."></textarea>
@@ -515,11 +507,13 @@
         return 0;
       };
 
-      const computeMonthlyHours = (sessions, requests) => {
+      const computeMonthlyHours = (requests) => {
         const monthKey = new Date().toISOString().slice(0, 7);
-        const acceptedRequests = (requests || []).filter((req) => (req.status || '').toLowerCase() === 'accepted');
-        const combined = [...(sessions || []), ...acceptedRequests];
-        return combined.reduce((total, entry) => {
+        const acceptedRequests = (requests || []).filter((req) => {
+          const status = String(req.status || '').toLowerCase();
+          return status === 'accepted' || status === 'confirmed';
+        });
+        return acceptedRequests.reduce((total, entry) => {
           const dateValue = entry.session_date || entry.date || entry.start_at;
           const entryDate = toDate(dateValue);
           if(!entryDate) return total;
@@ -565,12 +559,36 @@
         return 'TBD';
       };
 
-      const resolveCareType = (entry) => {
-        const raw = String(entry.care_type || entry.careType || entry.care || '').toLowerCase();
-        if(raw.includes('mixed')) return 'Mixed';
-        if(entry.curriculum === true || entry.is_curriculum === true || raw.includes('curr')) return 'Curriculum';
-        if(raw.includes('standard') || raw.includes('basic')) return 'Standard';
-        return 'Standard';
+      const resolveEstimatedEarningsCents = (entry) => {
+        const hours = durationHours(entry) || entry.pricing_snapshot?.hours || 0;
+        const snapshot = typeof entry.pricing_snapshot === 'string'
+          ? (() => {
+              try { return JSON.parse(entry.pricing_snapshot); } catch(_e){ return null; }
+            })()
+          : entry.pricing_snapshot;
+        const direct = Number(snapshot?.provider_earnings_cents ?? 0);
+        if(Number.isFinite(direct) && direct > 0) return Math.round(direct);
+        const providerPerHour = Number(snapshot?.provider_fee_cents ?? 0);
+        if(Number.isFinite(providerPerHour) && providerPerHour > 0) {
+          return Math.round(providerPerHour * (hours || 1));
+        }
+        let hourlyRate = Number(
+          snapshot?.hourly_rate_cents ??
+          entry.hourly_rate_cents ??
+          0
+        );
+        const providerShare = 0.7;
+        const totalBookingCents = Number(
+          entry.payment_amount_cents ??
+          entry.total_booking_cents ??
+          snapshot?.total_booking_cents ??
+          0
+        );
+        if((!Number.isFinite(hourlyRate) || hourlyRate <= 0) && Number.isFinite(totalBookingCents) && totalBookingCents > 0) {
+          return Math.round(totalBookingCents * providerShare);
+        }
+        if(!Number.isFinite(hourlyRate) || hourlyRate <= 0) return 0;
+        return Math.round(hourlyRate * providerShare * (hours || 1));
       };
 
       const formatChildDisplay = (entry) => {
@@ -606,11 +624,35 @@
         return entry.location || entry.address || entry.booking_address || entry.address_line1 || '';
       };
 
-      const buildUpcomingBookings = (sessions, requests) => {
+      let providerRequestsCache = [];
+      let providerStatsCache = {};
+      let providerApiBase = '';
+
+      const updateProviderMetrics = (requests) => {
+        const acceptedRequests = (requests || []).filter((req) => {
+          const status = String(req.status || '').toLowerCase();
+          return status === 'accepted' || status === 'confirmed';
+        });
+        const earnings = acceptedRequests.reduce((total, entry) => {
+          const cents = resolveEstimatedEarningsCents(entry);
+          return total + (cents ? cents / 100 : 0);
+        }, 0);
+        const monthHours = computeMonthlyHours(requests || []);
+        const earningsEl = document.getElementById('metricMonthlyEarnings');
+        if(earningsEl) earningsEl.textContent = formatCurrency(earnings);
+        const hoursEl = document.getElementById('metricMonthlyHours');
+        if(hoursEl) hoursEl.textContent = formatHours(monthHours);
+      };
+
+      const buildUpcomingBookings = (requests) => {
         const acceptedRequests = (requests || [])
-          .filter((req) => (req.status || '').toLowerCase() === 'accepted')
+          .filter((req) => {
+            const status = String(req.status || '').toLowerCase();
+            return status === 'accepted' || status === 'confirmed';
+          })
           .map((req) => ({
-            id: req.id ? `req-${req.id}` : `req-${Math.random().toString(36).slice(2)}`,
+            id: req.id || `req-${Math.random().toString(36).slice(2)}`,
+            request_id: req.id || null,
             child_name: req.child_name || req.childName || req.child,
             child_first_name: req.child_first_name || req.childFirstName,
             child_last_name: req.child_last_name || req.childLastName,
@@ -622,13 +664,15 @@
             session_date: req.session_date || req.date || (req.start_at ? String(req.start_at).slice(0, 10) : null),
             start_time: req.start_time,
             end_time: req.end_time,
-            care_type: req.care_type || req.careType || req.care,
+            pricing_snapshot: req.pricing_snapshot || req.pricingSnapshot || null,
+            hourly_rate_cents: req.hourly_rate_cents || null,
+            payment_amount_cents: req.payment_amount_cents || null,
+            payment_currency: req.payment_currency || null,
             status: req.status || 'accepted',
             location: req.location || req.address || req.booking_address || null
           }));
-        const combined = [...(sessions || []), ...acceptedRequests];
-        const upcoming = combined.filter((entry) => {
-          if((entry.status || '').toLowerCase() === 'cancelled') return false;
+        const upcoming = acceptedRequests.filter((entry) => {
+          if(isCancelled(entry)) return false;
           const start = getStartDate(entry);
           if(!start) return true;
           return start >= new Date();
@@ -643,8 +687,8 @@
         });
       };
 
-      const renderUpcomingBookings = (sessions, requests) => {
-        const upcoming = buildUpcomingBookings(sessions, requests);
+      const renderUpcomingBookings = (requests) => {
+        const upcoming = buildUpcomingBookings(requests);
         const listEl = document.getElementById('upcomingBookingsList');
         const countEl = document.getElementById('upcomingCount');
         if(countEl) countEl.textContent = `${upcoming.length} upcoming`;
@@ -657,12 +701,13 @@
               const familyLabel = resolveFamilyLabel(entry);
               const hoursValue = durationHours(entry);
               const hoursLabel = hoursValue ? `${formatHours(hoursValue)} hrs` : 'TBD';
-              const careLabel = resolveCareType(entry);
-              const careClass = careLabel === 'Curriculum' ? 'care-pill-curriculum' : 'care-pill-standard';
+              const earningsCents = resolveEstimatedEarningsCents(entry);
+              const earningsLabel = earningsCents ? formatCurrency(earningsCents / 100) : '$0';
               const timeLabel = formatScheduleLabel(entry);
               const addressLabel = resolveBookingAddress(entry) || 'Address not provided';
+              const requestId = entry.request_id || entry.id || '';
               return `
-                <div class="provider-bookings-row provider-bookings-item">
+                <div class="provider-bookings-row provider-bookings-item" data-request-id="${requestId}">
                   <div class="provider-booking-cell" data-label="Child">
                     <div class="booking-child">
                       <span>${childDisplay.label}</span>
@@ -671,8 +716,13 @@
                   </div>
                   <div class="provider-booking-cell" data-label="Family">${familyLabel}</div>
                   <div class="provider-booking-cell" data-label="Hours booked">${hoursLabel}</div>
-                  <div class="provider-booking-cell" data-label="Care type"><span class="care-pill ${careClass}">${careLabel}</span></div>
-                  <div class="provider-booking-cell" data-label="Time scheduled">${timeLabel}</div>
+                  <div class="provider-booking-cell" data-label="Estimated earnings">${earningsLabel}</div>
+                  <div class="provider-booking-cell" data-label="Time scheduled">
+                    <div class="booking-time-row">
+                      <span>${timeLabel}</span>
+                      ${requestId ? `<button class="provider-cancel-btn" type="button" data-request-id="${requestId}">Cancel</button>` : ''}
+                    </div>
+                  </div>
                   <div class="provider-booking-cell provider-booking-address" data-label="Address">
                     <span class="booking-address-text">${addressLabel}</span>
                     <button class="booking-back-btn" type="button">Go back</button>
@@ -688,14 +738,48 @@
             if(viewBtn) {
               const row = viewBtn.closest('.provider-bookings-item');
               if(row) row.classList.add('is-address');
+              return;
             }
             const backBtn = event.target.closest('.booking-back-btn');
             if(backBtn) {
               const row = backBtn.closest('.provider-bookings-item');
               if(row) row.classList.remove('is-address');
+              return;
+            }
+            const cancelBtn = event.target.closest('.provider-cancel-btn');
+            if(cancelBtn) {
+              const requestId = cancelBtn.getAttribute('data-request-id');
+              const reason = prompt('Reason for cancellation?');
+              if(reason === null) return;
+              cancelProviderRequest(requestId, reason.trim());
             }
           });
           listEl.dataset.addressBound = 'true';
+        }
+      };
+
+      const cancelProviderRequest = async (requestId, reason) => {
+        const id = parseInt(requestId, 10);
+        if(!id) return;
+        try{
+          const resp = await fetch(`${providerApiBase}/forms/request/${id}/cancel`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason, cancelled_by: 'provider' })
+          });
+          if(!resp.ok) throw new Error('Cancel failed');
+          const idx = providerRequestsCache.findIndex((req) => Number(req.id) === id);
+          if(idx > -1) {
+            providerRequestsCache[idx] = {
+              ...providerRequestsCache[idx],
+              status: 'cancelled_by_you'
+            };
+          }
+          renderUpcomingBookings(providerRequestsCache);
+          renderAreaRequests(providerRequestsCache);
+          renderDashboardInsights(providerRequestsCache, providerStatsCache);
+        } catch (err) {
+          alert('Could not cancel the booking. Please try again.');
         }
       };
 
@@ -732,19 +816,17 @@
         if(label) element.setAttribute('aria-label', label);
       };
 
-      const renderDashboardInsights = (sessions, requests, stats = {}, insights = {}) => {
+      const renderDashboardInsights = (requests, stats = {}) => {
+        const requestList = requests || [];
+        const acceptedRequests = requestList.filter((entry) => {
+          const status = String(entry.status || '').toLowerCase();
+          return status === 'accepted' || status === 'confirmed';
+        });
         const ageCounts = { infants: 0, early: 0, school: 0 };
-        const ageMix = insights.ageMix;
-        if(ageMix){
-          ageCounts.infants = Number(ageMix.infants || 0);
-          ageCounts.early = Number(ageMix.early || 0);
-          ageCounts.school = Number(ageMix.school || 0);
-        } else {
-          [...(sessions || []), ...(requests || [])].forEach((entry) => {
-            const group = parseAgeGroup(entry);
-            if(group && ageCounts[group] !== undefined) ageCounts[group] += 1;
-          });
-        }
+        acceptedRequests.forEach((entry) => {
+          const group = parseAgeGroup(entry);
+          if(group && ageCounts[group] !== undefined) ageCounts[group] += 1;
+        });
         const ageTotal = ageCounts.infants + ageCounts.early + ageCounts.school;
         const infantsPct = ageTotal ? Math.round((ageCounts.infants / ageTotal) * 100) : 0;
         const earlyPct = ageTotal ? Math.round((ageCounts.early / ageTotal) * 100) : 0;
@@ -771,15 +853,19 @@
         const ageSchoolEl = document.getElementById('ageMixSchool');
         if(ageSchoolEl) ageSchoolEl.textContent = `${ageCounts.school}`;
 
-        const allSessions = sessions || [];
-        let cancelledCount = allSessions.filter(isCancelled).length;
-        let totalSessions = allSessions.length;
-        let successCount = Math.max(0, totalSessions - cancelledCount);
-        if(insights.success){
-          successCount = Number(insights.success.completed || 0);
-          cancelledCount = Number(insights.success.cancelled || 0);
-          totalSessions = successCount + cancelledCount;
-        }
+        const resolved = requestList.filter((entry) => {
+          const status = String(entry.status || '').toLowerCase();
+          return status === 'accepted' || status === 'confirmed' || status === 'declined' || status.includes('cancel');
+        });
+        const successCount = resolved.filter((entry) => {
+          const status = String(entry.status || '').toLowerCase();
+          return status === 'accepted' || status === 'confirmed';
+        }).length;
+        const cancelledCount = resolved.filter((entry) => {
+          const status = String(entry.status || '').toLowerCase();
+          return !(status === 'accepted' || status === 'confirmed');
+        }).length;
+        const totalSessions = successCount + cancelledCount;
         const successPct = totalSessions ? Math.round((successCount / totalSessions) * 100) : 0;
         updatePie(
           document.getElementById('successRatePie'),
@@ -795,21 +881,14 @@
         const cancelCountEl = document.getElementById('cancelCount');
         if(cancelCountEl) cancelCountEl.textContent = `${cancelledCount}`;
 
-        let repeatFamilies = 0;
-        let newFamilies = 0;
-        if(insights.repeatFamilies){
-          repeatFamilies = Number(insights.repeatFamilies.repeat || 0);
-          newFamilies = Number(insights.repeatFamilies.new || 0);
-        } else {
-          const familyCounts = new Map();
-          allSessions.filter((entry) => !isCancelled(entry)).forEach((entry) => {
-            const key = entry.parent_id || entry.parentId || entry.parent_user_id || entry.parent || entry.parent_name || entry.family_name || entry.family || entry.email || entry.id;
-            if(!key) return;
-            familyCounts.set(key, (familyCounts.get(key) || 0) + 1);
-          });
-          repeatFamilies = Array.from(familyCounts.values()).filter((count) => count > 1).length;
-          newFamilies = Array.from(familyCounts.values()).filter((count) => count === 1).length;
-        }
+        const familyCounts = new Map();
+        acceptedRequests.forEach((entry) => {
+          const key = entry.parent_id || entry.parentId || entry.parent_user_id || entry.parent || entry.parent_name || entry.family_name || entry.family || entry.email || entry.id;
+          if(!key) return;
+          familyCounts.set(key, (familyCounts.get(key) || 0) + 1);
+        });
+        const repeatFamilies = Array.from(familyCounts.values()).filter((count) => count > 1).length;
+        const newFamilies = Array.from(familyCounts.values()).filter((count) => count === 1).length;
         const totalFamilies = repeatFamilies + newFamilies;
         const repeatPct = totalFamilies ? Math.round((repeatFamilies / totalFamilies) * 100) : 0;
         updatePie(
@@ -831,9 +910,8 @@
           return Number.isNaN(num) ? 0 : num;
         };
         const resolveEarnings = (entry) => {
-          if(entry.provider_earnings_cents) return toNumber(entry.provider_earnings_cents) / 100;
-          if(entry.payment_amount_cents) return toNumber(entry.payment_amount_cents) / 100;
-          return toNumber(entry.provider_earnings || entry.earnings || entry.amount || entry.total || 0);
+          const cents = resolveEstimatedEarningsCents(entry);
+          return cents ? cents / 100 : toNumber(entry.provider_earnings || entry.earnings || entry.amount || entry.total || 0);
         };
         const resolveTip = (entry) => {
           if(entry.tip_cents) return toNumber(entry.tip_cents) / 100;
@@ -843,56 +921,31 @@
           if(entry.bonus_cents) return toNumber(entry.bonus_cents) / 100;
           return toNumber(entry.bonus || entry.bonus_amount || 0);
         };
-        const resolveCare = (entry) => {
-          const raw = String(entry.care_type || entry.careType || entry.care || '').toLowerCase();
-          if(raw.includes('curriculum')) return 'curriculum';
-          if(raw.includes('mixed')) return 'mixed';
-          if(raw.includes('standard')) return 'standard';
-          return 'standard';
-        };
-        let curriculumTotal = 0;
-        let standardTotal = 0;
-        let tipsTotal = toNumber(stats.tips || 0);
+        let sessionTotal = 0;
+        let tipsTotal = 0;
         let bonusesTotal = 0;
-        if(insights.earnings){
-          curriculumTotal = toNumber(insights.earnings.curriculumCents || 0) / 100;
-          standardTotal = toNumber(insights.earnings.standardCents || 0) / 100;
-          tipsTotal = toNumber(insights.earnings.tipsCents || 0) / 100;
-          bonusesTotal = toNumber(insights.earnings.bonusesCents || 0) / 100;
-        } else {
-          allSessions.forEach((entry) => {
-            const amount = resolveEarnings(entry);
-            const tip = resolveTip(entry);
-            const bonus = resolveBonus(entry);
-            if(amount > 0) {
-              const care = resolveCare(entry);
-              if(care === 'curriculum') curriculumTotal += amount;
-              else standardTotal += amount;
-            }
-            if(tip > 0) tipsTotal += tip;
-            if(bonus > 0) bonusesTotal += bonus;
-          });
-          if(curriculumTotal + standardTotal === 0 && toNumber(stats.earnings || 0) > 0) {
-            standardTotal = toNumber(stats.earnings || 0);
-          }
-        }
-        const totalEarnings = curriculumTotal + standardTotal + tipsTotal + bonusesTotal;
+        acceptedRequests.forEach((entry) => {
+          const amount = resolveEarnings(entry);
+          const tip = resolveTip(entry);
+          const bonus = resolveBonus(entry);
+          if(amount > 0) sessionTotal += amount;
+          if(tip > 0) tipsTotal += tip;
+          if(bonus > 0) bonusesTotal += bonus;
+        });
+        const totalEarnings = sessionTotal + tipsTotal + bonusesTotal;
         const setSegWidth = (id, value) => {
           const el = document.getElementById(id);
           if(!el) return;
           const pct = totalEarnings ? Math.round((value / totalEarnings) * 100) : 0;
           el.style.setProperty('--w', `${pct}%`);
         };
-        setSegWidth('earnSegCurriculum', curriculumTotal);
-        setSegWidth('earnSegStandard', standardTotal);
+        setSegWidth('earnSegSessions', sessionTotal);
         setSegWidth('earnSegTips', tipsTotal);
         setSegWidth('earnSegBonuses', bonusesTotal);
         const totalEl = document.getElementById('earningsTotal');
         if(totalEl) totalEl.textContent = `${formatCurrency(totalEarnings)} total`;
-        const currEl = document.getElementById('earnCurriculumValue');
-        if(currEl) currEl.textContent = formatCurrency(curriculumTotal);
-        const stdEl = document.getElementById('earnStandardValue');
-        if(stdEl) stdEl.textContent = formatCurrency(standardTotal);
+        const sessionsEl = document.getElementById('earnSessionsValue');
+        if(sessionsEl) sessionsEl.textContent = formatCurrency(sessionTotal);
         const tipsEl = document.getElementById('earnTipsValue');
         if(tipsEl) tipsEl.textContent = formatCurrency(tipsTotal);
         const bonusEl = document.getElementById('earnBonusesValue');
@@ -901,38 +954,9 @@
         if(emptyEl) emptyEl.style.display = totalEarnings > 0 ? 'none' : 'block';
       };
 
-      const resolveRequestType = (entry) => {
-        if(entry.is_recurring === true || entry.recurring === true) return 'Recurring';
-        const raw = String(entry.request_type || entry.type || '').toLowerCase();
-        if(raw.includes('recurring')) return 'Recurring';
-        if(raw.includes('one')) return 'One-time';
-        return 'One-time';
-      };
-
-      const resolveChildAge = (entry) => {
-        return entry.child_age || entry.childAge || entry.child_age_group || entry.age || 'Not specified';
-      };
-
-      const resolveHoursPerWeek = (entry) => {
-        const hours = entry.hours_per_week || entry.hoursPerWeek || entry.weekly_hours || entry.hours;
-        if(hours === undefined || hours === null || hours === '') return 'TBD';
-        return `${hours} hrs/week`;
-      };
-
-      const resolveTimeOfDay = (entry) => {
-        const raw = String(entry.time_of_day || entry.timeOfDay || '').toLowerCase();
-        if(raw.includes('morning')) return 'Mornings';
-        if(raw.includes('afternoon')) return 'Afternoons';
-        if(raw.includes('evening')) return 'Evenings';
-        if(raw.includes('mixed')) return 'Mixed';
-        const startTime = entry.start_time || (entry.start_at ? new Date(entry.start_at).toTimeString().slice(0,5) : '');
-        const minutes = minutesFromTime(startTime);
-        if(minutes !== null) {
-          if(minutes < 12 * 60) return 'Mornings';
-          if(minutes < 17 * 60) return 'Afternoons';
-          return 'Evenings';
-        }
-        return 'Mixed';
+      const requestIsActionable = (status) => {
+        const normalized = String(status || '').toLowerCase();
+        return normalized === '' || normalized === 'pending' || normalized === 'requested';
       };
 
       const renderAreaRequests = (requests) => {
@@ -942,32 +966,146 @@
         if(countEl) countEl.textContent = `${rows.length} requests`;
         if(!listEl) return;
         if(rows.length === 0) {
-          listEl.innerHTML = '<div class="provider-requests-empty">No requests in your area yet.</div>';
+          listEl.innerHTML = '<div class="provider-requests-empty">No requests yet.</div>';
           return;
         }
         listEl.innerHTML = rows.map((entry) => {
-          const requestType = resolveRequestType(entry);
-          const childAge = resolveChildAge(entry);
-          const hours = resolveHoursPerWeek(entry);
-          const careType = resolveCareType(entry);
-          const careClass = careType === 'Curriculum' ? 'care-pill-curriculum' : (careType === 'Mixed' ? 'care-pill-mixed' : 'care-pill-standard');
-          const timeOfDay = resolveTimeOfDay(entry);
-          const detailsLink = entry.details_url || entry.detailsUrl || entry.link || '#';
+          const childDisplay = formatChildDisplay(entry);
+          const familyLabel = resolveFamilyLabel(entry);
+          const hoursValue = durationHours(entry);
+          const hoursLabel = hoursValue ? `${formatHours(hoursValue)} hrs` : 'TBD';
+          const earningsCents = resolveEstimatedEarningsCents(entry);
+          const earningsLabel = earningsCents ? formatCurrency(earningsCents / 100) : '$0';
+          const statusRaw = String(entry.status || 'pending').replace(/_/g, ' ');
+          const statusLabel = statusRaw.replace(/_/g, ' ').replace(/\b\w/g, (ch) => ch.toUpperCase());
+          const canRespond = requestIsActionable(entry.status);
+          const requestId = entry.id || '';
+          const actionMarkup = `
+            <div class="provider-requests-action ${canRespond ? '' : 'is-disabled'}">
+              <button class="provider-request-btn accept" type="button" data-action="accept" data-request-id="${requestId}" ${canRespond ? '' : 'disabled'}>Accept</button>
+              <button class="provider-request-btn decline" type="button" data-action="decline" data-request-id="${requestId}" ${canRespond ? '' : 'disabled'}>Decline</button>
+            </div>
+          `;
           return `
-            <div class="provider-requests-row provider-requests-item">
-              <div class="provider-requests-cell" data-label="Request type">${requestType}</div>
-              <div class="provider-requests-cell" data-label="Child age">${childAge}</div>
-              <div class="provider-requests-cell" data-label="Hours / week">${hours}</div>
-              <div class="provider-requests-cell" data-label="Care type"><span class="care-pill ${careClass}">${careType}</span></div>
-              <div class="provider-requests-cell" data-label="Time of day">${timeOfDay}</div>
-              <div class="provider-requests-cell provider-requests-action" data-label="Action">
-                <button class="provider-reach-btn" type="button">Reach out</button>
-                <a class="provider-details-link" href="${detailsLink}">View details</a>
-                <span class="provider-careplus-pill">Care+</span>
+            <div class="provider-requests-row provider-requests-item" data-request-id="${requestId}">
+              <div class="provider-requests-cell" data-label="Child">${childDisplay.label}</div>
+              <div class="provider-requests-cell" data-label="Family">${familyLabel}</div>
+              <div class="provider-requests-cell" data-label="Hours requested">${hoursLabel}</div>
+              <div class="provider-requests-cell" data-label="Estimated earnings">${earningsLabel}</div>
+              <div class="provider-requests-cell provider-requests-status" data-label="Status">
+                ${actionMarkup}
+                <span>${statusLabel}</span>
               </div>
             </div>
           `;
         }).join('');
+        if(!listEl.dataset.actionsBound) {
+          listEl.addEventListener('click', (event) => {
+            const btn = event.target.closest('.provider-request-btn');
+            if(!btn || btn.disabled) return;
+            const action = btn.getAttribute('data-action');
+            const requestId = btn.getAttribute('data-request-id');
+            if(!requestId || !action) return;
+            respondToRequest(requestId, action, btn);
+          });
+          listEl.dataset.actionsBound = 'true';
+        }
+      };
+
+      const respondToRequest = async (requestId, action, buttonEl) => {
+        const id = parseInt(requestId, 10);
+        if(!id) return;
+        if(buttonEl) buttonEl.disabled = true;
+        try{
+          const resp = await fetch(`${providerApiBase}/forms/request/${id}/respond`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, provider_id: parseInt(localStorage.getItem('user_id'), 10) })
+          });
+          const data = await resp.json().catch(() => ({}));
+          if(!resp.ok) throw new Error(data.error || 'Unable to update request');
+          const status = data.status || (action === 'accept' ? 'accepted' : 'declined');
+          const idx = providerRequestsCache.findIndex((entry) => Number(entry.id) === id);
+          if(idx > -1) {
+            providerRequestsCache[idx] = { ...providerRequestsCache[idx], status };
+          }
+          renderUpcomingBookings(providerRequestsCache);
+          renderAreaRequests(providerRequestsCache);
+          renderDashboardInsights(providerRequestsCache, providerStatsCache);
+          updateProviderMetrics(providerRequestsCache);
+        }catch(err){
+          alert(err.message || 'Unable to respond to request.');
+        }finally{
+          if(buttonEl) buttonEl.disabled = false;
+        }
+      };
+
+      const formatMessageTime = (value) => {
+        if(!value) return '';
+        const date = new Date(value);
+        if(Number.isNaN(date.getTime())) return '';
+        const now = new Date();
+        const sameDay = date.toDateString() === now.toDateString();
+        return sameDay
+          ? date.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' })
+          : date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+      };
+
+      const hookProviderMessages = () => {
+        const listEl = document.getElementById('providerMessagesList');
+        const unreadEl = document.getElementById('providerMessagesUnread');
+        const openBtn = document.getElementById('providerMessagesOpenBtn');
+        const apply = () => {
+          const threads = window.latestThreads || {};
+          const unread = window.latestUnread || 0;
+          if(unreadEl){
+            unreadEl.style.display = unread > 0 ? 'inline-flex' : 'none';
+            unreadEl.textContent = `${unread} unread`;
+          }
+          if(!listEl) return;
+          const uid = parseInt(localStorage.getItem('user_id'), 10);
+          const entries = Object.values(threads).map((thread) => {
+            const last = thread.messages[thread.messages.length - 1];
+            const time = last?.created_at || last?.createdAt || null;
+            return { thread, last, time };
+          }).sort((a, b) => {
+            const aTime = a.time ? new Date(a.time).getTime() : 0;
+            const bTime = b.time ? new Date(b.time).getTime() : 0;
+            return bTime - aTime;
+          });
+          if(entries.length === 0){
+            listEl.innerHTML = '<div class="provider-bookings-empty">No messages yet.</div>';
+            return;
+          }
+          listEl.innerHTML = entries.slice(0, 3).map(({ thread, last, time }) => {
+            const name = thread.other_name || 'User';
+            const initials = name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
+            const body = last?.body || '';
+            const unreadCount = uid
+              ? thread.messages.filter(m => m.receiver_id === uid && !m.read_at).length
+              : 0;
+            return `
+              <div class="parent-message-item provider-message-item">
+                <div class="provider-message-avatar">${initials || 'AH'}</div>
+                <div class="provider-message-content">
+                  <div class="provider-message-top">
+                    <div class="parent-message-name">${name}</div>
+                    <div class="provider-message-time">${formatMessageTime(time)}</div>
+                  </div>
+                  <div class="parent-message-body">${body}</div>
+                </div>
+                ${unreadCount ? `<span class="provider-message-unread">${unreadCount}</span>` : ''}
+              </div>
+            `;
+          }).join('');
+        };
+        apply();
+        window.addEventListener('chat-updated', apply);
+        if(openBtn){
+          openBtn.addEventListener('click', () => {
+            if(window.showChatWidget) window.showChatWidget();
+          });
+        }
       };
 
       const availabilityDays = [
@@ -1184,8 +1322,10 @@
         const userId = parseInt(localStorage.getItem('user_id'), 10);
         const userType = localStorage.getItem('user_type');
         if(!userId || userType !== 'provider') return;
+        providerApiBase = API_BASE;
 
         initAvailabilityEditor({ apiBase: API_BASE, userId });
+        hookProviderMessages();
 
         try {
           const resp = await fetch(`${API_BASE}/forms/provider/${userId}`);
@@ -1202,17 +1342,13 @@
           }
 
           const stats = data.stats || {};
-          const earnings = stats.earnings || stats.earnings_month || 0;
-          const monthHours = computeMonthlyHours(data.sessions || [], data.requests || []);
-
-          const earningsEl = document.getElementById('metricMonthlyEarnings');
-          if(earningsEl) earningsEl.textContent = formatCurrency(earnings);
-
-          const hoursEl = document.getElementById('metricMonthlyHours');
-          if(hoursEl) hoursEl.textContent = formatHours(monthHours);
-          renderUpcomingBookings(data.sessions || [], data.requests || []);
-          renderAreaRequests(data.area_requests || data.areaRequests || []);
-          renderDashboardInsights(data.sessions || [], data.requests || [], stats, data.insights || {});
+          const requests = data.requests || [];
+          providerRequestsCache = requests;
+          providerStatsCache = stats;
+          updateProviderMetrics(requests);
+          renderUpcomingBookings(requests);
+          renderAreaRequests(requests);
+          renderDashboardInsights(requests, stats);
           initAvailabilityEditor({ profile, apiBase: API_BASE, userId });
         } catch (err) {
           console.error('Failed to load provider metrics', err);

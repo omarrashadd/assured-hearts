@@ -47,7 +47,7 @@
         <nav class="provider-nav" role="tablist" aria-label="Parent dashboard sections">
           <button id="tab-dashboard" class="provider-nav-item is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel="dashboard">Dashboard</button>
           <button id="tab-calendar" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-calendar" data-panel="calendar">Calendar</button>
-          <button id="tab-inbox" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-inbox" data-panel="inbox">Inbox</button>
+          <button id="tab-inbox" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-inbox" data-panel="inbox">Messages</button>
           <button id="tab-children" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-children" data-panel="children">My Children</button>
           <button id="tab-caregivers" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-caregivers" data-panel="caregivers">My Caregivers</button>
           <button id="tab-curriculum" class="provider-nav-item" type="button" role="tab" aria-selected="false" aria-controls="panel-curriculum" data-panel="curriculum">My Curriculum</button>
@@ -81,6 +81,13 @@
               <div class="parent-time-header">
                 <div class="parent-time-title">What time are you looking for childcare?</div>
                 <div class="parent-time-sub">We’ll check your saved caregivers first.</div>
+                <div class="parent-time-child">
+                  <label for="savedAvailabilityChild">Child</label>
+                  <select id="savedAvailabilityChild" aria-label="Select child for this booking">
+                    <option value="">Who's this for?</option>
+                  </select>
+                  <span id="savedAvailabilityChildAge" class="parent-time-child-age">Age --</span>
+                </div>
               </div>
               <form id="savedAvailabilityForm" class="parent-time-form">
                 <div class="parent-time-field parent-time-field--full">
@@ -103,7 +110,15 @@
                 <button type="submit" class="parent-time-submit">Search</button>
                 <div id="savedAvailabilitySummary" class="parent-time-summary parent-time-field--full"></div>
               </form>
-              <div id="savedAvailabilityResults" class="parent-saved-results" aria-live="polite"></div>
+              <div class="parent-saved-results" aria-live="polite">
+                <div id="parentPaymentNotice" class="parent-payment-notice is-hidden" role="status">
+                  <div>
+                    <strong>Payment method required.</strong> Add a card to send booking requests.
+                  </div>
+                  <button type="button" id="parentAddPaymentBtn" class="parent-provider-btn primary">Add card</button>
+                </div>
+                <div id="savedAvailabilityResults" class="parent-saved-results-list"></div>
+              </div>
             </section>
 
             <section class="provider-bookings-card parent-find-card parent-search-card">
@@ -176,7 +191,6 @@
                     <div class="parent-booking-cell">Caregiver</div>
                     <div class="parent-booking-cell">Caregiver contact</div>
                     <div class="parent-booking-cell">Hours booked</div>
-                    <div class="parent-booking-cell">Care type</div>
                     <div class="parent-booking-cell">Time scheduled</div>
                     <div class="parent-booking-cell parent-booking-action">Action</div>
                   </div>
@@ -202,7 +216,7 @@
             <div class="provider-panel-card">
               <div class="provider-card-head">
                 <div>
-                  <h2>Inbox</h2>
+                  <h2>Messages</h2>
                   <p class="provider-card-sub">Stay in touch with caregivers and support.</p>
                 </div>
                 <span id="parentMessagesUnread" class="provider-card-pill" style="display:none;">0 unread</span>
@@ -219,11 +233,46 @@
               <div class="provider-card-head">
                 <div>
                   <h2>My children</h2>
-                  <p class="provider-card-sub">Manage child profiles and booking preferences.</p>
+                  <p class="provider-card-sub">Manage child profiles and care details.</p>
                 </div>
                 <div class="parent-action-row">
-                  <a class="provider-header-btn" href="child-demographics.html">Add child</a>
+                  <button id="parentAddChildBtn" class="provider-header-btn" type="button">Add child</button>
                 </div>
+              </div>
+              <div id="parentChildFormCard" class="parent-child-form-card is-hidden" aria-live="polite">
+                <div class="parent-child-form-head">
+                  <div>
+                    <h3 id="parentChildFormTitle">Add child</h3>
+                    <p class="parent-child-form-sub">Birthday is used to calculate age for pricing.</p>
+                  </div>
+                  <button id="parentChildFormCancel" class="provider-header-btn provider-header-btn-ghost" type="button">Cancel</button>
+                </div>
+                <form id="parentChildForm" class="parent-child-form">
+                  <input type="hidden" id="parentChildId">
+                  <div class="parent-child-form-grid">
+                    <label class="provider-form-field">
+                      <span>First name</span>
+                      <input type="text" id="parentChildFirst" class="provider-input" required>
+                    </label>
+                    <label class="provider-form-field">
+                      <span>Last name</span>
+                      <input type="text" id="parentChildLast" class="provider-input">
+                    </label>
+                    <label class="provider-form-field">
+                      <span>Birthday</span>
+                      <input type="date" id="parentChildBirthdate" class="provider-input" required>
+                      <div id="parentChildAgeLive" class="parent-child-age-live">Age: --</div>
+                    </label>
+                    <label class="provider-form-field parent-child-form-wide">
+                      <span>Special needs (optional)</span>
+                      <textarea id="parentChildNeeds" class="provider-textarea" rows="3" placeholder="Allergies, accommodations, notes..."></textarea>
+                    </label>
+                  </div>
+                  <div class="parent-child-form-actions">
+                    <button class="provider-header-btn" type="submit">Save child</button>
+                    <span id="parentChildFormStatus" class="provider-form-status"></span>
+                  </div>
+                </form>
               </div>
               <div id="parentChildrenList" class="parent-children-grid">
                 <div class="provider-bookings-empty">No children added yet.</div>
@@ -344,6 +393,19 @@
       const userId = parseInt(localStorage.getItem('user_id'), 10) || null;
       const savedCaregiversKey = userId ? `saved_caregivers_${userId}` : 'saved_caregivers_guest';
 
+      const computeAgeFromBirthdate = (value) => {
+        if(!value) return null;
+        const birth = new Date(value);
+        if(Number.isNaN(birth.getTime())) return null;
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        if(monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())){
+          age -= 1;
+        }
+        return age;
+      };
+
       const showNotice = (message, type) => {
         if(typeof window.showBanner === 'function') {
           window.showBanner(message, type || 'info');
@@ -351,6 +413,43 @@
           alert(message);
         }
       };
+
+      const formatHomeAddress = (profile) => {
+        if(!profile) return '';
+        return [profile.address_line1, profile.city, profile.province, profile.postal_code]
+          .filter(Boolean)
+          .join(', ');
+      };
+
+      let parentHasPaymentMethod = false;
+      const paymentNoticeEl = document.getElementById('parentPaymentNotice');
+      const addPaymentBtn = document.getElementById('parentAddPaymentBtn');
+      const togglePaymentNotice = (show) => {
+        if(!paymentNoticeEl) return;
+        paymentNoticeEl.classList.toggle('is-hidden', !show);
+      };
+
+      const refreshPaymentStatus = async () => {
+        if(!userId) return false;
+        try{
+          const res = await fetch(`${API_BASE}/payments/status?user_id=${userId}`);
+          const data = await res.json();
+          if(res.ok){
+            parentHasPaymentMethod = !!data.has_payment_method;
+            return parentHasPaymentMethod;
+          }
+        }catch(err){
+          console.warn('Payment status check failed', err);
+        }
+        return parentHasPaymentMethod;
+      };
+
+      if(addPaymentBtn){
+        addPaymentBtn.addEventListener('click', () => {
+          const returnUrl = encodeURIComponent('parent-dashboard.html');
+          window.location.href = `payment-method.html?return=${returnUrl}`;
+        });
+      }
 
       window.updateParentSavedCaregivers = async (savedIds = []) => {
         if(!userId) return;
@@ -402,6 +501,19 @@
 
       const initialPanel = window.location.hash.replace('#', '');
       activateParentPanel(initialPanel || 'dashboard');
+
+      window.focusBookingModule = (childId) => {
+        activateParentPanel('dashboard');
+        const card = document.querySelector('.parent-time-card');
+        if(card){
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        const childSelect = document.getElementById('savedAvailabilityChild');
+        if(childSelect && childId){
+          childSelect.value = String(childId);
+          childSelect.dispatchEvent(new Event('change'));
+        }
+      };
 
       document.getElementById('openParentProfileBtn')?.addEventListener('click', () => {
         window.location.hash = 'profile';
@@ -479,14 +591,6 @@
         return 'TBD';
       };
 
-      const formatCareType = (value) => {
-        const raw = String(value || '').toLowerCase();
-        if(raw.includes('curriculum')) return 'Curriculum';
-        if(raw.includes('mixed')) return 'Mixed';
-        if(raw.includes('standard')) return 'Standard';
-        return 'Standard';
-      };
-
       const renderUpcomingBookings = (sessions) => {
         const listEl = document.getElementById('parentBookingsList');
         const countEl = document.getElementById('parentBookingsPill');
@@ -514,7 +618,6 @@
           const contactBits = [entry.provider_email, entry.provider_phone].filter(Boolean).join(' · ');
           const hours = durationHours(entry);
           const hoursLabel = hours ? `${hours.toFixed(1).replace(/\.0$/, '')} hrs` : 'TBD';
-          const careType = formatCareType(entry.care_type);
           const providerName = entry.provider_name || 'Caregiver';
           const schedule = formatScheduleLabel(entry);
           const contactLabel = contactBits || 'Contact not available';
@@ -526,7 +629,6 @@
                 <span class="parent-booking-contact">${contactLabel}</span>
               </div>
               <div class="parent-booking-cell" data-label="Hours booked">${hoursLabel}</div>
-              <div class="parent-booking-cell" data-label="Care type">${careType}</div>
               <div class="parent-booking-cell" data-label="Time scheduled">${schedule}</div>
               <div class="parent-booking-cell parent-booking-action" data-label="Action">
                 <button class="parent-booking-btn" data-id="${providerId}" data-name="${providerName}">Message</button>
@@ -569,7 +671,6 @@
                 <div class="parent-calendar-title">${providerName}</div>
                 <div class="parent-calendar-sub">${schedule}</div>
               </div>
-              <span class="parent-calendar-pill">${formatCareType(entry.care_type)}</span>
             </div>
           `;
         }).join('');
@@ -582,10 +683,28 @@
           listEl.innerHTML = '<div class="provider-bookings-empty">No children added yet.</div>';
           return;
         }
+        window.parentChildrenList = children;
+        const childSelect = document.getElementById('savedAvailabilityChild');
+        if(childSelect){
+          const ageLabel = document.getElementById('savedAvailabilityChildAge');
+          childSelect.innerHTML = `<option value="">Who's this for?</option>${children.map((c) => {
+            const label = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.name || 'Child';
+            const ageVal = computeAgeFromBirthdate(c.birthdate) ?? c.age ?? '';
+            return `<option value="${c.id || ''}" data-age="${ageVal}">${label}</option>`;
+          }).join('')}`;
+          if(ageLabel) ageLabel.textContent = 'Age --';
+          childSelect.onchange = () => {
+            if(!ageLabel) return;
+            const selected = childSelect.options[childSelect.selectedIndex];
+            const ageVal = selected ? selected.getAttribute('data-age') : '';
+            ageLabel.textContent = ageVal ? `Age ${ageVal}` : 'Age --';
+          };
+        }
         listEl.innerHTML = children.map((child) => {
           const name = [child.first_name, child.last_name].filter(Boolean).join(' ') || 'Child';
           const initials = name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
-          const ageLabel = child.age ? `${child.age} yrs` : 'Age not set';
+          const derivedAge = computeAgeFromBirthdate(child.birthdate);
+          const ageLabel = (derivedAge !== null ? derivedAge : child.age) ? `${derivedAge !== null ? derivedAge : child.age} yrs` : 'Age not set';
           return `
             <div class="parent-child-card">
               <div class="parent-child-avatar">${initials}</div>
@@ -595,7 +714,7 @@
               </div>
               <div class="parent-child-actions">
                 <button class="parent-child-btn parent-child-edit" data-id="${child.id}">Edit</button>
-                <a class="parent-child-btn" href="request-childcare.html?child_id=${encodeURIComponent(child.id)}">Book with ${name.split(' ')[0] || 'child'}</a>
+                <button class="parent-child-btn parent-child-book" type="button" data-id="${child.id}">Book with ${name.split(' ')[0] || 'child'}</button>
               </div>
             </div>
           `;
@@ -604,11 +723,124 @@
         listEl.querySelectorAll('.parent-child-edit').forEach((btn) => {
           btn.addEventListener('click', () => {
             const childId = btn.getAttribute('data-id');
-            if(childId) {
-              localStorage.setItem('child_to_edit', childId);
-              window.location.href = 'child-demographics.html';
+            if(childId && typeof window.openChildForm === 'function') {
+              const child = children.find(c => String(c.id) === String(childId));
+              window.openChildForm(child);
             }
           });
+        });
+        listEl.querySelectorAll('.parent-child-book').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const childId = btn.getAttribute('data-id');
+            if(typeof window.focusBookingModule === 'function') {
+              window.focusBookingModule(childId);
+            }
+          });
+        });
+      };
+
+      const setupChildForm = () => {
+        const formCard = document.getElementById('parentChildFormCard');
+        const form = document.getElementById('parentChildForm');
+        if(!formCard || !form) return;
+        const titleEl = document.getElementById('parentChildFormTitle');
+        const cancelBtn = document.getElementById('parentChildFormCancel');
+        const addBtn = document.getElementById('parentAddChildBtn');
+        const statusEl = document.getElementById('parentChildFormStatus');
+        const idInput = document.getElementById('parentChildId');
+        const firstInput = document.getElementById('parentChildFirst');
+        const lastInput = document.getElementById('parentChildLast');
+        const birthInput = document.getElementById('parentChildBirthdate');
+        const needsInput = document.getElementById('parentChildNeeds');
+        const ageLive = document.getElementById('parentChildAgeLive');
+
+        const resetForm = () => {
+          if(idInput) idInput.value = '';
+          if(firstInput) firstInput.value = '';
+          if(lastInput) lastInput.value = '';
+          if(birthInput) birthInput.value = '';
+          if(needsInput) needsInput.value = '';
+          if(ageLive) ageLive.textContent = 'Age: --';
+          if(statusEl) statusEl.textContent = '';
+          if(titleEl) titleEl.textContent = 'Add child';
+        };
+
+        const updateAgeLive = () => {
+          if(!ageLive || !birthInput) return;
+          const age = computeAgeFromBirthdate(birthInput.value);
+          ageLive.textContent = age !== null ? `Age: ${age}` : 'Age: --';
+        };
+        birthInput?.addEventListener('change', updateAgeLive);
+
+        window.openChildForm = (child) => {
+          formCard.classList.remove('is-hidden');
+          if(child){
+            if(titleEl) titleEl.textContent = 'Edit child';
+            if(idInput) idInput.value = child.id || '';
+            if(firstInput) firstInput.value = child.first_name || '';
+            if(lastInput) lastInput.value = child.last_name || '';
+            if(birthInput) birthInput.value = child.birthdate || '';
+            if(needsInput) needsInput.value = child.special_needs || '';
+            updateAgeLive();
+          } else {
+            resetForm();
+          }
+        };
+
+        const closeForm = () => {
+          formCard.classList.add('is-hidden');
+          resetForm();
+        };
+        cancelBtn?.addEventListener('click', closeForm);
+        addBtn?.addEventListener('click', () => window.openChildForm());
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if(!userId){
+            showNotice('Please log in to save child profiles.', 'info');
+            return;
+          }
+          const payload = {
+            user_id: userId,
+            parent_id: userId,
+            first_name: firstInput?.value?.trim() || null,
+            last_name: lastInput?.value?.trim() || null,
+            birthdate: birthInput?.value || null,
+            age: computeAgeFromBirthdate(birthInput?.value || ''),
+            specialNeeds: needsInput?.value?.trim() || null
+          };
+          if(statusEl){
+            statusEl.textContent = 'Saving...';
+            statusEl.style.color = '#9ca3af';
+          }
+          try{
+            const editingId = idInput?.value ? parseInt(idInput.value, 10) : null;
+            if(editingId){
+              await fetch(`${API_BASE}/forms/child/${editingId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+            } else {
+              await fetch(`${API_BASE}/forms/children`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+            }
+            if(statusEl){
+              statusEl.textContent = 'Saved';
+              statusEl.style.color = '#34d399';
+            }
+            await loadParentDashboard();
+            setTimeout(closeForm, 400);
+          }catch(err){
+            if(statusEl){
+              statusEl.textContent = 'Save failed';
+              statusEl.style.color = '#f87171';
+            }
+            console.error(err);
+          }
         });
       };
 
@@ -744,6 +976,119 @@
         });
       };
 
+      const buildDateTime = (dateVal, timeVal) => {
+        if(!dateVal || !timeVal) return null;
+        if(timeVal === '24:00'){
+          const date = new Date(`${dateVal}T00:00:00`);
+          date.setDate(date.getDate() + 1);
+          return `${date.toISOString().slice(0,10)}T00:00`;
+        }
+        return `${dateVal}T${timeVal}`;
+      };
+
+      const getBookingLocation = () => {
+        if(window.parentHomeAddress) return window.parentHomeAddress;
+        const profile = window.parentProfile || {};
+        const homeAddress = formatHomeAddress(profile);
+        if(homeAddress) return homeAddress;
+        const locationInput = document.getElementById('heroLocationInput');
+        if(locationInput && locationInput.value) return locationInput.value;
+        return localStorage.getItem('parent_city') || localStorage.getItem('last_search_location') || '';
+      };
+
+      window.startDashboardBooking = async (providerId, providerName, triggerBtn) => {
+        if(!userId){
+          showNotice('Please log in to book caregivers.', 'info');
+          setTimeout(() => window.location.href = 'account-signup.html', 1200);
+          return;
+        }
+        if(!providerId){
+          showNotice('Please choose a caregiver first.', 'info');
+          return;
+        }
+        const dateInput = document.getElementById('savedAvailabilityDate');
+        const startInput = document.getElementById('savedAvailabilityStart');
+        const endInput = document.getElementById('savedAvailabilityEnd');
+        const childSelect = document.getElementById('savedAvailabilityChild');
+        const dateVal = dateInput?.value || '';
+        const startVal = startInput?.value || '';
+        const endVal = endInput?.value || '';
+        const childId = childSelect?.value || '';
+        if(!childId){
+          showNotice('Please choose a child for this booking.', 'info');
+          window.focusBookingModule && window.focusBookingModule();
+          return;
+        }
+        if(!dateVal || !startVal || !endVal){
+          showNotice('Please choose a date and time window first.', 'info');
+          window.focusBookingModule && window.focusBookingModule(childId);
+          return;
+        }
+        const startMinutes = parseTimeToMinutes(startVal);
+        const endMinutes = parseTimeToMinutes(endVal);
+        if(startMinutes === null || endMinutes === null || endMinutes <= startMinutes){
+          showNotice('Please choose a valid time window.', 'info');
+          return;
+        }
+        const start_at = buildDateTime(dateVal, startVal);
+        const end_at = buildDateTime(dateVal, endVal);
+        const location = getBookingLocation();
+        if(!location){
+          showNotice('Add your home address in My Profile before booking.', 'info');
+          return;
+        }
+
+        const hasPayment = await refreshPaymentStatus();
+        if(!hasPayment){
+          togglePaymentNotice(true);
+          showNotice('Payment method required to send a booking request.', 'info');
+          return;
+        }
+        togglePaymentNotice(false);
+
+        const selected = childSelect?.options?.[childSelect.selectedIndex];
+        const ageVal = selected ? selected.getAttribute('data-age') : '';
+        const payload = {
+          user_id: userId,
+          child_id: parseInt(childId, 10),
+          provider_id: providerId ? parseInt(providerId, 10) : null,
+          location,
+          start_at,
+          end_at,
+          notes: '',
+          child_age: ageVal ? Number(ageVal) : null
+        };
+
+        const originalLabel = triggerBtn ? triggerBtn.textContent : '';
+        if(triggerBtn){
+          triggerBtn.disabled = true;
+          triggerBtn.textContent = 'Sending...';
+        }
+        try{
+          const res = await fetch(`${API_BASE}/forms/request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json().catch(()=> ({}));
+          if(!res.ok){
+            if(data && data.code === 'missing_payment_method'){
+              togglePaymentNotice(true);
+            }
+            throw new Error(data.error || 'Failed to send request');
+          }
+          showNotice(`Request sent to ${providerName || 'caregiver'}. You will only be charged if they accept.`, 'success');
+        }catch(err){
+          console.error('Booking request failed', err);
+          showNotice(err.message || 'Unable to send request.', 'error');
+        }finally{
+          if(triggerBtn){
+            triggerBtn.disabled = false;
+            triggerBtn.textContent = originalLabel || 'Book';
+          }
+        }
+      };
+
       const hookSavedAvailabilitySearch = () => {
         const form = document.getElementById('savedAvailabilityForm');
         const dateInput = document.getElementById('savedAvailabilityDate');
@@ -835,6 +1180,25 @@
           );
           if(match) locationInput.value = match.value;
         };
+        const childSelect = document.getElementById('savedAvailabilityChild');
+        const populateChildSelect = () => {
+          if(!childSelect) return;
+          const children = Array.isArray(window.parentChildrenList) ? window.parentChildrenList : [];
+          childSelect.innerHTML = `<option value="">Who's this for?</option>${children.map(c => {
+            const label = c.name || `${c.first_name || ''} ${c.last_name || ''}`.trim() || 'Child';
+            const ageVal = computeAgeFromBirthdate(c.birthdate) ?? c.age ?? '';
+            return `<option value="${c.id || ''}" data-age="${ageVal}">${label}</option>`;
+          }).join('')}`;
+          const ageLabel = document.getElementById('savedAvailabilityChildAge');
+          if(ageLabel) ageLabel.textContent = 'Age --';
+          childSelect.onchange = () => {
+            if(!ageLabel) return;
+            const selected = childSelect.options[childSelect.selectedIndex];
+            const ageVal = selected ? selected.getAttribute('data-age') : '';
+            ageLabel.textContent = ageVal ? `Age ${ageVal}` : 'Age --';
+          };
+        };
+        populateChildSelect();
 
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -888,13 +1252,15 @@
           const profiles = await Promise.all(savedIds.map(fetchProviderProfile));
           const available = profiles.filter(Boolean).filter(p => {
             const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
-            return isAvailableForWindow(availability, dayKey, startMinutes, endMinutes);
+            const schedule = availability && availability.schedule ? availability.schedule : availability;
+            return isAvailableForWindow(schedule, dayKey, startMinutes, endMinutes);
           });
 
           if(available.length === 0){
             resultsEl.innerHTML = `
               <div class="parent-provider-empty">
                 No saved caregivers are available at that time.<br>
+                ${childSelect && childSelect.value ? `For: ${childSelect.options[childSelect.selectedIndex].textContent}` : ''}
                 Would you like to browse more Muslim caregivers in your area?
                 <div class="parent-empty-actions">
                   <button type="button" class="parent-provider-btn primary" id="searchAllCaregiversBtn">Yes, show caregivers</button>
@@ -924,7 +1290,6 @@
             const displayName = p.name || 'Caregiver';
             const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
             const profileLink = `caregiver-profile.html?provider_id=${encodeURIComponent(p.id)}`;
-            const bookLink = `request-childcare.html?provider_id=${encodeURIComponent(p.id)}&provider_name=${encodeURIComponent(displayName)}`;
             return `
               <div class="parent-provider-row" data-profile="${profileLink}">
                 <div class="parent-provider-main">
@@ -935,7 +1300,7 @@
                   </div>
                 </div>
                 <div class="parent-provider-actions">
-                  <a class="parent-provider-btn primary" href="${bookLink}">Book</a>
+                  <button type="button" class="parent-provider-btn primary" data-action="book" data-provider="${p.id}" data-name="${displayName}">Book</button>
                   <button type="button" class="parent-provider-btn ghost" data-action="message" data-provider="${p.id}" data-name="${displayName}">Message</button>
                 </div>
               </div>
@@ -962,10 +1327,23 @@
               if(window.showChatWidget && pid) window.showChatWidget(pid, name);
             });
           });
+          resultsEl.querySelectorAll('.parent-provider-btn[data-action="book"]').forEach(btn=>{
+            btn.addEventListener('click', async (evt)=>{
+              evt.preventDefault();
+              const pid = btn.dataset.provider;
+              const name = btn.dataset.name || 'Caregiver';
+              if(typeof window.startDashboardBooking === 'function') {
+                await window.startDashboardBooking(pid, name, btn);
+              }
+            });
+          });
         });
       };
 
       const fillProfileForm = (profile) => {
+        window.parentProfile = profile || {};
+        window.parentHomeAddress = formatHomeAddress(profile);
+        parentHasPaymentMethod = !!profile?.stripe_payment_method_id;
         document.getElementById('parentSidebarName').textContent = profile?.name ? `Signed in as ${profile.name}` : 'Signed in';
         const firstName = profile?.name ? profile.name.split(' ')[0] : '';
         document.getElementById('parentWelcomeName').textContent = firstName ? `, ${firstName}` : '';
@@ -1117,6 +1495,8 @@
           }
           window.parentDashboardSessions = sessions;
           fillProfileForm(profile);
+          await refreshPaymentStatus();
+          togglePaymentNotice(false);
           renderUpcomingBookings(sessions);
           renderCalendar(sessions);
           renderChildren(children);
@@ -1130,6 +1510,7 @@
       window.addEventListener('DOMContentLoaded', () => {
         hookProfileSave();
         hookInboxPreview();
+        setupChildForm();
         loadParentDashboard();
         hookSavedAvailabilitySearch();
       });

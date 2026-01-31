@@ -242,20 +242,33 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           return hours * 60 + mins;
         };
+        const resolveSchedule = (availability) => {
+          if(!availability) return {};
+          if(availability.schedule && typeof availability.schedule === 'object') return availability.schedule;
+          return availability;
+        };
         const matchesSelectedTime = (availability)=>{
           if(!selectedRange || selectedRange.startMinutes == null || selectedRange.endMinutes == null) return false;
           if(!availability) return false;
+          const schedule = resolveSchedule(availability);
           const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
           const dateKey = selectedRange.date ? days[new Date(`${selectedRange.date}T00:00:00`).getDay()] : null;
           const daysToCheck = dateKey ? [dateKey] : days;
           return daysToCheck.some((day)=>{
-            const dayAvailability = availability[day];
+            const dayAvailability = schedule[day];
             if(!dayAvailability) return false;
-            const slots = Array.isArray(dayAvailability) ? dayAvailability : [dayAvailability];
+            const slots = Array.isArray(dayAvailability)
+              ? dayAvailability
+              : Array.isArray(dayAvailability.slots)
+                ? dayAvailability.slots
+                : [dayAvailability];
             return slots.some((slot)=>{
-              if(!slot || !slot.from || !slot.to) return false;
-              const fromMinutes = parseTimeToMinutes(slot.from);
-              const toMinutes = parseTimeToMinutes(slot.to);
+              if(!slot) return false;
+              const fromVal = slot.from || slot.start;
+              const toVal = slot.to || slot.end;
+              if(!fromVal || !toVal) return false;
+              const fromMinutes = parseTimeToMinutes(fromVal);
+              const toMinutes = parseTimeToMinutes(toVal);
               if(fromMinutes == null || toMinutes == null) return false;
               return selectedRange.startMinutes >= fromMinutes && selectedRange.endMinutes <= toMinutes;
             });
@@ -270,33 +283,46 @@ document.addEventListener('DOMContentLoaded', () => {
             savedIds = [];
           }
         }
-        const normalizeProviders = providers.map((p, idx)=> {
-          const displayName = p.name || `Caregiver ${idx + 1}`;
-          const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() || 'CG';
-          const pid = String(p.user_id || p.id || '');
-          const city = p.city || location;
-          const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
-          const matchesSelected = matchesSelectedTime(availability);
-          let availabilityText = 'Availability not provided';
-          if(availability.status === 'immediate') availabilityText = 'Available immediately';
-          if(availability.status === 'next24') availabilityText = 'Available in the next 24 hours';
-          const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'request-childcare.html';
-          const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
-          const certText = p.certifications || 'Certifications on file';
-          const ageGroups = Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (typeof p.age_groups === 'string' ? p.age_groups : 'Age groups on file');
-          return {
-            id: pid,
-            displayName,
-            initials,
-            city,
-            availabilityText,
-            certText,
-            ageGroups,
-            matchesSelected,
-            bookLink,
-            profileLink
+        const renderVerifyIcons = (p, dark=false) => {
+          const mk = (active, label, emoji) => {
+            const cls = dark ? 'verify-chip verify-chip-dark' : 'verify-chip';
+            return `<span class="${cls}${active ? ' is-active' : ''}" title="${label}">${emoji}</span>`;
           };
-        });
+          return `
+            <div class="verify-chip-row">
+              ${mk(p.cpr_certified, 'CPR / First Aid verified', '❤')}
+              ${mk(p.consent_background_check, 'Background check verified', '🛡')}
+              ${mk(p.caregiver_insurance, 'Caregiver insurance verified', '✓')}
+            </div>
+          `;
+        };
+        const normalizeProviders = providers.map((p, idx)=> {
+            const displayName = p.name || `Caregiver ${idx + 1}`;
+            const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() || 'CG';
+            const pid = String(p.user_id || p.id || '');
+            const city = p.city || location;
+            const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
+            const schedule = availability && availability.schedule ? availability.schedule : availability;
+            const matchesSelected = matchesSelectedTime(availability);
+            let availabilityText = 'Availability not provided';
+            if(availability.status === 'immediate') availabilityText = 'Available immediately';
+            if(availability.status === 'next24') availabilityText = 'Available in the next 24 hours';
+            const bookLink = pid ? `parent-dashboard.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'parent-dashboard.html';
+            const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
+            const certText = p.certifications || 'Certifications on file';
+            return {
+              id: pid,
+              displayName,
+              initials,
+              city,
+              availabilityText,
+              certText,
+              matchesSelected,
+              bookLink,
+              profileLink,
+              verifyIcons: renderVerifyIcons(p, true)
+            };
+          });
 
         const persistSaved = (ids)=>{
           const unique = Array.from(new Set(ids));
@@ -320,15 +346,15 @@ document.addEventListener('DOMContentLoaded', () => {
                   </div>
                   <button type="button" class="parent-provider-save${isSaved ? ' is-saved' : ''}" data-action="save" aria-pressed="${isSaved ? 'true' : 'false'}">${isSaved ? 'Saved' : 'Save'}</button>
                 </div>
-                <div class="parent-provider-tags">
-                  ${p.matchesSelected ? '<span class="parent-provider-tag highlight">Available for your selected time</span>' : ''}
-                  <span>${p.availabilityText}</span>
-                  <span>${p.ageGroups}</span>
-                </div>
-              </div>
+            <div class="parent-provider-tags">
+              ${p.matchesSelected ? '<span class="parent-provider-tag highlight">Available for your selected time</span>' : ''}
+              <span>${p.availabilityText}</span>
             </div>
+            ${p.verifyIcons}
+          </div>
+        </div>
             <div class="parent-provider-actions">
-              <a class="parent-provider-btn primary" href="${p.bookLink}">Book</a>
+              <a class="parent-provider-btn primary" href="${p.bookLink}" data-action="book" data-provider="${p.id}" data-name="${p.displayName}">Book</a>
               <button type="button" class="parent-provider-btn ghost" data-action="message" data-provider="${p.id}" data-name="${p.displayName}">Message</button>
             </div>
           </div>
@@ -421,6 +447,18 @@ document.addEventListener('DOMContentLoaded', () => {
               if(window.showChatWidget && pid) window.showChatWidget(pid, name);
             });
           });
+          container.querySelectorAll('.parent-provider-btn[data-action="book"]').forEach(btn=>{
+            btn.addEventListener('click', async (e)=>{
+              e.preventDefault();
+              const pid = btn.dataset.provider;
+              const name = btn.dataset.name || 'Caregiver';
+              if(document.body.classList.contains('parent-dashboard') && typeof window.startDashboardBooking === 'function'){
+                await window.startDashboardBooking(pid, name, btn);
+              } else if(pid){
+                window.location.href = `parent-dashboard.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(name)}`;
+              }
+            });
+          });
         };
 
         renderParentResults();
@@ -432,6 +470,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const city = p.city || location;
         const pid = p.user_id || p.id || '';
         const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
+        const renderVerifyIcons = (p) => {
+          const mk = (active, label, emoji) => `<span class="verify-chip" style="background:${active ? 'rgba(6,70,78,0.12)' : '#f3f4f6'}; color:${active ? '#06464E' : '#9ca3af'}; border:1px solid ${active ? 'rgba(6,70,78,0.3)' : '#e5e7eb'};" title="${label}">${emoji}</span>`;
+          return `<div class="verify-chip-row" style="display:flex; gap:6px; flex-wrap:wrap;">${[
+            mk(p.cpr_certified, 'CPR / First Aid verified', '❤'),
+            mk(p.consent_background_check, 'Background check verified', '🛡'),
+            mk(p.caregiver_insurance, 'Caregiver insurance verified', '✓')
+          ].join('')}</div>`;
+        };
         let availabilityTag = '';
         let availabilityText = 'Availability not provided';
         if(availability.status === 'immediate'){
@@ -442,10 +488,9 @@ document.addEventListener('DOMContentLoaded', () => {
           availabilityTag = '<span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">Available in next 24h</span>';
           availabilityText = 'Available in the next 24 hours';
         }
-        const bookLink = pid ? `request-childcare.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'request-childcare.html';
+        const bookLink = pid ? `parent-dashboard.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'parent-dashboard.html';
         const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
         const certText = p.certifications || 'Certifications on file';
-        const ageGroups = Array.isArray(p.age_groups) ? p.age_groups.join(', ') : (typeof p.age_groups === 'string' ? p.age_groups : 'Age groups on file');
         return `
           <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
             <div style="display:flex; gap:12px; align-items:center;">
@@ -458,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${availabilityTag}
             <div style="font-size:12px; color:#475569;"><strong>Availability:</strong> ${availabilityText}</div>
             <div style="font-size:12px; color:#475569;"><strong>Certifications:</strong> ${certText}</div>
-            <div style="font-size:12px; color:#475569;"><strong>Age groups:</strong> ${ageGroups}</div>
+            ${renderVerifyIcons(p)}
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
               <a class="btn" style="padding:8px 12px; font-size:12px; background: linear-gradient(135deg, #67B3C2 0%, #06464E 100%); color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block;" href="${bookLink}">Book ${displayName.split(' ')[0]}</a>
               <a class="btn secondary" href="${profileLink}" style="padding:8px 12px; font-size:12px; border:1px solid #06464E; color:#06464E; background:#fff; border-radius:8px; text-decoration:none; display:inline-block;">View profile</a>
@@ -783,12 +828,12 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'signup.html';
     } else if(target.id === 'heroLoginBtn'){
       localStorage.setItem('care_available', 'true');
-      localStorage.setItem('post_login_target', 'request-childcare');
+      localStorage.setItem('post_login_target', 'parent-dashboard');
       const loginModal = document.getElementById('loginModal');
       if(loginModal) loginModal.classList.remove('hidden');
     } else if(target.id === 'heroApplyBtn'){
       localStorage.setItem('care_available', 'true');
-      window.location.href = 'request-childcare.html';
+      window.location.href = 'parent-dashboard.html';
     }
   });
 
@@ -904,11 +949,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if(welcomeModalEl) welcomeModalEl.classList.add('hidden');
       form.reset();
       renderAuthNav();
-      // Redirect by role; ignore request-childcare target for providers
+      // Redirect by role; ignore parent-dashboard target for providers
       if(userType === 'provider'){
         window.location.href = 'caregiver-dashboard.html';
-      } else if(target === 'request-childcare'){
-        window.location.href = 'request-childcare.html';
+      } else if(target === 'parent-dashboard'){
+        window.location.href = 'parent-dashboard.html';
       } else {
         window.location.href = 'parent-dashboard.html';
       }
@@ -1090,10 +1135,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if(photoField) photoField.value = p.photo_url || '';
             const aboutField = document.getElementById('provAbout');
             if(aboutField) aboutField.value = p.about || '';
-            const cprField = document.getElementById('provCprCertified');
-            if(cprField) cprField.value = typeof p.cpr_certified === 'boolean' ? String(p.cpr_certified) : '';
-            const insuranceField = document.getElementById('provCaregiverInsurance');
-            if(insuranceField) insuranceField.value = typeof p.caregiver_insurance === 'boolean' ? String(p.caregiver_insurance) : '';
+            const verifyRow = document.getElementById('provVerifyRow');
+            if(verifyRow){
+              const mkBadge = (active, label, emoji) => `
+                <span class="verify-chip${active ? ' is-active' : ''}" title="${label}">
+                  ${emoji}
+                </span>`;
+              verifyRow.innerHTML = [
+                mkBadge(p.cpr_certified, 'CPR / First Aid verified', '❤'),
+                mkBadge(p.consent_background_check, 'Background check verified', '🛡'),
+                mkBadge(p.caregiver_insurance, 'Caregiver insurance verified', '✓')
+              ].join('');
+            }
             const availability = typeof p.availability === 'string' ? JSON.parse(p.availability || '{}') : (p.availability || {});
             const availabilityNotesEl = document.getElementById('provAvailabilityNotes');
             if(availabilityNotesEl){
@@ -1157,13 +1210,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         payload.availability = availability;
       }
-      const boolFromSelect = (val) => {
-        if(val === 'true') return true;
-        if(val === 'false') return false;
-        return null;
-      };
-      if(payload.cpr_certified !== undefined) payload.cpr_certified = boolFromSelect(payload.cpr_certified);
-      if(payload.caregiver_insurance !== undefined) payload.caregiver_insurance = boolFromSelect(payload.caregiver_insurance);
+      // Verification fields managed by admin/backoffice only
+      delete payload.cpr_certified;
+      delete payload.caregiver_insurance;
+      delete payload.consent_background_check;
       // Clean empty strings to null so COALESCE works and avoid updating immutable fields
       ['first_name','last_name','phone','city','province','address_line1','postal_code','payout_method','languages','about','photo_url'].forEach(k=>{
         if(payload[k] !== undefined && payload[k] !== null && payload[k].trim() === ''){
@@ -1328,7 +1378,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const certs = [
           `CPR: ${p.cpr_certified ? 'Yes' : 'No'}`,
-          `Caregiver insurance: ${p.caregiver_insurance ? 'Yes' : 'No'}`
+          `Caregiver insurance: ${p.caregiver_insurance ? 'Yes' : 'No'}`,
+          `Background check: ${p.consent_background_check ? 'Yes' : 'No'}`
         ];
         cgCertsEl.innerHTML = certs.map(c=> `<li>${c}</li>`).join('');
         cgContact.innerHTML = `
@@ -1359,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cgLanguages.innerHTML = languageList.map(lang=> `<span style="display:inline-block; margin:0 6px 6px 0; padding:4px 10px; border-radius:999px; background:#eef2ff; color:#4338ca; font-size:12px; font-weight:700;">${lang}</span>`).join('');
           }
         }
-        const bookHref = `request-childcare.html?provider_id=${encodeURIComponent(providerId)}&provider_name=${encodeURIComponent(p.name || '')}`;
+        const bookHref = `parent-dashboard.html?provider_id=${encodeURIComponent(providerId)}&provider_name=${encodeURIComponent(p.name || '')}`;
         cgBookBtn.href = bookHref;
         cgMessageBtn.addEventListener('click', (ev)=>{
           ev.preventDefault();
@@ -1397,6 +1448,18 @@ document.addEventListener('DOMContentLoaded', () => {
       goals: document.getElementById('childGoals'),
       activities: document.getElementById('childActivities')
     };
+    const calcAgeFromBirthdate = (value) => {
+      if(!value) return null;
+      const birth = new Date(value);
+      if(Number.isNaN(birth.getTime())) return null;
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if(monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())){
+        age -= 1;
+      }
+      return age;
+    };
 
     async function loadChildProfile(){
       if(!childId){
@@ -1412,7 +1475,8 @@ document.addEventListener('DOMContentLoaded', () => {
         childNameEl.textContent = name;
         const initial = name.charAt(0).toUpperCase();
         childAvatar.textContent = initial;
-        const age = c.age || (Array.isArray(c.ages) && c.ages.length ? c.ages[0] : '');
+        const derivedAge = calcAgeFromBirthdate(c.birthdate);
+        const age = derivedAge !== null ? derivedAge : (c.age || (Array.isArray(c.ages) && c.ages.length ? c.ages[0] : ''));
         const city = c.city || '';
         childMetaEl.textContent = [age ? `${age} yrs` : '', city].filter(Boolean).join(' • ') || 'Child profile';
         childNotes.textContent = c.notes || 'No notes yet.';
@@ -1439,15 +1503,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Set edit link
-    const childEditBtn = document.getElementById('childEditBtn');
-    if(childEditBtn && childId){
-      childEditBtn.addEventListener('click', (e)=>{
-        e.preventDefault();
-        localStorage.setItem('child_to_edit', childId);
-        window.location.href = 'child-demographics.html';
-      });
-    }
     loadChildProfile();
   }
 
@@ -1558,7 +1613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         name: 'Care+ Basic',
         price: '$39.99/month',
         savings: 'Break even or save',
-        blurb: 'Occasional childcare, predictable pricing.',
+        blurb: 'Occasional childcare with 50% off the 6% platform fee.',
         anchor: '#care-basic'
       },
       plus: {
@@ -1566,7 +1621,7 @@ document.addEventListener('DOMContentLoaded', () => {
         name: 'Care+ Plus',
         price: '$59.99/month',
         savings: 'Save $60–$120+/month',
-        blurb: 'Weekly childcare, steady savings with included curriculum sessions.',
+        blurb: 'Weekly childcare with 70% off the platform fee.',
         anchor: '#care-plus'
       },
       premium: {
@@ -1574,7 +1629,7 @@ document.addEventListener('DOMContentLoaded', () => {
         name: 'Care+ Premium',
         price: '$89.99/month',
         savings: 'Save $120–$180+/month',
-        blurb: 'Multiple sessions weekly, maximum value with the lowest fees and unlimited curriculum sessions.',
+        blurb: 'Multiple sessions weekly with the platform fee waived.',
         anchor: '#care-premium'
       }
     };
@@ -1979,113 +2034,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Child demographics form -> send child info to backend (create or edit)
-  const childDemographicsForm = document.getElementById('childDemographicsForm');
-  const childFirstInput = document.getElementById('childFirstName');
-  const childLastInput = document.getElementById('childLastName');
-  const childAgeInput = document.getElementById('childAge');
-  const frequencyInput = document.getElementById('frequency');
-  const preferredScheduleInput = document.getElementById('preferredSchedule');
-  const specialNeedsInput = document.getElementById('specialNeeds');
-
-  async function populateChildFormForEdit(){
-    const editIdRaw = localStorage.getItem('child_to_edit');
-    const editId = editIdRaw && /^\d+$/.test(editIdRaw) ? parseInt(editIdRaw, 10) : null;
-    if(!childDemographicsForm || !editId || !Number.isFinite(editId)){
-      localStorage.removeItem('child_to_edit');
-      return;
-    }
-    try{
-      console.log('[child edit] Loading child id', editId, 'from', API_BASE);
-      const res = await fetch(`${API_BASE}/forms/child/${editId}`);
-      if(!res.ok) throw new Error('Failed to fetch child');
-      const child = await res.json();
-      if(childFirstInput) childFirstInput.value = child.first_name || '';
-      if(childLastInput) childLastInput.value = child.last_name || '';
-      if(childAgeInput){
-        childAgeInput.value = child.age || '';
-      }
-      if(frequencyInput) frequencyInput.value = child.frequency || '';
-      if(preferredScheduleInput) preferredScheduleInput.value = child.preferred_schedule || '';
-      if(specialNeedsInput) specialNeedsInput.value = child.special_needs || '';
-    }catch(err){
-      console.error('Populate child edit failed', err);
-      localStorage.removeItem('child_to_edit');
-      showBanner('Could not load child details. Please select the child again.', 'error');
-      setTimeout(()=> window.location.href = 'parent-dashboard.html', 1200);
-    }
-  }
-
-  if(childDemographicsForm){
-    populateChildFormForEdit();
-    childDemographicsForm.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const fd = new FormData(childDemographicsForm);
-      const childFirst = fd.get('childFirstName');
-      const childLast = fd.get('childLastName');
-      const childAge = fd.get('childAge');
-      const frequency = fd.get('frequency');
-      const preferredSchedule = fd.get('preferredSchedule');
-      const specialNeeds = fd.get('specialNeeds');
-      
-      // Get user_id from URL or localStorage (set after parent login)
-      const user_id = parseInt(localStorage.getItem('user_id')) || null;
-      if(!user_id){
-        showBanner('Please log in to add child profiles.', 'info');
-        setTimeout(() => window.location.href = 'account-signup.html', 1500);
-        return;
-      }
-
-      try{
-        const backendPayload = {
-          parent_id: user_id,
-          user_id,
-          first_name: childFirst,
-          last_name: childLast,
-          age: childAge ? parseInt(childAge) : null,
-          frequency,
-          preferredSchedule,
-          specialNeeds
-        };
-        
-        const editingIdRaw = localStorage.getItem('child_to_edit');
-        const editingId = editingIdRaw && /^\d+$/.test(editingIdRaw) ? parseInt(editingIdRaw, 10) : null;
-        let savedId = null;
-        if(editingId){
-          await postJSON(`/forms/child/${editingId}`, backendPayload);
-          savedId = editingId;
-        } else {
-          const resp = await postJSON('/forms/children', backendPayload);
-          savedId = resp?.childId ? parseInt(resp.childId, 10) : null;
-        }
-        if(!savedId || Number.isNaN(savedId)){
-          throw new Error('Child save did not return a valid id');
-        }
-        const cached = JSON.parse(localStorage.getItem('child_cache') || '[]')
-          .filter(c => c && parseInt(c.id,10) !== savedId);
-        cached.push({ id: savedId, first_name: childFirst, last_name: childLast, name: `${childFirst || ''} ${childLast || ''}`.trim() || 'Child', parent_id: user_id, age: childAge ? parseInt(childAge) : null, frequency });
-        localStorage.setItem('child_cache', JSON.stringify(cached));
-        const banner = document.getElementById('childSuccessBanner');
-        const successName = `${childFirst || ''} ${childLast || ''}`.trim() || 'your child';
-        localStorage.setItem('flash_message', `Great, we've added ${successName} to your profile.`);
-        if(banner){
-          childDemographicsForm.style.display = 'none';
-          banner.style.display = 'block';
-          banner.innerHTML = `<strong>Success!</strong> Great, we've added ${successName} to your profile. Redirecting...`;
-          setTimeout(()=>{ window.location.href = 'parent-dashboard.html'; }, 1800);
-        } else {
-          showBanner(`Great, we've added ${successName} to your profile.`, 'success');
-          childDemographicsForm.reset();
-          setTimeout(()=>{ window.location.href = 'parent-dashboard.html'; }, 1200);
-        }
-        localStorage.removeItem('child_to_edit');
-      }catch(err){
-        showBanner('There was a problem saving the child profile. Please try again.', 'error');
-        console.error(err);
-      }
-    });
-  }
-
   // Password visibility toggles
   const toggleButtons = document.querySelectorAll('.togglePassword');
   toggleButtons.forEach(button => {
@@ -2435,8 +2383,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     bookBtn.style.display = 'inline-block';
     bookBtn.textContent = `Book with ${name.split(' ')[0] || name}`;
     bookBtn.onclick = ()=>{
-      const link = `request-childcare.html?provider_id=${encodeURIComponent(activeThread)}&provider_name=${encodeURIComponent(name)}`;
-      window.location.href = link;
+      if(document.body.classList.contains('parent-dashboard') && typeof window.startDashboardBooking === 'function'){
+        window.startDashboardBooking(activeThread, name, bookBtn);
+      } else {
+        const link = `parent-dashboard.html?provider_id=${encodeURIComponent(activeThread)}&provider_name=${encodeURIComponent(name)}`;
+        window.location.href = link;
+      }
     };
   }
 

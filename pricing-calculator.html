@@ -41,6 +41,27 @@
         padding-top: 0;
         margin-top: 0;
       }
+      .pricing-pill-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      }
+      .pricing-pill {
+        background: #f8fbfc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 13px;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .pricing-pill span {
+        color: #6b7280;
+        font-size: 12px;
+      }
       .pricing-table {
         width: 100%;
         border-collapse: collapse;
@@ -154,7 +175,7 @@
       <div class="pricing-grid">
         <section class="pricing-card">
           <h2>Pricing Settings</h2>
-          <p style="margin: 0; color:#6b7280; font-size: 13px;">Base rate × age multiplier × time multiplier − premium discount = hourly rate. Taxes apply based on province.</p>
+          <p style="margin: 0; color:#6b7280; font-size: 13px;">Base rate by age group + discounted platform fee + taxes on the base rate = customer hourly total.</p>
 
           <div class="pricing-section">
             <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Base Rates by Location</h3>
@@ -162,34 +183,33 @@
           </div>
 
           <div class="pricing-section">
-            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Age Multipliers</h3>
-            <div id="ageBracketsWrap" style="display: grid; gap: 10px;"></div>
-            <button id="addAgeBracketBtn" class="tiny-btn" type="button" style="margin-top: 8px;">+ Add age bracket</button>
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Age Groups</h3>
+            <div id="ageGroupsWrap"></div>
+            <p class="status-text">IDs tie to base-rate columns. Keep them stable while adjusting ranges.</p>
           </div>
 
           <div class="pricing-section">
-            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Time of Day Multipliers</h3>
-            <div id="timeBandsWrap" style="display: grid; gap: 10px;"></div>
-            <button id="addTimeBandBtn" class="tiny-btn" type="button" style="margin-top: 8px;">+ Add time band</button>
-          </div>
-
-          <div class="pricing-section">
-            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Membership Discount</h3>
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Membership Tiers (discount on platform fee)</h3>
             <div class="row-grid cols-3">
               <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
-                Premium discount (%)
-                <input id="premiumDiscountInput" type="number" step="0.1" min="0" max="100">
+                Care+ Basic discount (%)
+                <input id="discountBasicInput" type="number" step="0.1" min="0" max="100">
+              </label>
+              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+                Care+ Plus discount (%)
+                <input id="discountPlusInput" type="number" step="0.1" min="0" max="100">
+              </label>
+              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
+                Care+ Premium discount (%)
+                <input id="discountPremiumInput" type="number" step="0.1" min="0" max="100">
               </label>
             </div>
+            <p class="status-text">Standard members pay the full platform fee.</p>
           </div>
 
           <div class="pricing-section">
             <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Fees</h3>
-            <div class="row-grid cols-4">
-              <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
-                Provider share (%)
-                <input id="providerShareInput" type="number" step="0.1" min="0" max="100">
-              </label>
+            <div class="row-grid cols-3">
               <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
                 Platform fee (%)
                 <input id="platformFeeInput" type="number" step="0.1" min="0" max="100">
@@ -206,13 +226,14 @@
           </div>
 
           <div class="pricing-section">
-            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Taxes by Province</h3>
+            <h3 style="margin: 0 0 8px 0; color:#06464E; font-size: 15px;">Taxes by Province (GST/PST)</h3>
             <div class="row-grid cols-3" style="margin-bottom: 10px;">
               <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
                 Tax applies to
                 <select id="taxAppliesSelect">
-                  <option value="platform_fee">Platform fee</option>
-                  <option value="total">Total hourly rate</option>
+                  <option value="base_rate">Hourly base rate</option>
+                  <option value="total">Hourly base + platform fee</option>
+                  <option value="platform_fee">Platform fee only</option>
                 </select>
               </label>
             </div>
@@ -239,21 +260,16 @@
               <input id="calcAge" type="number" min="0" max="17" placeholder="Age">
             </label>
             <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
-              Care type
-              <select id="calcCareType">
-                <option value="basic">Basic care</option>
-                <option value="curriculum">Curriculum care</option>
+              Membership tier
+              <select id="calcMembership">
+                <option value="standard">Standard</option>
+                <option value="basic">Care+ Basic</option>
+                <option value="plus">Care+ Plus</option>
+                <option value="premium">Care+ Premium</option>
               </select>
             </label>
           </div>
           <div class="row-grid cols-3" style="margin-bottom: 12px;">
-            <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
-              Membership
-              <select id="calcMembership">
-                <option value="standard">Standard</option>
-                <option value="premium">Premium</option>
-              </select>
-            </label>
             <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
               Start date
               <input id="calcDate" type="date">
@@ -262,8 +278,6 @@
               Start time
               <input id="calcStart" type="time">
             </label>
-          </div>
-          <div class="row-grid cols-3" style="margin-bottom: 14px;">
             <label style="display: grid; gap: 6px; font-size: 13px; color:#374151;">
               Hours
               <input id="calcHours" type="number" min="0.5" step="0.5" value="2">
@@ -279,6 +293,7 @@
             <div class="calc-highlight">Total for booking: —</div>
           </div>
           <p id="calcStatus" class="status-text" style="margin-top: 10px;"></p>
+          <p class="status-text" style="margin-top: 6px;">Curriculum is included with every booking.</p>
         </section>
       </div>
     </main>
@@ -308,13 +323,13 @@
       ];
 
       const baseRatesTable = document.getElementById('baseRatesTable');
-      const ageBracketsWrap = document.getElementById('ageBracketsWrap');
-      const timeBandsWrap = document.getElementById('timeBandsWrap');
+      const ageGroupsWrap = document.getElementById('ageGroupsWrap');
       const taxRatesTable = document.getElementById('taxRatesTable');
       const configStatus = document.getElementById('configStatus');
       const savePricingBtn = document.getElementById('savePricingBtn');
-      const premiumDiscountInput = document.getElementById('premiumDiscountInput');
-      const providerShareInput = document.getElementById('providerShareInput');
+      const discountBasicInput = document.getElementById('discountBasicInput');
+      const discountPlusInput = document.getElementById('discountPlusInput');
+      const discountPremiumInput = document.getElementById('discountPremiumInput');
       const platformFeeInput = document.getElementById('platformFeeInput');
       const stripePercentInput = document.getElementById('stripePercentInput');
       const stripeFixedInput = document.getElementById('stripeFixedInput');
@@ -322,7 +337,6 @@
 
       const calcProvince = document.getElementById('calcProvince');
       const calcAge = document.getElementById('calcAge');
-      const calcCareType = document.getElementById('calcCareType');
       const calcMembership = document.getElementById('calcMembership');
       const calcDate = document.getElementById('calcDate');
       const calcStart = document.getElementById('calcStart');
@@ -347,15 +361,23 @@
 
       function renderBaseRates(config) {
         const rates = config?.base_rates || {};
+        const ageGroups = Array.isArray(config?.age_groups) ? config.age_groups : [];
+        const headerCols = ageGroups.map((group) => {
+          const min = group.min ?? '';
+          const max = group.max ?? '';
+          const rangeLabel = min !== '' && max !== '' ? `${min}-${max}` : '';
+          return `<th>${group.label || group.id} ${rangeLabel ? `<span style="color:#94a3b8; font-weight:500;">(${rangeLabel})</span>` : ''}</th>`;
+        }).join('');
         const rows = PROVINCES.map((p) => {
           const entry = rates[p.code] || rates.default || {};
-          const basic = centsToDollars(entry.basic || 0);
-          const curriculum = centsToDollars(entry.curriculum || 0);
+          const cells = ageGroups.map((group) => {
+            const value = centsToDollars(entry[group.id] || 0);
+            return `<td><input type="number" step="0.01" class="base-rate" data-group="${group.id}" value="${value}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>`;
+          }).join('');
           return `
             <tr data-location="${p.code}">
               <td>${p.name}</td>
-              <td><input type="number" step="0.01" class="base-basic" value="${basic}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
-              <td><input type="number" step="0.01" class="base-curriculum" value="${curriculum}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+              ${cells}
             </tr>
           `;
         }).join('');
@@ -364,8 +386,7 @@
             <thead>
               <tr>
                 <th>Location</th>
-                <th>Basic ($/hr)</th>
-                <th>Curriculum ($/hr)</th>
+                ${headerCols}
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -373,62 +394,52 @@
         `;
       }
 
-      function ageRowTemplate(bracket = {}) {
-        const min = bracket.min ?? 0;
-        const max = bracket.max ?? 0;
-        const multiplier = bracket.multiplier ?? 1;
-        return `
-          <div class="row-grid cols-4 age-row">
-            <input type="number" class="age-min" value="${min}" min="0" placeholder="Min age">
-            <input type="number" class="age-max" value="${max}" min="0" placeholder="Max age">
-            <input type="number" class="age-multiplier" value="${multiplier}" step="0.01" min="0">
-            <button class="tiny-btn danger remove-age" type="button">Remove</button>
-          </div>
-        `;
-      }
-
-      function renderAgeBrackets(config) {
-        const brackets = Array.isArray(config?.age_brackets) ? config.age_brackets : [];
-        ageBracketsWrap.innerHTML = brackets.map((bracket) => ageRowTemplate(bracket)).join('');
-        if(brackets.length === 0){
-          ageBracketsWrap.innerHTML = ageRowTemplate({ min: 0, max: 12, multiplier: 1 });
+      function renderAgeGroups(config) {
+        if(!ageGroupsWrap) return;
+        const groups = Array.isArray(config?.age_groups) ? config.age_groups : [];
+        if(groups.length === 0){
+          ageGroupsWrap.innerHTML = '<div class="status-text">No age groups configured yet.</div>';
+          return;
         }
-      }
-
-      function timeRowTemplate(band = {}) {
-        const label = band.label || '';
-        const start = band.start || '09:00';
-        const end = band.end || '17:00';
-        const multiplier = band.multiplier ?? 1;
-        return `
-          <div class="row-grid cols-4 time-row">
-            <input type="text" class="time-label" value="${label}" placeholder="Label">
-            <input type="time" class="time-start" value="${start}">
-            <input type="time" class="time-end" value="${end}">
-            <div style="display:flex; gap:8px; align-items:center;">
-              <input type="number" class="time-multiplier" value="${multiplier}" step="0.01" min="0" style="width: 100%;">
-              <button class="tiny-btn danger remove-time" type="button">Remove</button>
-            </div>
-          </div>
+        const rows = groups.map((group) => {
+          const min = group.min ?? '';
+          const max = group.max ?? '';
+          const label = group.label || group.id || '';
+          return `
+            <tr data-group-id="${group.id || ''}">
+              <td>${group.id || ''}</td>
+              <td><input type="text" class="age-label" value="${label}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+              <td><input type="number" class="age-min" min="0" step="1" value="${min}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+              <td><input type="number" class="age-max" min="0" step="1" value="${max}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+            </tr>
+          `;
+        }).join('');
+        ageGroupsWrap.innerHTML = `
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Group ID</th>
+                <th>Label</th>
+                <th>Min age</th>
+                <th>Max age</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
         `;
-      }
-
-      function renderTimeBands(config) {
-        const bands = Array.isArray(config?.time_of_day) ? config.time_of_day : [];
-        timeBandsWrap.innerHTML = bands.map((band) => timeRowTemplate(band)).join('');
-        if(bands.length === 0){
-          timeBandsWrap.innerHTML = timeRowTemplate({ label: 'Standard', start: '09:00', end: '17:00', multiplier: 1 });
-        }
       }
 
       function renderTaxRates(config) {
         const rates = config?.tax_rates || {};
         const rows = PROVINCES.filter(p => p.code !== 'default').map((p) => {
-          const rate = rates[p.code] ?? 0;
+          const entry = rates[p.code] ?? {};
+          const gst = typeof entry === 'number' ? entry : (entry.gst ?? entry.gst_percent ?? 0);
+          const pst = typeof entry === 'number' ? 0 : (entry.pst ?? entry.pst_percent ?? 0);
           return `
             <tr data-province="${p.code}">
               <td>${p.name}</td>
-              <td><input type="number" step="0.1" min="0" max="30" class="tax-rate" value="${rate}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+              <td><input type="number" step="0.1" min="0" max="30" class="tax-gst" value="${gst}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
+              <td><input type="number" step="0.1" min="0" max="30" class="tax-pst" value="${pst}" style="width: 100%; padding:6px 8px; border:1px solid #d6dde5; border-radius:6px;"></td>
             </tr>
           `;
         }).join('');
@@ -437,7 +448,8 @@
             <thead>
               <tr>
                 <th>Province</th>
-                <th>Tax %</th>
+                <th>GST %</th>
+                <th>PST %</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -460,15 +472,15 @@
 
       function applyConfigToUI(config) {
         renderBaseRates(config);
-        renderAgeBrackets(config);
-        renderTimeBands(config);
+        renderAgeGroups(config);
         renderTaxRates(config);
-        premiumDiscountInput.value = config?.premium_discount_percent ?? 0;
-        providerShareInput.value = config?.fees?.provider_share_percent ?? 0;
+        if(discountBasicInput) discountBasicInput.value = config?.membership_discounts?.basic ?? 0;
+        if(discountPlusInput) discountPlusInput.value = config?.membership_discounts?.plus ?? 0;
+        if(discountPremiumInput) discountPremiumInput.value = config?.membership_discounts?.premium ?? 0;
         platformFeeInput.value = config?.fees?.platform_fee_percent ?? 0;
         stripePercentInput.value = config?.fees?.stripe_percent ?? 0;
         stripeFixedInput.value = config?.fees?.stripe_fixed_cents ?? 0;
-        taxAppliesSelect.value = config?.tax_applies_to || 'platform_fee';
+        taxAppliesSelect.value = config?.tax_applies_to || 'base_rate';
         populateCalculator();
       }
 
@@ -476,52 +488,60 @@
         const baseRates = {};
         baseRatesTable.querySelectorAll('tbody tr').forEach((row) => {
           const location = row.dataset.location;
-          const basic = row.querySelector('.base-basic')?.value;
-          const curriculum = row.querySelector('.base-curriculum')?.value;
-          baseRates[location] = {
-            basic: dollarsToCents(basic),
-            curriculum: dollarsToCents(curriculum)
-          };
+          const rateInputs = row.querySelectorAll('.base-rate');
+          const values = {};
+          rateInputs.forEach((input) => {
+            const groupId = input.dataset.group;
+            values[groupId] = dollarsToCents(input.value);
+          });
+          baseRates[location] = values;
         });
-
-        const ageBrackets = Array.from(ageBracketsWrap.querySelectorAll('.age-row')).map((row, index) => ({
-          id: `age-${index + 1}`,
-          min: Number(row.querySelector('.age-min')?.value || 0),
-          max: Number(row.querySelector('.age-max')?.value || 0),
-          multiplier: Number(row.querySelector('.age-multiplier')?.value || 1)
-        }));
-
-        const timeBands = Array.from(timeBandsWrap.querySelectorAll('.time-row')).map((row, index) => ({
-          id: `time-${index + 1}`,
-          label: row.querySelector('.time-label')?.value || '',
-          start: row.querySelector('.time-start')?.value || '09:00',
-          end: row.querySelector('.time-end')?.value || '17:00',
-          multiplier: Number(row.querySelector('.time-multiplier')?.value || 1)
-        }));
 
         const taxRates = {};
         taxRatesTable.querySelectorAll('tbody tr').forEach((row) => {
           const province = row.dataset.province;
-          const rate = Number(row.querySelector('.tax-rate')?.value || 0);
-          taxRates[province] = rate;
+          const gst = Number(row.querySelector('.tax-gst')?.value || 0);
+          const pst = Number(row.querySelector('.tax-pst')?.value || 0);
+          taxRates[province] = { gst, pst };
         });
 
         return {
-          version: pricingConfig?.version || 1,
+          version: pricingConfig?.version || 2,
           currency: pricingConfig?.currency || 'cad',
           location_fallback: 'default',
+          age_groups: (() => {
+            const groups = [];
+            ageGroupsWrap?.querySelectorAll('tbody tr').forEach((row) => {
+              const id = row.dataset.groupId || row.dataset.groupID || '';
+              if(!id) return;
+              const label = row.querySelector('.age-label')?.value || id;
+              const minRaw = row.querySelector('.age-min')?.value ?? '';
+              const maxRaw = row.querySelector('.age-max')?.value ?? '';
+              const minVal = minRaw === '' ? null : Number(minRaw);
+              const maxVal = maxRaw === '' ? null : Number(maxRaw);
+              groups.push({
+                id,
+                label,
+                min: Number.isFinite(minVal) ? minVal : null,
+                max: Number.isFinite(maxVal) ? maxVal : null
+              });
+            });
+            return groups.length ? groups : (pricingConfig?.age_groups || []);
+          })(),
           base_rates: baseRates,
-          age_brackets: ageBrackets,
-          time_of_day: timeBands,
-          premium_discount_percent: Number(premiumDiscountInput.value || 0),
+          membership_discounts: {
+            standard: 0,
+            basic: Number(discountBasicInput?.value || 0),
+            plus: Number(discountPlusInput?.value || 0),
+            premium: Number(discountPremiumInput?.value || 0)
+          },
           fees: {
-            provider_share_percent: Number(providerShareInput.value || 0),
             platform_fee_percent: Number(platformFeeInput.value || 0),
             stripe_percent: Number(stripePercentInput.value || 0),
             stripe_fixed_cents: Number(stripeFixedInput.value || 0)
           },
           tax_rates: taxRates,
-          tax_applies_to: taxAppliesSelect.value || 'platform_fee'
+          tax_applies_to: taxAppliesSelect.value || 'base_rate'
         };
       }
 
@@ -543,6 +563,7 @@
         const hoursVal = Number(calcHours?.value || 1);
         const ageRaw = calcAge?.value || '';
         const ageVal = ageRaw === '' ? null : Number(ageRaw);
+        const membershipTier = calcMembership?.value || 'standard';
         const endDate = buildEndDate(dateVal, startVal, hoursVal);
         const endAt = endDate
           ? `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2,'0')}-${String(endDate.getDate()).padStart(2,'0')}T${String(endDate.getHours()).padStart(2,'0')}:${String(endDate.getMinutes()).padStart(2,'0')}`
@@ -550,8 +571,8 @@
         return {
           province: calcProvince?.value || '',
           age: ageVal,
-          care_type: calcCareType?.value || 'basic',
-          is_premium: calcMembership?.value === 'premium',
+          membership_tier: membershipTier,
+          subscription_type: membershipTier,
           start_at: dateVal && startVal ? `${dateVal}T${startVal}` : null,
           end_at: endAt,
           hours: hoursVal
@@ -577,6 +598,8 @@
           const taxCents = pricing.tax_cents;
           const stripeFee = pricing.stripe_fee_cents;
           const totalBooking = pricing.total_booking_cents;
+          const tierLabel = pricing.membership_tier ? pricing.membership_tier.replace(/_/g, ' ') : 'standard';
+          const ageLabel = pricing.age_group_label ? ` · ${pricing.age_group_label}` : '';
           pricingBreakdown.innerHTML = `
             <div class="calc-line"><span>Hourly rate</span><strong>$${centsToDollars(hourlyTotal)}</strong></div>
             <div class="calc-line"><span>Provider fee (per hour)</span><strong>$${centsToDollars(providerFee)}</strong></div>
@@ -585,7 +608,7 @@
             <div class="calc-line"><span>Stripe fee (per booking)</span><strong>$${centsToDollars(stripeFee)}</strong></div>
             <div class="calc-highlight">Total for booking: $${centsToDollars(totalBooking)}</div>
           `;
-          calcStatus.textContent = `Using ${factors.hours} hour(s) in ${factors.province || 'your province'}.`;
+          calcStatus.textContent = `Using ${factors.hours} hour(s) in ${factors.province || 'your province'} · ${tierLabel}${ageLabel}.`;
         }catch(err){
           calcStatus.textContent = err.message || 'Unable to calculate pricing.';
         }
@@ -624,32 +647,6 @@
           updateCalculator();
         }catch(err){
           configStatus.textContent = err.message || 'Unable to save pricing rules.';
-        }
-      });
-
-      document.getElementById('addAgeBracketBtn').addEventListener('click', () => {
-        ageBracketsWrap.insertAdjacentHTML('beforeend', ageRowTemplate({ min: 0, max: 0, multiplier: 1 }));
-        scheduleCalc();
-      });
-
-      document.getElementById('addTimeBandBtn').addEventListener('click', () => {
-        timeBandsWrap.insertAdjacentHTML('beforeend', timeRowTemplate({ label: '', start: '09:00', end: '17:00', multiplier: 1 }));
-        scheduleCalc();
-      });
-
-      ageBracketsWrap.addEventListener('click', (e) => {
-        if(e.target.classList.contains('remove-age')){
-          const row = e.target.closest('.age-row');
-          if(row) row.remove();
-          scheduleCalc();
-        }
-      });
-
-      timeBandsWrap.addEventListener('click', (e) => {
-        if(e.target.classList.contains('remove-time')){
-          const row = e.target.closest('.time-row');
-          if(row) row.remove();
-          scheduleCalc();
         }
       });
 
