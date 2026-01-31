@@ -918,6 +918,145 @@ document.addEventListener('DOMContentLoaded', () => {
     if(caregiverBtn) caregiverBtn.addEventListener('click', ()=> window.location.href = 'apply.html');
   }
 
+  let pendingTwoFactorUserId = null;
+  let pendingTwoFactorForm = null;
+  let twoFactorModal = null;
+  let twoFactorForm = null;
+  let twoFactorHint = null;
+  let twoFactorCodeInput = null;
+  let twoFactorResendBtn = null;
+  let twoFactorSubmitBtn = null;
+
+  function ensureTwoFactorModal(){
+    if(twoFactorModal) return twoFactorModal;
+    twoFactorModal = document.getElementById('twoFactorModal');
+    if(!twoFactorModal){
+      twoFactorModal = document.createElement('div');
+      twoFactorModal.id = 'twoFactorModal';
+      twoFactorModal.className = 'modal hidden';
+      twoFactorModal.innerHTML = `
+        <div class="modal-content">
+          <button class="modal-close" type="button" id="twoFactorClose">&times;</button>
+          <h2>Verify it&apos;s you</h2>
+          <p id="twoFactorHint" style="margin:0 0 16px;color:var(--muted);font-size:14px;">Enter the 6-digit code we sent to your phone.</p>
+          <form id="twoFactorForm">
+            <label>
+              Verification code
+              <input id="twoFactorCode" name="twoFactorCode" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" required>
+            </label>
+            <button type="submit" class="btn" style="width:100%;margin-top:12px;">Verify</button>
+          </form>
+          <button type="button" id="twoFactorResend" class="btn secondary" style="width:100%;margin-top:10px;">Resend code</button>
+        </div>
+      `;
+      document.body.appendChild(twoFactorModal);
+    }
+    twoFactorForm = twoFactorModal.querySelector('#twoFactorForm');
+    twoFactorHint = twoFactorModal.querySelector('#twoFactorHint');
+    twoFactorCodeInput = twoFactorModal.querySelector('#twoFactorCode');
+    twoFactorResendBtn = twoFactorModal.querySelector('#twoFactorResend');
+    twoFactorSubmitBtn = twoFactorModal.querySelector('button[type="submit"]');
+    const closeBtn = twoFactorModal.querySelector('#twoFactorClose');
+    closeBtn && closeBtn.addEventListener('click', ()=> twoFactorModal.classList.add('hidden'));
+    twoFactorModal.addEventListener('click', e=> { if(e.target === twoFactorModal) twoFactorModal.classList.add('hidden'); });
+    twoFactorForm && twoFactorForm.addEventListener('submit', handleTwoFactorSubmit);
+    twoFactorResendBtn && twoFactorResendBtn.addEventListener('click', handleTwoFactorResend);
+    return twoFactorModal;
+  }
+
+  function openTwoFactorModal(phoneMasked){
+    const modal = ensureTwoFactorModal();
+    if(twoFactorHint){
+      twoFactorHint.textContent = phoneMasked
+        ? `Enter the 6-digit code sent to ${phoneMasked}.`
+        : 'Enter the 6-digit code we sent to your phone.';
+    }
+    if(loginModal) loginModal.classList.add('hidden');
+    modal.classList.remove('hidden');
+    if(twoFactorCodeInput){
+      twoFactorCodeInput.value = '';
+      twoFactorCodeInput.focus();
+    }
+  }
+
+  function completeLogin(resp, form){
+    const userType = resp.type || 'parent';
+    localStorage.setItem('user_id', String(resp.userId));
+    localStorage.setItem('user_type', userType);
+    if(userType === 'parent'){
+      const familyId = localStorage.getItem('family_id') || `family_${resp.userId}`;
+      localStorage.setItem('family_id', familyId);
+    }
+    if(userType === 'provider' && !localStorage.getItem('provider_status')){
+      localStorage.setItem('provider_status', 'under_review');
+    }
+    if(resp.name) localStorage.setItem('user_name', resp.name);
+    localStorage.setItem('flash_message', 'Login successful!');
+    localStorage.removeItem('post_login_target');
+    const target = localStorage.getItem('post_login_target');
+    if(loginModal) loginModal.classList.add('hidden');
+    if(twoFactorModal) twoFactorModal.classList.add('hidden');
+    const welcomeModalEl = document.getElementById('welcomeModal');
+    if(welcomeModalEl) welcomeModalEl.classList.add('hidden');
+    if(form) form.reset();
+    pendingTwoFactorUserId = null;
+    pendingTwoFactorForm = null;
+    renderAuthNav();
+    if(userType === 'provider'){
+      window.location.href = 'caregiver-dashboard.html';
+    } else if(target === 'parent-dashboard'){
+      window.location.href = 'parent-dashboard.html';
+    } else {
+      window.location.href = 'parent-dashboard.html';
+    }
+  }
+
+  async function handleTwoFactorSubmit(e){
+    e.preventDefault();
+    if(!pendingTwoFactorUserId){
+      showBanner('Please sign in again to verify.', 'info');
+      return;
+    }
+    const code = twoFactorCodeInput ? twoFactorCodeInput.value.trim() : '';
+    if(!code){
+      showBanner('Enter the verification code.', 'info');
+      return;
+    }
+    if(twoFactorSubmitBtn) twoFactorSubmitBtn.disabled = true;
+    if(twoFactorResendBtn) twoFactorResendBtn.disabled = true;
+    try{
+      const resp = await postJSON('/forms/2fa/verify', { userId: pendingTwoFactorUserId, code });
+      pendingTwoFactorUserId = null;
+      completeLogin(resp, pendingTwoFactorForm);
+      pendingTwoFactorForm = null;
+      twoFactorForm && twoFactorForm.reset();
+    }catch(err){
+      showBanner(err.message || 'Verification failed. Please try again.', 'error');
+      console.error(err);
+    }finally{
+      if(twoFactorSubmitBtn) twoFactorSubmitBtn.disabled = false;
+      if(twoFactorResendBtn) twoFactorResendBtn.disabled = false;
+    }
+  }
+
+  async function handleTwoFactorResend(){
+    if(!pendingTwoFactorUserId){
+      showBanner('Please sign in again to verify.', 'info');
+      return;
+    }
+    if(twoFactorResendBtn) twoFactorResendBtn.disabled = true;
+    try{
+      const resp = await postJSON('/forms/2fa/start', { userId: pendingTwoFactorUserId });
+      const hint = resp.phone_masked ? `New code sent to ${resp.phone_masked}.` : 'New code sent.';
+      showBanner(hint, 'info');
+    }catch(err){
+      showBanner(err.message || 'Could not resend the code.', 'error');
+      console.error(err);
+    }finally{
+      if(twoFactorResendBtn) twoFactorResendBtn.disabled = false;
+    }
+  }
+
   async function handleLoginSubmit(e, form){
     e.preventDefault();
     const fd = new FormData(form);
@@ -929,36 +1068,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     try{
       const resp = await postJSON('/forms/login', { email, password });
-      const userType = resp.type || 'parent';
-      localStorage.setItem('user_id', String(resp.userId));
-      localStorage.setItem('user_type', userType);
-      if(userType === 'parent'){
-        const familyId = localStorage.getItem('family_id') || `family_${resp.userId}`;
-        localStorage.setItem('family_id', familyId);
+      if(resp.requires_2fa){
+        pendingTwoFactorUserId = resp.userId;
+        pendingTwoFactorForm = form;
+        openTwoFactorModal(resp.phone_masked);
+        return;
       }
-      if(userType === 'provider' && !localStorage.getItem('provider_status')){
-        localStorage.setItem('provider_status', 'under_review');
-      }
-      if(resp.name) localStorage.setItem('user_name', resp.name);
-      localStorage.setItem('flash_message', 'Login successful!');
-      localStorage.removeItem('post_login_target');
-      const target = localStorage.getItem('post_login_target');
-      // Close any open modals
-      if(loginModal) loginModal.classList.add('hidden');
-      const welcomeModalEl = document.getElementById('welcomeModal');
-      if(welcomeModalEl) welcomeModalEl.classList.add('hidden');
-      form.reset();
-      renderAuthNav();
-      // Redirect by role; ignore parent-dashboard target for providers
-      if(userType === 'provider'){
-        window.location.href = 'caregiver-dashboard.html';
-      } else if(target === 'parent-dashboard'){
-        window.location.href = 'parent-dashboard.html';
-      } else {
-        window.location.href = 'parent-dashboard.html';
-      }
+      completeLogin(resp, form);
     }catch(err){
-      showBanner('Invalid email or password. Please try again.', 'error');
+      const message = err.message === 'Invalid credentials'
+        ? 'Invalid email or password. Please try again.'
+        : (err.message || 'Login failed. Please try again.');
+      showBanner(message, 'error');
       console.error(err);
     }
   }
