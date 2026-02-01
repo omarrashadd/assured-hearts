@@ -1681,13 +1681,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const isDashboard = document.body.classList.contains('provider-dashboard');
   const mobileMenuBadge = mobileMenuBtn ? mobileMenuBtn.querySelector('.mobile-menu-badge') : null;
-  const updateMobileBadge = (count)=>{
-    if(!mobileMenuBadge || !mobileMenuBtn) return;
+  const inboxTab = isDashboard ? document.querySelector('.provider-nav-item[data-panel="inbox"]') : null;
+  const inboxBadge = inboxTab ? inboxTab.querySelector('.provider-nav-badge') : null;
+  const updateMessageBadges = (count)=>{
     const unread = Number(count) || 0;
-    mobileMenuBadge.textContent = '';
-    mobileMenuBadge.style.display = unread > 0 ? 'inline-flex' : 'none';
-    mobileMenuBtn.setAttribute('aria-label', unread > 0 ? `Open messages (${unread} unread)` : 'Open messages');
+    if(inboxBadge && inboxTab){
+      inboxBadge.textContent = '';
+      inboxBadge.style.display = unread > 0 ? 'inline-flex' : 'none';
+      inboxTab.setAttribute('aria-label', unread > 0 ? `Messages (${unread} unread)` : 'Messages');
+    }
+    if(mobileMenuBadge && mobileMenuBtn){
+      mobileMenuBadge.textContent = '';
+      mobileMenuBadge.style.display = unread > 0 ? 'inline-flex' : 'none';
+      mobileMenuBtn.setAttribute('aria-label', unread > 0 ? `Open messages (${unread} unread)` : 'Open messages');
+    }
   };
+  if(isDashboard){
+    if(typeof window.latestUnread === 'number') updateMessageBadges(window.latestUnread);
+    window.addEventListener('chat-updated', (event) => {
+      updateMessageBadges(event?.detail?.unread);
+    });
+  }
   if(mobileMenuBtn){
     if(isDashboard){
       mobileMenuBtn.addEventListener('click', () => {
@@ -1695,12 +1709,8 @@ document.addEventListener('DOMContentLoaded', () => {
           window.showChatWidget();
           return;
         }
-        const inboxTab = document.querySelector('[data-panel="inbox"]');
-        if(inboxTab) inboxTab.click();
-      });
-      if(typeof window.latestUnread === 'number') updateMobileBadge(window.latestUnread);
-      window.addEventListener('chat-updated', (event) => {
-        updateMobileBadge(event?.detail?.unread);
+        const fallbackInbox = document.querySelector('[data-panel="inbox"]');
+        if(fallbackInbox) fallbackInbox.click();
       });
     } else {
       mobileMenuBtn.addEventListener('click', openMobileMenu);

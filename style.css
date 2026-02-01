@@ -1248,6 +1248,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   font-weight:600;
   text-align:left;
   cursor:pointer;
+  position:relative;
   transition:background .2s ease,color .2s ease,border .2s ease,transform .2s ease;
 }
 .provider-nav-item .nav-icon{
@@ -1257,6 +1258,32 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
 }
 .provider-nav-item .nav-label{
   display:inline;
+}
+.provider-nav-badge{
+  position:absolute;
+  top:8px;
+  right:12px;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ef4444;
+  display:none;
+}
+.provider-top-profile-btn{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:38px;
+  height:38px;
+  padding:0;
+  border-radius:999px;
+  border:1px solid rgba(6,70,78,0.2);
+  background:#fff;
+  color:#06464E;
+  box-shadow:0 6px 14px rgba(6,70,78,0.12);
+}
+.provider-top-profile-btn svg{
+  display:block;
 }
 .provider-nav-icon-btn{
   display:none;
@@ -3237,6 +3264,13 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
     display:block;
     margin:0 auto;
   }
+  .provider-dashboard .provider-nav-item[data-panel="inbox"] .nav-label{
+    display:none;
+  }
+  .provider-dashboard .provider-nav-item[data-panel="inbox"] .nav-icon{
+    display:block;
+    margin:0 auto;
+  }
   .provider-dashboard .provider-nav-icon-btn{
     display:inline-flex;
     position:static;
@@ -3259,13 +3293,32 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
     background:transparent;
     border-color:transparent;
   }
+  .provider-dashboard .provider-top-profile-btn{
+    display:inline-flex;
+    width:36px;
+    height:36px;
+    padding:0;
+    border:1px solid rgba(6,70,78,0.2);
+    border-radius:999px;
+    background:#fff;
+    color:#06464E;
+    box-shadow:0 4px 10px rgba(6,70,78,0.12);
+  }
+  .provider-dashboard .provider-top-profile-btn.is-active{
+    border-color:#67B3C2;
+    color:#67B3C2;
+  }
+  .provider-dashboard .provider-nav-profile{
+    display:none;
+  }
+  .provider-dashboard .provider-nav-badge{
+    top:6px;
+    right:14px;
+  }
   .parent-dashboard .parent-profile-btn{
     display:none;
   }
   .provider-dashboard:not(.parent-dashboard) .provider-profile-btn{
-    display:none;
-  }
-  .provider-dashboard .provider-nav-item[data-panel="inbox"]{
     display:none;
   }
   .provider-dashboard .provider-nav-item[data-panel="curriculum"]{
