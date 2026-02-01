@@ -4515,6 +4515,7 @@ body.chat-embed-active #chatLauncher{
   max-width:640px;
   font-size:16px;
   font-weight:500;
+  min-height:calc(1.7em * 2);
 }
 .careplus-support .careplus-emphasis{
   background:linear-gradient(90deg, rgba(103,179,194,0.15), rgba(103,179,194,0));
@@ -4546,6 +4547,7 @@ body.chat-embed-active #chatLauncher{
   }
   .careplus-support{
     font-size:14px;
+    min-height:calc(1.7em * 3);
   }
   .careplus-page{
     --provider-bottom-nav-height:86px;
