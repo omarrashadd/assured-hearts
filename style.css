@@ -4444,6 +4444,116 @@ body.chat-embed-active #chatLauncher{
   }
 }
 
+/* Care+ pricing page */
+.careplus-main{
+  padding:32px 16px 72px;
+  max-width:1200px;
+}
+.careplus-intro{
+  margin-top:-24px;
+  margin-bottom:28px;
+}
+.careplus-intro__panel{
+  background:linear-gradient(135deg, #06464E 0%, #0f1f24 100%);
+  color:#fff;
+  border-radius:24px;
+  padding:28px;
+  display:grid;
+  gap:24px;
+  position:relative;
+  overflow:hidden;
+}
+.careplus-intro__panel::before{
+  content:'';
+  position:absolute;
+  right:-40px;
+  top:-40px;
+  width:180px;
+  height:180px;
+  background:radial-gradient(circle at center, rgba(103,179,194,0.35), rgba(6,70,78,0));
+}
+.careplus-eyebrow{
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  font-size:11px;
+  font-weight:700;
+  color:rgba(255,255,255,0.7);
+}
+.careplus-intro__copy h2{
+  margin:8px 0 8px;
+  font-size:28px;
+}
+.careplus-intro__copy p{
+  margin:0 0 16px;
+  color:rgba(255,255,255,0.85);
+  line-height:1.6;
+}
+.careplus-cta{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.careplus-cta-btn{
+  background:#fff;
+  color:#06464E;
+  padding:10px 18px;
+  border-radius:999px;
+  font-weight:700;
+  text-decoration:none;
+  box-shadow:0 8px 16px rgba(0,0,0,0.18);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.careplus-cta-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+.careplus-cta-note{
+  font-size:12px;
+  color:rgba(255,255,255,0.7);
+}
+.careplus-intro__perks{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+  gap:14px;
+}
+.careplus-perk{
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.12);
+  padding:12px 14px;
+  border-radius:14px;
+}
+.careplus-perk__title{
+  font-weight:700;
+  font-size:13px;
+  margin-bottom:6px;
+}
+.careplus-perk__copy{
+  font-size:12px;
+  color:rgba(255,255,255,0.75);
+  line-height:1.5;
+}
+
+@media (max-width:719px){
+  .careplus-intro{
+    margin-top:-16px;
+  }
+  .careplus-intro__panel{
+    padding:20px;
+  }
+  .careplus-intro__copy h2{
+    font-size:22px;
+  }
+  .careplus-cta-btn{
+    width:100%;
+    text-align:center;
+  }
+  .careplus-cta-note{
+    width:100%;
+    text-align:center;
+  }
+}
+
 /* Pull-to-refresh */
 .pull-refresh{
   position:fixed;

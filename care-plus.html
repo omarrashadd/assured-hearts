@@ -93,11 +93,41 @@
       </div>
     </header>
 
-    <main class="container" style="padding:32px 16px 64px;max-width:1200px;">
-      <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
-      <stripe-pricing-table pricing-table-id="prctbl_1SuMwoGVn10jQAgVWJJA4riu"
-      publishable-key="pk_live_51SoYPvGVn10jQAgVpEBLsPFBQtGYfAZWByN5yNmy4suslrftxtH7FzTkeoy1GVWjTRqTfKMbo3BUSj4HO7l1xupw00oe6aNQ7E">
-      </stripe-pricing-table>
+    <main class="container careplus-main">
+      <section class="careplus-intro" aria-labelledby="careplusSupportTitle">
+        <div class="careplus-intro__panel">
+          <div class="careplus-intro__copy">
+            <span class="careplus-eyebrow">Support the platform</span>
+            <h2 id="careplusSupportTitle">Keep Assured Hearts thriving</h2>
+            <p>Your subscription helps us keep this platform great, and gives you all the perks and savings that come with Care+.</p>
+            <div class="careplus-cta">
+              <a class="careplus-cta-btn" href="#careplus-table">See plans</a>
+              <span class="careplus-cta-note">Pick the plan that fits your family.</span>
+            </div>
+          </div>
+          <div class="careplus-intro__perks">
+            <div class="careplus-perk">
+              <div class="careplus-perk__title">Care+ savings</div>
+              <div class="careplus-perk__copy">Enjoy member savings baked into every plan.</div>
+            </div>
+            <div class="careplus-perk">
+              <div class="careplus-perk__title">Reliable platform</div>
+              <div class="careplus-perk__copy">Your membership keeps the experience smooth and trusted.</div>
+            </div>
+            <div class="careplus-perk">
+              <div class="careplus-perk__title">Community impact</div>
+              <div class="careplus-perk__copy">Help more families and caregivers find each other.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="careplus-table" class="careplus-table">
+        <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
+        <stripe-pricing-table pricing-table-id="prctbl_1SuMwoGVn10jQAgVWJJA4riu"
+        publishable-key="pk_live_51SoYPvGVn10jQAgVpEBLsPFBQtGYfAZWByN5yNmy4suslrftxtH7FzTkeoy1GVWjTRqTfKMbo3BUSj4HO7l1xupw00oe6aNQ7E">
+        </stripe-pricing-table>
+      </section>
     </main>
 
     <footer style="background:#06464E;color:#fff;padding:32px 24px;text-align:center;margin-top:48px;">
