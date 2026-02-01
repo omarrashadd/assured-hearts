@@ -2298,6 +2298,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
   let threads = {};
   let activeThread = null;
+  const contactCache = {};
 
   const launcher = document.createElement('button');
   launcher.id = 'chatLauncher';
@@ -2433,6 +2434,43 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return msg.other_photo || msg.other_photo_url || msg.photo_url || msg.avatar_url || msg.other_avatar || '';
   };
 
+  const extractPhoneFromProfile = (data = {})=>{
+    const profile = data.profile || data.provider || data.parent || data.user || data || {};
+    return (
+      profile.phone ||
+      profile.phone_number ||
+      profile.phoneNumber ||
+      profile.contact_phone ||
+      profile.contactPhone ||
+      ''
+    );
+  };
+
+  const ensureContactPhone = async (otherId)=>{
+    if(!otherId) return;
+    const thread = threads[otherId];
+    if(thread && thread.other_phone) return;
+    if(contactCache[otherId]){
+      if(thread) thread.other_phone = contactCache[otherId];
+      updateActiveHeader();
+      return;
+    }
+    try{
+      const endpoint = userType === 'provider' ? 'parent' : 'provider';
+      const res = await fetch(`${API_BASE}/forms/${endpoint}/${encodeURIComponent(otherId)}`);
+      if(!res.ok) return;
+      const data = await res.json().catch(() => ({}));
+      const phone = extractPhoneFromProfile(data);
+      if(phone){
+        contactCache[otherId] = phone;
+        if(thread) thread.other_phone = phone;
+        updateActiveHeader();
+      }
+    }catch(err){
+      console.error('Failed to fetch contact phone', err);
+    }
+  };
+
   const setChatView = (view)=>{
     modal.classList.toggle('chat-modal--thread', view === 'thread');
   };
@@ -2530,6 +2568,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setChatView('thread');
     markRead(activeThread);
     updateBookButton();
+    ensureContactPhone(activeThread);
   };
 
   // Expose opener so other buttons can launch a thread
@@ -2674,6 +2713,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       historyEl.innerHTML = '<div class="chat-empty">No messages yet.</div>';
       return;
     }
+    ensureContactPhone(otherId);
     const name = thread.other_name || 'User';
     const avatarUrl = thread.other_photo || '';
     const avatarInner = avatarUrl ? `<img src="${avatarUrl}" alt="">` : getInitials(name);
