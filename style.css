@@ -4444,6 +4444,48 @@ body.chat-embed-active #chatLauncher{
   }
 }
 
+/* Pull-to-refresh */
+.pull-refresh{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:0;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  pointer-events:none;
+  z-index:9998;
+}
+.pull-refresh-indicator{
+  margin-bottom:8px;
+  background:#fff;
+  color:#0f172a;
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:12px;
+  font-weight:700;
+  border:1px solid rgba(15,23,42,0.08);
+  box-shadow:0 6px 16px rgba(0,0,0,0.12);
+  opacity:0;
+  transform:translateY(-10px);
+  transition:opacity .2s ease, transform .2s ease, background .2s ease;
+}
+.pull-refresh.is-visible .pull-refresh-indicator{
+  opacity:1;
+  transform:translateY(0);
+}
+.pull-refresh.is-ready .pull-refresh-indicator{
+  background:#06464E;
+  color:#fff;
+  border-color:transparent;
+}
+.pull-refresh.is-refreshing .pull-refresh-indicator{
+  background:#111827;
+  color:#fff;
+  border-color:transparent;
+}
+
 /* Chat widget */
 .chat-modal{
   font-family:inherit;

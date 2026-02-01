@@ -3798,3 +3798,138 @@ document.addEventListener('DOMContentLoaded', ()=>{
   fetchMessages();
   setInterval(fetchMessages, 15000);
 });
+
+// Pull-to-refresh on mobile
+document.addEventListener('DOMContentLoaded', ()=>{
+  const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const isMobile = window.matchMedia('(max-width: 719px)').matches;
+  if(!isTouch || !isMobile) return;
+  if(document.getElementById('pullRefresh')) return;
+
+  const scroller = document.scrollingElement || document.documentElement;
+  const pullWrap = document.createElement('div');
+  pullWrap.id = 'pullRefresh';
+  pullWrap.className = 'pull-refresh';
+  pullWrap.innerHTML = '<div class="pull-refresh-indicator">Pull to refresh</div>';
+  document.body.appendChild(pullWrap);
+  const indicator = pullWrap.querySelector('.pull-refresh-indicator');
+
+  const threshold = 70;
+  const maxPull = 120;
+  let startY = 0;
+  let pullY = 0;
+  let pulling = false;
+  let ready = false;
+  let refreshing = false;
+  let hasVibrated = false;
+
+  const setIndicatorState = (state)=>{
+    const visible = state !== 'hidden';
+    pullWrap.classList.toggle('is-visible', visible);
+    pullWrap.classList.toggle('is-ready', state === 'ready');
+    pullWrap.classList.toggle('is-refreshing', state === 'refreshing');
+    if(indicator){
+      indicator.textContent = state === 'ready'
+        ? 'Release to refresh'
+        : state === 'refreshing'
+          ? 'Refreshing...'
+          : 'Pull to refresh';
+    }
+  };
+
+  const resetPull = ()=>{
+    pulling = false;
+    ready = false;
+    refreshing = false;
+    hasVibrated = false;
+    pullY = 0;
+    pullWrap.style.height = '0px';
+    setIndicatorState('hidden');
+  };
+
+  const shouldIgnoreTarget = (target)=>{
+    if(!target || !(target instanceof Element)) return false;
+    if(target.closest('input, textarea, select, button, a, [contenteditable="true"]')) return true;
+    if(target.closest('.chat-modal, .chat-history, .chat-threads, .chat-booking-panel')) return true;
+    return false;
+  };
+
+  const hasScrollableParent = (target)=>{
+    let el = target;
+    while(el && el !== document.body && el !== document.documentElement){
+      const style = window.getComputedStyle(el);
+      const overflowY = style.overflowY;
+      if((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight){
+        return true;
+      }
+      el = el.parentElement;
+    }
+    return false;
+  };
+
+  const triggerRefresh = ()=>{
+    refreshing = true;
+    setIndicatorState('refreshing');
+    pullWrap.style.height = '70px';
+    if(navigator.vibrate){
+      navigator.vibrate(12);
+    }
+    setTimeout(()=>{
+      window.location.reload();
+    }, 250);
+  };
+
+  const onStart = (event)=>{
+    if(refreshing) return;
+    if(scroller.scrollTop > 0) return;
+    const target = event.target;
+    if(shouldIgnoreTarget(target)) return;
+    if(hasScrollableParent(target)) return;
+    pulling = true;
+    startY = event.touches[0].clientY;
+    pullY = 0;
+    setIndicatorState('hidden');
+  };
+
+  const onMove = (event)=>{
+    if(!pulling || refreshing) return;
+    if(scroller.scrollTop > 0){
+      resetPull();
+      return;
+    }
+    const currentY = event.touches[0].clientY;
+    const delta = currentY - startY;
+    if(delta <= 0) return;
+    event.preventDefault();
+    pullY = Math.min(delta, maxPull);
+    pullWrap.style.height = `${pullY}px`;
+    const isNowReady = pullY >= threshold;
+    if(isNowReady && !ready){
+      ready = true;
+      setIndicatorState('ready');
+      if(!hasVibrated && navigator.vibrate){
+        navigator.vibrate(10);
+        hasVibrated = true;
+      }
+    } else if(!isNowReady && ready){
+      ready = false;
+      setIndicatorState('pulling');
+    } else if(pullY > 0 && !ready){
+      setIndicatorState('pulling');
+    }
+  };
+
+  const onEnd = ()=>{
+    if(!pulling || refreshing) return;
+    if(ready){
+      triggerRefresh();
+      return;
+    }
+    resetPull();
+  };
+
+  window.addEventListener('touchstart', onStart, { passive: true });
+  window.addEventListener('touchmove', onMove, { passive: false });
+  window.addEventListener('touchend', onEnd);
+  window.addEventListener('touchcancel', resetPull);
+});
