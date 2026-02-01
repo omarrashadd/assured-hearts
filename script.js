@@ -3983,6 +3983,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
 document.addEventListener('DOMContentLoaded', ()=>{
   if(!document.body.classList.contains('careplus-page')) return;
   const userId = parseInt(localStorage.getItem('user_id'), 10);
+  const profileBtn = document.getElementById('topProfileBtn');
+  if(profileBtn){
+    profileBtn.addEventListener('click', () => {
+      window.location.href = 'parent-dashboard.html#profile';
+    });
+  }
   if(!userId || Number.isNaN(userId)) return;
   const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
   fetch(`${API_BASE}/forms/parent/${userId}`)
