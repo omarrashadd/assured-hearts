@@ -1066,6 +1066,49 @@ document.addEventListener('DOMContentLoaded', () => {
   const glanceForm = document.getElementById('glanceForm');
   const glanceLocation = document.getElementById('glanceLocation');
   const glanceResult = document.getElementById('glanceResult');
+  const glanceLocationBtn = document.getElementById('glanceLocationBtn');
+  if(glanceLocationBtn && glanceLocation){
+    glanceLocationBtn.addEventListener('click', (event)=>{
+      event.preventDefault();
+      if(!navigator.geolocation){
+        showBanner('Geolocation is not supported by your browser.', 'info');
+        return;
+      }
+      glanceLocationBtn.disabled = true;
+      glanceLocationBtn.style.opacity = '0.6';
+      navigator.geolocation.getCurrentPosition(
+        (position)=>{
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+            .then(response => response.json())
+            .then(data => {
+              const address = data.address || {};
+              const city = address.city || address.town || address.village || address.county || address.state;
+              if(city){
+                glanceLocation.value = city;
+                glanceLocation.focus();
+              } else {
+                showBanner('Could not determine your city. Please enter it manually.', 'info');
+              }
+              glanceLocationBtn.disabled = false;
+              glanceLocationBtn.style.opacity = '1';
+            })
+            .catch(error => {
+              console.error('Geocoding error:', error);
+              showBanner('Could not determine location. Please enter it manually.', 'error');
+              glanceLocationBtn.disabled = false;
+              glanceLocationBtn.style.opacity = '1';
+            });
+        },
+        ()=>{
+          showBanner('Location access denied. Please enter your city manually.', 'info');
+          glanceLocationBtn.disabled = false;
+          glanceLocationBtn.style.opacity = '1';
+        }
+      );
+    });
+  }
   if(glanceForm && glanceLocation && glanceResult){
     glanceForm.addEventListener('submit', async (event)=>{
       event.preventDefault();
