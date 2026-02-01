@@ -25,6 +25,127 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return json || {};
   }
+  const PROFILE_PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+
+  const getProfileInitials = (value) => {
+    const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
+    const letters = parts.map(part => part[0]).join('').slice(0, 2).toUpperCase();
+    return letters || 'AH';
+  };
+
+  const setTopProfilePhoto = (url) => {
+    const btn = document.getElementById('topProfileBtn');
+    if(!btn) return;
+    const img = btn.querySelector('img');
+    if(!img) return;
+    if(url){
+      img.src = url;
+      btn.classList.add('has-photo');
+      img.addEventListener('error', () => {
+        btn.classList.remove('has-photo');
+        img.removeAttribute('src');
+      }, { once: true });
+    } else {
+      btn.classList.remove('has-photo');
+      img.removeAttribute('src');
+    }
+  };
+
+  const updateProfilePhotoPreview = (prefix, url, name) => {
+    const preview = document.getElementById(`${prefix}PhotoPreview`);
+    const img = document.getElementById(`${prefix}PhotoImg`);
+    const initialsEl = document.getElementById(`${prefix}PhotoInitials`);
+    if(initialsEl){
+      const baseName = name || localStorage.getItem('user_name') || '';
+      initialsEl.textContent = getProfileInitials(baseName);
+    }
+    if(!preview || !img) return;
+    if(url){
+      img.src = url;
+      preview.classList.add('has-photo');
+      img.addEventListener('error', () => {
+        preview.classList.remove('has-photo');
+        img.removeAttribute('src');
+      }, { once: true });
+    } else {
+      preview.classList.remove('has-photo');
+      img.removeAttribute('src');
+    }
+  };
+
+  const requestCloudinarySignature = async (folder) => {
+    return postJSON('/api/cloudinary/sign', { folder });
+  };
+
+  const uploadImageToCloudinary = async (file, folder) => {
+    const signature = await requestCloudinarySignature(folder);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('timestamp', signature.timestamp);
+    formData.append('signature', signature.signature);
+    formData.append('api_key', signature.apiKey);
+    if(signature.folder){
+      formData.append('folder', signature.folder);
+    }
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${signature.cloudName}/image/upload`;
+    const res = await fetch(uploadUrl, { method: 'POST', body: formData });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok){
+      const message = data?.error?.message || 'Upload failed';
+      throw new Error(message);
+    }
+    return data.secure_url || data.url || '';
+  };
+
+  const setupProfilePhotoUpload = ({ prefix, folder, getName }) => {
+    const input = document.getElementById(`${prefix}PhotoInput`);
+    const button = document.getElementById(`${prefix}PhotoUploadBtn`);
+    const status = document.getElementById(`${prefix}PhotoStatus`);
+    const urlField = document.getElementById(`${prefix}PhotoUrl`);
+    if(!input || !button || !urlField) return;
+
+    const setStatus = (message) => {
+      if(status) status.textContent = message;
+    };
+    const getDisplayName = () => (typeof getName === 'function' ? getName() : '');
+
+    button.addEventListener('click', () => {
+      input.click();
+    });
+
+    input.addEventListener('change', async () => {
+      const file = input.files && input.files[0];
+      if(!file) return;
+      if(!file.type || !file.type.startsWith('image/')){
+        setStatus('Please choose an image file.');
+        input.value = '';
+        return;
+      }
+      if(file.size > PROFILE_PHOTO_MAX_BYTES){
+        setStatus('Photo must be under 5MB.');
+        input.value = '';
+        return;
+      }
+      setStatus('Uploading...');
+      button.disabled = true;
+      try{
+        const url = await uploadImageToCloudinary(file, folder);
+        if(!url) throw new Error('Upload failed');
+        urlField.value = url;
+        updateProfilePhotoPreview(prefix, url, getDisplayName());
+        setTopProfilePhoto(url);
+        setStatus('Photo uploaded.');
+      }catch(err){
+        setStatus(err.message || 'Upload failed.');
+      }finally{
+        button.disabled = false;
+        input.value = '';
+      }
+    });
+  };
+
+  window.setTopProfilePhoto = setTopProfilePhoto;
+  window.updateProfilePhotoPreview = updateProfilePhotoPreview;
   // Banner helper
   function showBanner(message, type='success'){
     const existing = document.getElementById('globalBanner');
@@ -151,6 +272,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if(mobileAuth) renderAuth(mobileAuth, 'mobile');
   }
   renderAuthNav();
+  setupProfilePhotoUpload({
+    prefix: 'prov',
+    folder: 'profiles/providers',
+    getName: () => {
+      const first = document.getElementById('provFirstName')?.value?.trim() || '';
+      const last = document.getElementById('provLastName')?.value?.trim() || '';
+      const fullName = [first, last].filter(Boolean).join(' ');
+      return fullName || localStorage.getItem('user_name') || '';
+    }
+  });
+  setupProfilePhotoUpload({
+    prefix: 'parent',
+    folder: 'profiles/parents',
+    getName: () => document.getElementById('parentName')?.value?.trim() || localStorage.getItem('user_name') || ''
+  });
   // GPS location button handler
   const gpsBtn = document.getElementById('gpsBtn');
   const locationInput = document.getElementById('locationInput');
@@ -1268,6 +1404,8 @@ document.addEventListener('DOMContentLoaded', () => {
             renderLanguageChips();
             const photoField = document.getElementById('provPhotoUrl');
             if(photoField) photoField.value = p.photo_url || '';
+            updateProfilePhotoPreview('prov', p.photo_url || '', p.name || '');
+            setTopProfilePhoto(p.photo_url || '');
             const aboutField = document.getElementById('provAbout');
             if(aboutField) aboutField.value = p.about || '';
             const verifyRow = document.getElementById('provVerifyRow');

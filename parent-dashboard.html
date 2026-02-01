@@ -20,6 +20,7 @@
           <a href="learning.html">At-Home Learning</a>
         </div>
         <button id="topProfileBtn" class="provider-top-profile-btn provider-nav-item provider-nav-icon-btn" type="button" data-panel="profile" aria-label="My profile">
+          <img class="provider-top-profile-img" alt="" loading="lazy">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
             <path d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zm0 2c-3.314 0-8 1.664-8 5v3h16v-3c0-3.336-4.686-5-8-5z" fill="currentColor"/>
           </svg>
@@ -337,6 +338,23 @@
                 <button id="parentProfileBackBtn" class="provider-header-btn provider-header-btn-ghost" type="button">Back to Dashboard</button>
               </div>
               <form id="parentProfileForm" class="provider-profile-form">
+                <div class="provider-form-grid">
+                  <label class="provider-form-field provider-form-field-wide provider-photo-field">
+                    <span>Profile photo</span>
+                    <div class="profile-photo-row">
+                      <div id="parentPhotoPreview" class="profile-photo-preview">
+                        <img id="parentPhotoImg" alt="" loading="lazy">
+                        <span id="parentPhotoInitials">AH</span>
+                      </div>
+                      <div class="profile-photo-actions">
+                        <input type="file" id="parentPhotoInput" class="profile-photo-input" accept="image/*" capture="user">
+                        <button type="button" id="parentPhotoUploadBtn" class="provider-header-btn provider-header-btn-ghost">Upload photo</button>
+                        <div id="parentPhotoStatus" class="profile-photo-status">PNG or JPG up to 5MB.</div>
+                      </div>
+                    </div>
+                    <input type="hidden" id="parentPhotoUrl" name="photo_url">
+                  </label>
+                </div>
                 <div class="provider-form-grid">
                   <label class="provider-form-field">
                     <span>Full name</span>
@@ -1444,6 +1462,7 @@
         setVal('parentName', profile?.name);
         setVal('parentEmail', profile?.email);
         setVal('parentPhone', profile?.phone);
+        setVal('parentPhotoUrl', profile?.photo_url);
         setVal('parentAddress1', profile?.address_line1);
         setVal('parentAddress2', profile?.address_line2);
         setVal('parentCity', profile?.city);
@@ -1455,6 +1474,12 @@
         setVal('parentSpousePhone', profile?.spouse_phone);
         const subscription = profile?.subscription_type || (profile?.is_premium ? 'Care+ Premium' : 'Standard');
         setVal('parentSubscription', subscription);
+        if(typeof window.updateProfilePhotoPreview === 'function'){
+          window.updateProfilePhotoPreview('parent', profile?.photo_url || '', profile?.name || '');
+        }
+        if(typeof window.setTopProfilePhoto === 'function'){
+          window.setTopProfilePhoto(profile?.photo_url || '');
+        }
         const locationSelect = document.getElementById('heroLocationInput');
         if(locationSelect && profile?.city){
           const match = Array.from(locationSelect.options).find(option =>
@@ -1477,6 +1502,7 @@
           const payload = {
             name: document.getElementById('parentName')?.value?.trim() || null,
             phone: document.getElementById('parentPhone')?.value?.trim() || null,
+            photo_url: document.getElementById('parentPhotoUrl')?.value?.trim() || null,
             city: document.getElementById('parentCity')?.value?.trim() || null,
             province: document.getElementById('parentProvince')?.value?.trim() || null,
             address_line1: document.getElementById('parentAddress1')?.value?.trim() || null,

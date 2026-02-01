@@ -20,6 +20,7 @@
           <a href="learning.html">At-Home Learning</a>
         </div>
         <button id="topProfileBtn" class="provider-top-profile-btn provider-nav-item provider-nav-icon-btn" type="button" data-panel="profile" aria-label="My profile">
+          <img class="provider-top-profile-img" alt="" loading="lazy">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
             <path d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zm0 2c-3.314 0-8 1.664-8 5v3h16v-3c0-3.336-4.686-5-8-5z" fill="currentColor"/>
           </svg>
@@ -405,9 +406,20 @@
                     </div>
                     <small>Shown on your public profile. Start typing and press Enter to add.</small>
                   </label>
-                  <label class="provider-form-field">
-                    <span>Profile photo URL</span>
-                    <input type="url" name="photo_url" id="provPhotoUrl" class="provider-input" placeholder="https://">
+                  <label class="provider-form-field provider-photo-field">
+                    <span>Profile photo</span>
+                    <div class="profile-photo-row">
+                      <div id="provPhotoPreview" class="profile-photo-preview">
+                        <img id="provPhotoImg" alt="" loading="lazy">
+                        <span id="provPhotoInitials">AH</span>
+                      </div>
+                      <div class="profile-photo-actions">
+                        <input type="file" id="provPhotoInput" class="profile-photo-input" accept="image/*" capture="user">
+                        <button type="button" id="provPhotoUploadBtn" class="provider-header-btn provider-header-btn-ghost">Upload photo</button>
+                        <div id="provPhotoStatus" class="profile-photo-status">PNG or JPG up to 5MB.</div>
+                      </div>
+                    </div>
+                    <input type="hidden" name="photo_url" id="provPhotoUrl">
                   </label>
                 </div>
 
