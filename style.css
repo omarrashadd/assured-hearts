@@ -4527,6 +4527,9 @@ body.chat-embed-active #chatLauncher{
   letter-spacing:0.08em;
   text-transform:uppercase;
 }
+.careplus-bottom-nav{
+  display:none;
+}
 
 @media (max-width:719px){
   .careplus-intro{
@@ -4538,6 +4541,16 @@ body.chat-embed-active #chatLauncher{
   }
   .careplus-support{
     font-size:14px;
+  }
+  .careplus-page{
+    --provider-bottom-nav-height:86px;
+    padding-bottom:calc(var(--provider-bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
+  }
+  .careplus-page.provider-dashboard{
+    background:#ffffff;
+  }
+  .careplus-bottom-nav{
+    display:block;
   }
 }
 
