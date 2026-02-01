@@ -709,6 +709,13 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(6,70,78,0.1);
 }
 
+@media (max-width:768px){
+  .hero-login-form input,
+  .modal-content input{
+    font-size:16px;
+  }
+}
+
 /* App Section */
 .app-section{
   background:#f7f7f7;padding:40px 24px;margin:40px 0;text-align:center;
