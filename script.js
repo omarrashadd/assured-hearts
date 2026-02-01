@@ -2446,6 +2446,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   let threads = {};
   let activeThread = null;
   const contactCache = {};
+  const requestCache = { map: {}, loadedAt: 0, inFlight: null };
+  const REQUEST_CACHE_TTL = 15000;
 
   const launcher = document.createElement('button');
   launcher.id = 'chatLauncher';
@@ -2627,6 +2629,99 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(hours < 24) return `Active ${hours}h ago`;
     const days = Math.floor(hours / 24);
     return `Active ${days}d ago`;
+  };
+
+  const formatDateLabel = (value)=>{
+    if(!value) return '';
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-CA', { weekday:'short', month:'short', day:'numeric' });
+  };
+
+  const formatTimeLabel = (value)=>{
+    if(!value) return '';
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())) return '';
+    return date.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+  };
+
+  const formatScheduleLabel = (startAt, endAt)=>{
+    const dateLabel = formatDateLabel(startAt);
+    const startTime = formatTimeLabel(startAt);
+    const endTime = formatTimeLabel(endAt);
+    const timeLabel = startTime && endTime ? `${startTime} - ${endTime}` : startTime;
+    if(dateLabel && timeLabel) return `${dateLabel}, ${timeLabel}`;
+    return dateLabel || timeLabel || '';
+  };
+
+  const hoursBetween = (startAt, endAt)=>{
+    if(!startAt || !endAt) return 0;
+    const start = new Date(startAt);
+    const end = new Date(endAt);
+    if(Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
+    const hours = (end - start) / (1000 * 60 * 60);
+    return hours > 0 ? Math.round(hours * 100) / 100 : 0;
+  };
+
+  const formatCents = (cents, currency)=>{
+    const value = Number(cents);
+    if(!Number.isFinite(value)) return '';
+    const amount = value / 100;
+    const code = String(currency || 'CAD').toUpperCase();
+    try{
+      return new Intl.NumberFormat('en-CA', { style:'currency', currency: code }).format(amount);
+    }catch(_err){
+      return `$${amount.toFixed(2)}`;
+    }
+  };
+
+  const resolveProviderEarningsCents = (entry)=>{
+    if(!entry) return 0;
+    let snapshot = entry.pricing_snapshot || {};
+    if(typeof snapshot === 'string'){
+      try{
+        snapshot = JSON.parse(snapshot);
+      }catch(_err){
+        snapshot = {};
+      }
+    }
+    const hours = snapshot.hours || hoursBetween(entry.start_at, entry.end_at) || 0;
+    const direct = Number(snapshot.provider_earnings_cents || entry.provider_earnings_cents || 0);
+    if(Number.isFinite(direct) && direct > 0) return Math.round(direct);
+    const providerRate = Number(snapshot.provider_fee_cents || 0);
+    if(Number.isFinite(providerRate) && providerRate > 0){
+      return Math.round(providerRate * (hours || 1));
+    }
+    const baseRate = Number(snapshot.hourly_rate_cents || entry.hourly_rate_cents || 0);
+    if(Number.isFinite(baseRate) && baseRate > 0){
+      return Math.round(baseRate * 0.7 * (hours || 1));
+    }
+    return 0;
+  };
+
+  const getRequestChildName = (request)=>{
+    if(!request) return '';
+    const direct = request.child_name || request.childName;
+    if(direct) return direct;
+    return [request.child_first_name, request.child_last_name].filter(Boolean).join(' ');
+  };
+
+  const buildRequestMessageText = (request, fallbackBody)=>{
+    const body = String(fallbackBody || '').trim();
+    if(body) return body;
+    const childName = getRequestChildName(request) || 'my child';
+    const schedule = formatScheduleLabel(request?.start_at, request?.end_at);
+    if(schedule) return `Hi, can you join ${childName} on ${schedule}?`;
+    return `Hi, can you join ${childName}?`;
+  };
+
+  const normalizeRequestStatus = (status)=>{
+    const value = String(status || 'pending').toLowerCase();
+    if(value === 'accepted' || value === 'confirmed') return { label:'Accepted', className:'is-accepted' };
+    if(value === 'declined' || value === 'rejected') return { label:'Declined', className:'is-declined' };
+    if(value === 'needs_info') return { label:'Needs info', className:'is-needs-info' };
+    if(value.includes('cancel')) return { label:'Canceled', className:'is-declined' };
+    return { label:'Pending', className:'is-pending' };
   };
 
   const bookingState = { profile: null, children: [], loadedAt: 0 };
@@ -2851,6 +2946,119 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   };
 
+  const loadChatRequests = async (force = false)=>{
+    if(!userType) return requestCache.map;
+    const now = Date.now();
+    if(!force && requestCache.loadedAt && (now - requestCache.loadedAt) < REQUEST_CACHE_TTL){
+      return requestCache.map;
+    }
+    if(requestCache.inFlight) return requestCache.inFlight;
+    const endpoint = userType === 'provider' ? 'provider' : 'parent';
+    requestCache.inFlight = (async ()=>{
+      try{
+        const res = await fetch(`${API_BASE}/forms/${endpoint}/${userId}`);
+        if(!res.ok){
+          requestCache.loadedAt = Date.now();
+          return requestCache.map;
+        }
+        const data = await res.json().catch(() => ({}));
+        const requests = Array.isArray(data?.requests) ? data.requests : [];
+        const nextMap = {};
+        requests.forEach((request)=>{
+          if(request && request.id){
+            nextMap[String(request.id)] = request;
+          }
+        });
+        requestCache.map = nextMap;
+        requestCache.loadedAt = Date.now();
+      }catch(err){
+        console.warn('Failed to load requests', err);
+        requestCache.loadedAt = Date.now();
+      }finally{
+        requestCache.inFlight = null;
+      }
+      return requestCache.map;
+    })();
+    return requestCache.inFlight;
+  };
+
+  const getRequestForMessage = (message)=>{
+    const requestId = message?.request_id || message?.requestId;
+    if(!requestId) return null;
+    return requestCache.map[String(requestId)] || null;
+  };
+
+  const buildRequestBubble = (message, request)=>{
+    const requestId = request?.id || message?.request_id || '';
+    const statusInfo = normalizeRequestStatus(request?.status || 'pending');
+    const childName = getRequestChildName(request);
+    const scheduleLabel = formatScheduleLabel(request?.start_at, request?.end_at);
+    const location = request?.location || '';
+    const notes = request?.notes || '';
+    const bodyText = buildRequestMessageText(request, message?.body);
+    const currency = request?.payment_currency || request?.pricing_snapshot?.currency || 'CAD';
+    const earningsCents = userType === 'provider' ? resolveProviderEarningsCents(request) : 0;
+    const earningsLabel = userType === 'provider' && earningsCents ? formatCents(earningsCents, currency) : '';
+    const showActions = userType === 'provider' && request && String(request.status || 'pending').toLowerCase() === 'pending';
+    const metaRows = request ? [
+      childName ? `<div class="chat-request-row"><span>Child</span><strong>${childName}</strong></div>` : '',
+      scheduleLabel ? `<div class="chat-request-row"><span>Schedule</span><strong>${scheduleLabel}</strong></div>` : '',
+      location ? `<div class="chat-request-row"><span>Location</span><strong>${location}</strong></div>` : '',
+      notes ? `<div class="chat-request-notes">${notes}</div>` : '',
+      earningsLabel ? `<div class="chat-request-row chat-request-earnings"><span>Est. earnings</span><strong>${earningsLabel}</strong></div>` : ''
+    ].filter(Boolean).join('') : '<div class="chat-request-meta--loading">Request details loading...</div>';
+
+    return `
+      <div class="chat-bubble chat-bubble--request">
+        <div class="chat-request-head">
+          <div class="chat-request-title">Booking request</div>
+          <span class="chat-request-status ${statusInfo.className}">${statusInfo.label}</span>
+        </div>
+        ${bodyText ? `<div class="chat-request-text">${bodyText}</div>` : ''}
+        <div class="chat-request-meta">${metaRows}</div>
+        ${showActions ? `
+          <div class="chat-request-actions">
+            <button class="chat-request-btn decline" type="button" data-request-action="decline" data-request-id="${requestId}">Decline</button>
+            <button class="chat-request-btn accept" type="button" data-request-action="accept" data-request-id="${requestId}">Accept</button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  };
+
+  const respondToRequest = async (requestId, action)=>{
+    if(!requestId) return false;
+    try{
+      const res = await fetch(`${API_BASE}/forms/request/${requestId}/respond`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ action, provider_id: userId })
+      });
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok){
+        throw new Error(data.error || 'Unable to update request');
+      }
+      if(requestCache.map[String(requestId)]){
+        requestCache.map[String(requestId)].status = data.status || action;
+      }
+      await loadChatRequests(true);
+      if(activeThread) renderHistory(activeThread);
+      if(statusEl){
+        const label = action === 'accept' ? 'accepted' : 'declined';
+        statusEl.textContent = `Request ${label}.`;
+        setTimeout(()=>{ statusEl.textContent = ''; }, 1500);
+      }
+      return true;
+    }catch(err){
+      console.error('Request update failed', err);
+      if(statusEl){
+        statusEl.textContent = err.message || 'Request update failed';
+        setTimeout(()=>{ statusEl.textContent = ''; }, 1500);
+      }
+      return false;
+    }
+  };
+
   const setChatView = (view)=>{
     modal.classList.toggle('chat-modal--thread', view === 'thread');
   };
@@ -3031,6 +3239,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
           }
           throw new Error(data.error || 'Failed to send request');
         }
+        const requestId = Number.isFinite(data?.id) ? data.id : null;
+        const childLabel = selected ? String(selected.textContent || '').trim() : 'my child';
+        const scheduleLabel = formatScheduleLabel(start_at, end_at);
+        const requestText = scheduleLabel
+          ? `Hi, can you join ${childLabel} on ${scheduleLabel}?`
+          : `Hi, can you join ${childLabel}?`;
+        await sendMessage({ body: requestText, requestId, statusLabel: 'Sending request...' });
         setBookingStatus('Request sent. We will text you with updates.', '');
         setTimeout(()=> closeChatBookingPanel(), 800);
       }catch(err){
@@ -3079,6 +3294,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const data = await res.json();
       threads = {};
       const msgs = data.messages || [];
+      const hasRequestMessages = msgs.some(m => m.request_id);
+      if(hasRequestMessages){
+        await loadChatRequests();
+      }
       msgs.forEach(m=>{
         const key = m.other_id;
         if(!threads[key]) {
@@ -3146,7 +3365,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const name = thread.other_name || 'User';
       const lastBody = String(last?.body || '').trim();
       const hasImage = !!(last?.image_url || last?.photo_url || last?.image);
-      const preview = lastBody || (hasImage ? 'Photo' : 'Start a conversation.');
+      const hasRequest = !!last?.request_id;
+      const preview = lastBody || (hasImage ? 'Photo' : (hasRequest ? 'Booking request' : 'Start a conversation.'));
       const avatarUrl = thread.other_photo || '';
       const timeLabel = formatThreadTime(timeValue);
       const isActive = activeThread == thread.other_id;
@@ -3192,8 +3412,25 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const name = thread.other_name || 'User';
     const avatarUrl = thread.other_photo || '';
     const avatarInner = avatarUrl ? `<img src="${avatarUrl}" alt="">` : getInitials(name);
+    const hasRequestMessage = thread.messages.some(m => m.request_id);
+    if(hasRequestMessage && !requestCache.loadedAt && !requestCache.inFlight){
+      loadChatRequests().then(()=>{
+        if(activeThread === otherId) renderHistory(otherId);
+      });
+    }
     historyEl.innerHTML = thread.messages.map(m=>{
       const mine = m.sender_id === userId;
+      const request = m.request_id ? getRequestForMessage(m) : null;
+      if(m.request_id){
+        const avatarHtml = !mine ? `<div class="chat-message-avatar">${avatarInner}</div>` : '';
+        const bubble = buildRequestBubble(m, request);
+        return `
+          <div class="chat-message ${mine ? 'is-mine' : 'is-theirs'}">
+            ${avatarHtml}
+            ${bubble}
+          </div>
+        `;
+      }
       const imageUrl = m.image_url || m.photo_url || m.image || '';
       const body = m.body || '';
       const bodyHtml = body ? `<div class="chat-message-text">${body}</div>` : '';
@@ -3206,6 +3443,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
         </div>
       `;
     }).join('');
+    historyEl.querySelectorAll('[data-request-action]').forEach((button)=>{
+      button.addEventListener('click', async ()=>{
+        if(userType !== 'provider') return;
+        const requestId = parseInt(button.dataset.requestId, 10);
+        const action = button.dataset.requestAction;
+        if(!requestId || !action) return;
+        const container = button.closest('.chat-request-actions');
+        const buttons = container ? Array.from(container.querySelectorAll('button')) : [button];
+        buttons.forEach(btn => { btn.disabled = true; });
+        const ok = await respondToRequest(requestId, action);
+        if(!ok){
+          buttons.forEach(btn => { btn.disabled = false; });
+        }
+      });
+    });
     historyEl.scrollTop = historyEl.scrollHeight;
   }
 
@@ -3213,6 +3465,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const rawBody = Object.prototype.hasOwnProperty.call(options, 'body') ? options.body : (inputEl?.value || '');
     const text = String(rawBody || '').trim();
     const imageUrl = options.imageUrl || options.image_url || '';
+    const requestId = options.requestId || options.request_id || null;
     if(!text && !imageUrl) return;
     if(!activeThread) return;
     sendBtn.disabled = true;
@@ -3223,7 +3476,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const res = await fetch(`${API_BASE}/forms/messages`, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ sender_id:userId, receiver_id: activeThread, body: text, image_url: imageUrl || null })
+        body: JSON.stringify({
+          sender_id: userId,
+          receiver_id: activeThread,
+          body: text,
+          image_url: imageUrl || null,
+          request_id: requestId || null
+        })
       });
       if(!res.ok){
         const errTxt = await res.text();
