@@ -2437,11 +2437,20 @@ document.addEventListener('DOMContentLoaded', ()=>{
     modal.classList.toggle('chat-modal--thread', view === 'thread');
   };
 
+  const setKeyboardState = (open)=>{
+    if(!document.body.classList.contains('provider-dashboard')) return;
+    if(!window.matchMedia('(max-width: 719px)').matches) return;
+    document.body.classList.toggle('chat-keyboard-open', open);
+  };
+
   const setModalOpen = (open)=>{
     modal.style.display = open ? 'block' : 'none';
     if(open){
       setChatView(activeThread ? 'thread' : 'list');
       updateActiveHeader();
+    } else {
+      setKeyboardState(false);
+      inputEl && inputEl.blur();
     }
   };
 
@@ -2735,6 +2744,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
       sendMessage();
     }
   });
+  inputEl.addEventListener('focus', ()=> setKeyboardState(true));
+  inputEl.addEventListener('blur', ()=> setKeyboardState(false));
 
   function updateBookButton(){
     if(!bookBtn) return;

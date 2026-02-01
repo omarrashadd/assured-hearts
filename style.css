@@ -3243,6 +3243,10 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
     box-shadow:none;
     z-index:1100;
   }
+  .provider-dashboard.chat-keyboard-open .provider-nav{
+    transform:translateY(120%);
+    pointer-events:none;
+  }
   .provider-dashboard .provider-nav-item{
     text-align:center;
     justify-content:center;
@@ -3943,6 +3947,9 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
     bottom:calc(var(--provider-bottom-nav-height) + env(safe-area-inset-bottom)) !important;
     height:auto !important;
     max-height:none !important;
+  }
+  .provider-dashboard.chat-keyboard-open #chatModal.chat-modal{
+    bottom:env(safe-area-inset-bottom) !important;
   }
   .chat-modal .chat-shell{
     height:100%;
