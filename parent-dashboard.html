@@ -941,6 +941,7 @@
           return {
             id: profile.provider_id || profile.id || providerId,
             name: profile.name || 'Caregiver',
+            photo_url: profile.photo_url || '',
             email: profile.email || '',
             phone: profile.phone || '',
             city: profile.city || '',
@@ -964,6 +965,7 @@
           caregivers.set(String(id), {
             id: String(id),
             name: entry.provider_name || 'Caregiver',
+            photo_url: entry.provider_photo || '',
             email: entry.provider_email || '',
             phone: entry.provider_phone || '',
             city: entry.provider_city || '',
@@ -977,6 +979,7 @@
             caregivers.set(String(profile.id), {
               id: String(profile.id),
               name: profile.name,
+              photo_url: profile.photo_url || '',
               email: profile.email,
               phone: profile.phone,
               city: profile.city,
@@ -998,11 +1001,15 @@
         }
         listEl.innerHTML = items.map((c) => {
           const initials = c.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+          const photoUrl = c.photo_url || '';
           const location = [c.city, c.province].filter(Boolean).join(', ');
           const contact = [c.email, c.phone].filter(Boolean).join(' · ') || 'Contact not available';
           return `
             <div class="parent-caregiver-card">
-              <div class="parent-caregiver-avatar">${initials}</div>
+              <div class="parent-caregiver-avatar${photoUrl ? ' has-photo' : ''}">
+                ${photoUrl ? `<img src="${photoUrl}" alt="">` : ''}
+                <span>${initials}</span>
+              </div>
               <div class="parent-caregiver-info">
                 <div class="parent-caregiver-name">${c.name}</div>
                 <div class="parent-caregiver-meta">${location || 'Location not set'}</div>
@@ -1376,11 +1383,15 @@
           const rows = available.map((p) => {
             const displayName = p.name || 'Caregiver';
             const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+            const photoUrl = p.photo_url || '';
             const profileLink = `caregiver-profile.html?provider_id=${encodeURIComponent(p.id)}`;
             return `
               <div class="parent-provider-row" data-profile="${profileLink}">
                 <div class="parent-provider-main">
-                  <div class="parent-provider-avatar">${initials}</div>
+                  <div class="parent-provider-avatar${photoUrl ? ' has-photo' : ''}">
+                    ${photoUrl ? `<img src="${photoUrl}" alt="">` : ''}
+                    <span>${initials}</span>
+                  </div>
                   <div class="parent-provider-body">
                     <div class="parent-provider-name">${displayName}</div>
                     <div class="parent-provider-meta">From your saved caregivers · Available for your selected time</div>

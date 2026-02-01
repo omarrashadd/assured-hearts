@@ -2416,6 +2416,19 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   font-weight:700;
   font-size:14px;
   flex-shrink:0;
+  overflow:hidden;
+}
+.parent-provider-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:none;
+}
+.parent-provider-avatar.has-photo img{
+  display:block;
+}
+.parent-provider-avatar.has-photo span{
+  display:none;
 }
 .parent-provider-body{
   display:grid;
@@ -2664,6 +2677,19 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   justify-content:center;
   color:#fff;
   font-weight:700;
+  overflow:hidden;
+}
+.parent-caregiver-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:none;
+}
+.parent-caregiver-avatar.has-photo img{
+  display:block;
+}
+.parent-caregiver-avatar.has-photo span{
+  display:none;
 }
 .parent-caregiver-name{
   font-weight:700;

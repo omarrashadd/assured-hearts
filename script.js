@@ -453,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
               id: pid,
               displayName,
               initials,
+              photoUrl: p.photo_url || p.photoUrl || '',
               city,
               availabilityText,
               certText,
@@ -477,7 +478,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const buildRow = (p, isSaved)=> `
           <div class="parent-provider-row" data-provider="${p.id}" data-profile="${p.profileLink}" tabindex="0">
             <div class="parent-provider-main">
-              <div class="parent-provider-avatar">${p.initials}</div>
+              <div class="parent-provider-avatar${p.photoUrl ? ' has-photo' : ''}">
+                ${p.photoUrl ? `<img src="${p.photoUrl}" alt="">` : ''}
+                <span>${p.initials}</span>
+              </div>
               <div class="parent-provider-body">
                 <div class="parent-provider-top">
                   <div>
@@ -618,6 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const caregiversHTML = providers.map((p, idx)=> {
         const displayName = p.name || 'Caregiver ' + (idx + 1);
         const initials = displayName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() || 'CG';
+        const photoUrl = p.photo_url || p.photoUrl || '';
         const city = p.city || location;
         const pid = p.user_id || p.id || '';
         const availability = p.availability ? (typeof p.availability === 'string' ? JSON.parse(p.availability) : p.availability) : {};
@@ -642,10 +647,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const bookLink = pid ? `parent-dashboard.html?provider_id=${encodeURIComponent(pid)}&provider_name=${encodeURIComponent(displayName)}` : 'parent-dashboard.html';
         const profileLink = pid ? `caregiver-profile.html?provider_id=${encodeURIComponent(pid)}` : '#';
         const certText = p.certifications || 'Certifications on file';
+        const avatarHtml = photoUrl
+          ? `<div class="parent-provider-avatar has-photo"><img src="${photoUrl}" alt=""><span>${initials}</span></div>`
+          : `<div class="parent-provider-avatar"><span>${initials}</span></div>`;
         return `
           <div class="hero-card" style="min-width: 260px; max-width: 280px; flex: 0 0 auto; border:1px solid #e5e7eb; border-radius:12px; padding:14px; text-align:left; display:grid; gap:8px; background:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.05); cursor:pointer;" data-profile="${profileLink}">
             <div style="display:flex; gap:12px; align-items:center;">
-              <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#67B3C2 0%, #06464E 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">${initials}</div>
+              ${avatarHtml}
               <div>
                 <div style="font-weight:700; color:#06464E; font-size:15px;">${displayName}</div>
                 <div style="font-size:12px; color:#6b7280;">${city || 'Location on file'}</div>
