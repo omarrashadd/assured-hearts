@@ -2778,24 +2778,32 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
 
   let sendLock = false;
+  const isMobileChat = ()=> window.matchMedia('(max-width: 719px)').matches;
   const triggerSend = ()=>{
     if(sendLock) return;
     const text = (inputEl?.value || '').trim();
     if(!text || !activeThread) return;
+    if(inputEl && isMobileChat()){
+      inputEl.focus({ preventScroll: true });
+    }
     sendLock = true;
     Promise.resolve(sendMessage()).finally(()=>{
       sendLock = false;
-      if(inputEl && window.matchMedia('(max-width: 719px)').matches){
-        inputEl.focus();
+      if(inputEl && isMobileChat()){
+        inputEl.focus({ preventScroll: true });
       }
     });
   };
-  sendBtn.addEventListener('pointerdown', (e)=>{
-    if(window.matchMedia('(max-width: 719px)').matches){
-      e.preventDefault();
-      triggerSend();
-    }
-  });
+  const handleSendPress = (e)=>{
+    if(!isMobileChat()) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(inputEl) inputEl.focus({ preventScroll: true });
+    triggerSend();
+  };
+  sendBtn.addEventListener('touchstart', handleSendPress, { passive: false });
+  sendBtn.addEventListener('pointerdown', handleSendPress);
+  sendBtn.addEventListener('mousedown', handleSendPress);
   sendBtn.addEventListener('click', (e)=>{
     e.preventDefault();
     triggerSend();
