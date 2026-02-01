@@ -1067,6 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const glanceLocation = document.getElementById('glanceLocation');
   const glanceResult = document.getElementById('glanceResult');
   const glanceLocationBtn = document.getElementById('glanceLocationBtn');
+  const glancePanel = glanceForm ? glanceForm.closest('.glance-panel') : null;
   if(glanceLocationBtn && glanceLocation){
     glanceLocationBtn.addEventListener('click', (event)=>{
       event.preventDefault();
@@ -1128,13 +1129,49 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Glance search failed', err);
       }
       const safeLocation = escapeHtml(location);
+      if(count > 0){
+        if(glancePanel) glancePanel.classList.remove('is-waitlist');
+        glanceResult.innerHTML = `
+          <div class="glance-result-card">
+            <div class="glance-result-count">${count}</div>
+            <div class="glance-result-text">There are ${count} Muslim caregivers in ${safeLocation}. Sign up to see more.</div>
+            <a class="glance-result-btn" href="signup.html">Sign up</a>
+          </div>
+        `;
+        return;
+      }
+
+      if(glancePanel) glancePanel.classList.add('is-waitlist');
       glanceResult.innerHTML = `
-        <div class="glance-result-card">
-          <div class="glance-result-count">${count}</div>
-          <div class="glance-result-text">There are ${count} Muslim caregivers in ${safeLocation}. Sign up to see more.</div>
-          <a class="glance-result-btn" href="signup.html">Sign up</a>
+        <div class="glance-waitlist">
+          <div class="glance-waitlist-title">No caregivers in ${safeLocation} yet.</div>
+          <div class="glance-waitlist-text">Join the waitlist and we will notify you as soon as caregivers become available.</div>
+          <input id="glanceWaitlistEmail" type="email" placeholder="Email address" required>
+          <button type="button" id="glanceWaitlistBtn">Join waitlist</button>
+          <div class="glance-waitlist-divider"><span class="glance-waitlist-or">OR</span></div>
+          <div class="glance-waitlist-alt">Be the first caregiver in ${safeLocation}! Sign up below for an easy, fulfilling way to earn.</div>
+          <a class="glance-waitlist-link" href="become-provider.html">Become a caregiver</a>
         </div>
       `;
+
+      const waitlistBtn = document.getElementById('glanceWaitlistBtn');
+      const waitlistEmail = document.getElementById('glanceWaitlistEmail');
+      waitlistBtn && waitlistBtn.addEventListener('click', async ()=>{
+        const email = String(waitlistEmail?.value || '').trim();
+        if(!email){
+          showBanner('Please enter your email to join the waitlist.', 'info');
+          return;
+        }
+        try{
+          await postJSON('/forms/waitlist', { email, city: location });
+          showBanner(`Thank you! We added ${email} to the waitlist for ${location}.`, 'success');
+          glanceResult.innerHTML = '';
+          if(glancePanel) glancePanel.classList.remove('is-waitlist');
+        }catch(err){
+          console.error('Waitlist error:', err);
+          showBanner('Failed to join the waitlist. Please try again.', 'error');
+        }
+      });
     });
   }
 
