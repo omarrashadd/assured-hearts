@@ -3159,7 +3159,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
 }
 @media (max-width:719px){
   .provider-dashboard{
-    --provider-bottom-nav-height:80px;
+    --provider-bottom-nav-height:86px;
     --provider-bottom-nav-offset:calc(var(--provider-bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
     padding-bottom:var(--provider-bottom-nav-offset);
     background:#0f1720;
@@ -3233,7 +3233,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
     grid-auto-columns:1fr;
     align-items:center;
     gap:6px;
-    padding:14px 12px calc(14px + env(safe-area-inset-bottom));
+    padding:16px 12px calc(16px + env(safe-area-inset-bottom));
     overflow:hidden;
     background:#000;
     border:0;
