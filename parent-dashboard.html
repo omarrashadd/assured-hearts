@@ -547,6 +547,9 @@
             window.showChatWidget();
             return;
           }
+          if(isMobile && panel !== 'inbox' && typeof window.hideChatWidget === 'function'){
+            window.hideChatWidget();
+          }
           activateParentPanel(panel);
         });
         btn.addEventListener('keydown', (event) => {

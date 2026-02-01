@@ -2445,6 +2445,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   };
 
+  window.hideChatWidget = ()=>{
+    setModalOpen(false);
+  };
+
   launcher.addEventListener('click', ()=>{
     const isOpen = modal.style.display === 'block';
     setModalOpen(!isOpen);
