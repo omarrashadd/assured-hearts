@@ -2512,6 +2512,50 @@ document.addEventListener('DOMContentLoaded', ()=>{
         </div>
       </div>
     </div>
+    <div id="chatBookingPanel" class="chat-booking-panel" aria-hidden="true">
+      <div class="chat-booking-card" role="dialog" aria-modal="true" aria-labelledby="chatBookingTitle">
+        <div class="chat-booking-header">
+          <div>
+            <div id="chatBookingTitle" class="chat-booking-title">Book with <span id="chatBookingName">Caregiver</span></div>
+            <div class="chat-booking-sub">Select child, date, and time.</div>
+          </div>
+          <button id="chatBookingClose" class="chat-icon-btn chat-close-btn" type="button" aria-label="Close booking">&times;</button>
+        </div>
+        <form id="chatBookingForm" class="chat-booking-form">
+          <label class="chat-booking-field">
+            <span>Child</span>
+            <select id="chatBookingChild" required></select>
+          </label>
+          <label class="chat-booking-field">
+            <span>Date</span>
+            <input type="date" id="chatBookingDate" required>
+          </label>
+          <div class="chat-booking-row">
+            <label class="chat-booking-field">
+              <span>Start</span>
+              <select id="chatBookingStart" required></select>
+            </label>
+            <label class="chat-booking-field">
+              <span>End</span>
+              <select id="chatBookingEnd" required></select>
+            </label>
+          </div>
+          <label class="chat-booking-field">
+            <span>Notes (optional)</span>
+            <textarea id="chatBookingNotes" rows="2" placeholder="Add a note..."></textarea>
+          </label>
+          <div id="chatBookingPayment" class="chat-booking-payment is-hidden">
+            Payment method required.
+            <button type="button" id="chatBookingPaymentBtn" class="chat-booking-link">Add payment method</button>
+          </div>
+          <div id="chatBookingStatus" class="chat-booking-status"></div>
+          <div class="chat-booking-actions">
+            <button type="button" id="chatBookingCancel" class="chat-booking-btn ghost">Cancel</button>
+            <button type="submit" id="chatBookingSubmit" class="chat-booking-btn primary">Send booking request</button>
+          </div>
+        </form>
+      </div>
+    </div>
   `;
   document.body.appendChild(modal);
 
@@ -2530,6 +2574,20 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const activeAvatar = modal.querySelector('#chatActiveAvatar');
   const activeName = modal.querySelector('#chatActiveName');
   const activeSub = modal.querySelector('#chatActiveSub');
+  const bookingPanel = modal.querySelector('#chatBookingPanel');
+  const bookingForm = modal.querySelector('#chatBookingForm');
+  const bookingNameEl = modal.querySelector('#chatBookingName');
+  const bookingChildEl = modal.querySelector('#chatBookingChild');
+  const bookingDateEl = modal.querySelector('#chatBookingDate');
+  const bookingStartEl = modal.querySelector('#chatBookingStart');
+  const bookingEndEl = modal.querySelector('#chatBookingEnd');
+  const bookingNotesEl = modal.querySelector('#chatBookingNotes');
+  const bookingStatusEl = modal.querySelector('#chatBookingStatus');
+  const bookingPaymentEl = modal.querySelector('#chatBookingPayment');
+  const bookingPaymentBtn = modal.querySelector('#chatBookingPaymentBtn');
+  const bookingSubmitBtn = modal.querySelector('#chatBookingSubmit');
+  const bookingCancelBtn = modal.querySelector('#chatBookingCancel');
+  const bookingCloseBtn = modal.querySelector('#chatBookingClose');
   const userType = localStorage.getItem('user_type') || '';
 
   const getInitials = (value)=>{
@@ -2569,6 +2627,181 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(hours < 24) return `Active ${hours}h ago`;
     const days = Math.floor(hours / 24);
     return `Active ${days}d ago`;
+  };
+
+  const bookingState = { profile: null, children: [], loadedAt: 0 };
+
+  const toLocalDateString = (value) => {
+    const yyyy = value.getFullYear();
+    const mm = String(value.getMonth() + 1).padStart(2, '0');
+    const dd = String(value.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const parseTimeToMinutes = (value) => {
+    if(!value) return null;
+    const raw = String(value).trim();
+    const clean = raw.replace(/[^0-9:]/g, '');
+    const parts = clean.split(':');
+    if(parts.length < 2) return null;
+    const hours = parseInt(parts[0], 10);
+    const mins = parseInt(parts[1], 10);
+    if(Number.isNaN(hours) || Number.isNaN(mins)) return null;
+    return hours * 60 + mins;
+  };
+
+  const buildDateTime = (dateVal, timeVal) => {
+    if(!dateVal || !timeVal) return null;
+    if(timeVal === '24:00'){
+      const date = new Date(`${dateVal}T00:00:00`);
+      date.setDate(date.getDate() + 1);
+      return `${date.toISOString().slice(0,10)}T00:00`;
+    }
+    return `${dateVal}T${timeVal}`;
+  };
+
+  const computeAgeFromBirthdate = (value) => {
+    if(!value) return null;
+    const birth = new Date(value);
+    if(Number.isNaN(birth.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if(monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())){
+      age -= 1;
+    }
+    return age;
+  };
+
+  const formatBookingLocation = (profile = {}) => {
+    return [profile.address_line1, profile.city, profile.province, profile.postal_code]
+      .filter(Boolean)
+      .join(', ');
+  };
+
+  const buildTimeOptions = (select, maxMinutes) => {
+    if(!select) return;
+    select.innerHTML = '<option value="">Select</option>';
+    const start = 6 * 60;
+    const end = maxMinutes;
+    for(let minutes = start; minutes <= end; minutes += 30){
+      const hours24 = Math.floor(minutes / 60);
+      const mins = String(minutes % 60).padStart(2, '0');
+      const value = `${String(hours24).padStart(2, '0')}:${mins}`;
+      let label;
+      if(hours24 === 24){
+        label = `12:${mins} AM`;
+      } else {
+        const period = hours24 >= 12 ? 'PM' : 'AM';
+        const hours12Raw = hours24 % 12;
+        const hours12 = hours12Raw === 0 ? 12 : hours12Raw;
+        label = `${hours12}:${mins} ${period}`;
+      }
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = label;
+      select.appendChild(option);
+    }
+  };
+
+  const setBookingOpen = (open) => {
+    if(!bookingPanel) return;
+    bookingPanel.classList.toggle('is-active', open);
+    bookingPanel.setAttribute('aria-hidden', open ? 'false' : 'true');
+  };
+
+  const setBookingStatus = (message, tone) => {
+    if(!bookingStatusEl) return;
+    bookingStatusEl.textContent = message || '';
+    bookingStatusEl.classList.toggle('is-error', tone === 'error');
+  };
+
+  const setBookingPaymentNotice = (show) => {
+    if(!bookingPaymentEl) return;
+    bookingPaymentEl.classList.toggle('is-hidden', !show);
+  };
+
+  const ensureBookingData = async () => {
+    const hasLocal = window.parentProfile && Array.isArray(window.parentChildrenList);
+    if(hasLocal){
+      bookingState.profile = window.parentProfile || {};
+      bookingState.children = window.parentChildrenList || [];
+      bookingState.loadedAt = Date.now();
+      return bookingState;
+    }
+    if(bookingState.profile && bookingState.children.length){
+      return bookingState;
+    }
+    const res = await fetch(`${API_BASE}/forms/parent/${userId}`);
+    if(!res.ok) throw new Error('Unable to load parent profile');
+    const data = await res.json();
+    bookingState.profile = data.profile || {};
+    bookingState.children = Array.isArray(data.children) ? data.children : [];
+    bookingState.loadedAt = Date.now();
+    return bookingState;
+  };
+
+  const populateBookingChildren = (children) => {
+    if(!bookingChildEl) return;
+    if(!children || children.length === 0){
+      bookingChildEl.innerHTML = '<option value="">Add a child first</option>';
+      if(bookingSubmitBtn) bookingSubmitBtn.disabled = true;
+      return;
+    }
+    if(bookingSubmitBtn) bookingSubmitBtn.disabled = false;
+    bookingChildEl.innerHTML = `<option value="">Select a child</option>${children.map((c) => {
+      const label = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.name || 'Child';
+      const ageVal = computeAgeFromBirthdate(c.birthdate) ?? c.age ?? '';
+      return `<option value="${c.id || ''}" data-age="${ageVal}">${label}</option>`;
+    }).join('')}`;
+  };
+
+  const checkChatPaymentStatus = async () => {
+    try{
+      const res = await fetch(`${API_BASE}/payments/status?user_id=${userId}`);
+      const data = await res.json().catch(() => ({}));
+      if(res.ok){
+        return !!data.has_payment_method;
+      }
+    }catch(err){
+      console.warn('Payment status check failed', err);
+    }
+    return false;
+  };
+
+  const openChatBookingPanel = async () => {
+    if(userType !== 'parent') return;
+    if(!activeThread) return;
+    setBookingStatus('');
+    setBookingPaymentNotice(false);
+    if(bookingNotesEl) bookingNotesEl.value = '';
+    if(bookingNameEl){
+      const thread = threads[activeThread] || {};
+      bookingNameEl.textContent = thread.other_name || 'Caregiver';
+    }
+    buildTimeOptions(bookingStartEl, 23 * 60 + 30);
+    buildTimeOptions(bookingEndEl, 24 * 60);
+    if(bookingDateEl){
+      const today = new Date();
+      bookingDateEl.min = toLocalDateString(today);
+      if(!bookingDateEl.value) bookingDateEl.value = bookingDateEl.min;
+    }
+    setBookingOpen(true);
+    if(bookingForm) bookingForm.scrollTop = 0;
+    try{
+      const data = await ensureBookingData();
+      populateBookingChildren(data.children);
+      if(data.children.length === 0){
+        setBookingStatus('Please add a child in your dashboard before booking.', 'error');
+      }
+    }catch(err){
+      setBookingStatus(err.message || 'Unable to load booking data.', 'error');
+    }
+  };
+
+  const closeChatBookingPanel = () => {
+    setBookingOpen(false);
+    setBookingStatus('');
   };
 
   const extractPhone = (msg)=>{
@@ -2634,6 +2867,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       setChatView(activeThread ? 'thread' : 'list');
       updateActiveHeader();
     } else {
+      closeChatBookingPanel();
       setKeyboardState(false);
       inputEl && inputEl.blur();
     }
@@ -2656,6 +2890,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(callBtn.classList.contains('is-disabled')){
       event.preventDefault();
     }
+  });
+  bookingCloseBtn && bookingCloseBtn.addEventListener('click', closeChatBookingPanel);
+  bookingCancelBtn && bookingCancelBtn.addEventListener('click', closeChatBookingPanel);
+  bookingPanel && bookingPanel.addEventListener('click', (event)=>{
+    if(event.target === bookingPanel){
+      closeChatBookingPanel();
+    }
+  });
+  bookingPaymentBtn && bookingPaymentBtn.addEventListener('click', ()=>{
+    const path = window.location.pathname.split('/').pop() || 'index.html';
+    const returnPath = `${path}${window.location.search || ''}${window.location.hash || ''}`;
+    window.location.href = `payment-method.html?return=${encodeURIComponent(returnPath)}`;
   });
   if(photoBtn && photoInput){
     photoBtn.addEventListener('click', ()=>{
@@ -2717,6 +2963,86 @@ document.addEventListener('DOMContentLoaded', ()=>{
     updateBookButton();
     ensureContactPhone(activeThread);
   };
+
+  if(bookingForm){
+    bookingForm.addEventListener('submit', async (event)=>{
+      event.preventDefault();
+      if(!activeThread) return;
+      const childId = bookingChildEl?.value || '';
+      const dateVal = bookingDateEl?.value || '';
+      const startVal = bookingStartEl?.value || '';
+      const endVal = bookingEndEl?.value || '';
+      if(!childId){
+        setBookingStatus('Please select a child.', 'error');
+        return;
+      }
+      if(!dateVal || !startVal || !endVal){
+        setBookingStatus('Please choose a date and time window.', 'error');
+        return;
+      }
+      const startMinutes = parseTimeToMinutes(startVal);
+      const endMinutes = parseTimeToMinutes(endVal);
+      if(startMinutes === null || endMinutes === null || endMinutes <= startMinutes){
+        setBookingStatus('Please choose a valid time window.', 'error');
+        return;
+      }
+      const location = formatBookingLocation(bookingState.profile || {});
+      if(!location){
+        setBookingStatus('Add your home address in My Profile before booking.', 'error');
+        return;
+      }
+      const hasPayment = await checkChatPaymentStatus();
+      if(!hasPayment){
+        setBookingPaymentNotice(true);
+        setBookingStatus('Payment method required to send request.', 'error');
+        return;
+      }
+      setBookingPaymentNotice(false);
+      const start_at = buildDateTime(dateVal, startVal);
+      const end_at = buildDateTime(dateVal, endVal);
+      const selected = bookingChildEl?.options?.[bookingChildEl.selectedIndex];
+      const ageVal = selected ? selected.getAttribute('data-age') : '';
+      const notes = bookingNotesEl?.value?.trim() || '';
+      const payload = {
+        user_id: userId,
+        child_id: parseInt(childId, 10),
+        provider_id: parseInt(activeThread, 10),
+        location,
+        start_at,
+        end_at,
+        notes,
+        child_age: ageVal ? Number(ageVal) : null
+      };
+      const originalLabel = bookingSubmitBtn ? bookingSubmitBtn.textContent : '';
+      if(bookingSubmitBtn){
+        bookingSubmitBtn.disabled = true;
+        bookingSubmitBtn.textContent = 'Sending...';
+      }
+      try{
+        const res = await fetch(`${API_BASE}/forms/request`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({}));
+        if(!res.ok){
+          if(data && data.code === 'missing_payment_method'){
+            setBookingPaymentNotice(true);
+          }
+          throw new Error(data.error || 'Failed to send request');
+        }
+        setBookingStatus('Request sent. We will text you with updates.', '');
+        setTimeout(()=> closeChatBookingPanel(), 800);
+      }catch(err){
+        setBookingStatus(err.message || 'Unable to send request.', 'error');
+      }finally{
+        if(bookingSubmitBtn){
+          bookingSubmitBtn.disabled = false;
+          bookingSubmitBtn.textContent = originalLabel || 'Send booking request';
+        }
+      }
+    });
+  }
 
   // Expose opener so other buttons can launch a thread
   window.openChatThread = (otherId, otherName)=>{
@@ -3003,8 +3329,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   function updateBookButton(){
     if(!bookBtn) return;
-    // Hide for caregivers (they can't book)
-    if(userType === 'provider'){
+    // Hide for non-parents
+    if(userType !== 'parent'){
       bookBtn.style.display = 'none';
       return;
     }
@@ -3017,12 +3343,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     bookBtn.style.display = 'inline-block';
     bookBtn.textContent = `Book with ${name.split(' ')[0] || name}`;
     bookBtn.onclick = ()=>{
-      if(document.body.classList.contains('parent-dashboard') && typeof window.startDashboardBooking === 'function'){
-        window.startDashboardBooking(activeThread, name, bookBtn);
-      } else {
-        const link = `parent-dashboard.html?provider_id=${encodeURIComponent(activeThread)}&provider_name=${encodeURIComponent(name)}`;
-        window.location.href = link;
-      }
+      openChatBookingPanel();
     };
   }
 

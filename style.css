@@ -4012,6 +4012,127 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   font-size:11px;
   display:none;
 }
+.chat-booking-panel{
+  position:absolute;
+  inset:0;
+  background:rgba(15,23,42,0.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:5;
+}
+.chat-booking-panel.is-active{
+  display:flex;
+}
+.chat-booking-card{
+  width:100%;
+  max-width:320px;
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 16px 40px rgba(15,23,42,0.25);
+  display:flex;
+  flex-direction:column;
+  max-height:100%;
+}
+.chat-booking-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  border-bottom:1px solid #e5e7eb;
+}
+.chat-booking-title{
+  font-weight:700;
+  color:#111827;
+  font-size:14px;
+}
+.chat-booking-sub{
+  font-size:12px;
+  color:#6b7280;
+}
+.chat-booking-form{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:14px 16px;
+  overflow:auto;
+}
+.chat-booking-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:12px;
+  color:#374151;
+}
+.chat-booking-field input,
+.chat-booking-field select,
+.chat-booking-field textarea{
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:13px;
+}
+.chat-booking-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.chat-booking-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+}
+.chat-booking-btn{
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:700;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  color:#111827;
+  cursor:pointer;
+}
+.chat-booking-btn.primary{
+  background:#06464E;
+  color:#fff;
+  border:none;
+}
+.chat-booking-btn.ghost{
+  background:transparent;
+}
+.chat-booking-status{
+  font-size:12px;
+  color:#6b7280;
+  min-height:16px;
+}
+.chat-booking-status.is-error{
+  color:#b91c1c;
+}
+.chat-booking-payment{
+  font-size:12px;
+  color:#b91c1c;
+  background:#fef2f2;
+  border:1px solid #fecaca;
+  padding:8px 10px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.chat-booking-payment.is-hidden{
+  display:none;
+}
+.chat-booking-link{
+  background:none;
+  border:none;
+  color:#1d4ed8;
+  font-weight:700;
+  cursor:pointer;
+  padding:0;
+}
 
 @media (max-width:719px){
   #chatModal.chat-modal{
