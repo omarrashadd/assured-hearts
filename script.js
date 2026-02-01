@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return json || {};
   }
   const PROFILE_PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+  const CHAT_PHOTO_MAX_BYTES = 5 * 1024 * 1024;
 
   const getProfileInitials = (value) => {
     const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
@@ -2655,8 +2656,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
     photoInput.addEventListener('change', ()=>{
       if(!photoInput.files || photoInput.files.length === 0) return;
-      statusEl.textContent = 'Photo selected';
-      setTimeout(()=>{ statusEl.textContent = ''; }, 1200);
+      const file = photoInput.files[0];
+      sendChatPhoto(file);
       photoInput.value = '';
     });
   }
@@ -2809,7 +2810,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
     threadsEl.innerHTML = entries.map(({ thread, last, timeValue, unreadCount })=>{
       const name = thread.other_name || 'User';
-      const preview = last?.body || 'Start a conversation.';
+      const lastBody = String(last?.body || '').trim();
+      const hasImage = !!(last?.image_url || last?.photo_url || last?.image);
+      const preview = lastBody || (hasImage ? 'Photo' : 'Start a conversation.');
       const avatarUrl = thread.other_photo || '';
       const timeLabel = formatThreadTime(timeValue);
       const isActive = activeThread == thread.other_id;
@@ -2872,23 +2875,27 @@ document.addEventListener('DOMContentLoaded', ()=>{
     historyEl.scrollTop = historyEl.scrollHeight;
   }
 
-  async function sendMessage(){
-    const text = (inputEl.value || '').trim();
-    if(!text) return;
+  async function sendMessage(options = {}){
+    const rawBody = Object.prototype.hasOwnProperty.call(options, 'body') ? options.body : (inputEl?.value || '');
+    const text = String(rawBody || '').trim();
+    const imageUrl = options.imageUrl || options.image_url || '';
+    if(!text && !imageUrl) return;
     if(!activeThread) return;
     sendBtn.disabled = true;
-    statusEl.textContent = 'Sending...';
+    if(statusEl){
+      statusEl.textContent = options.statusLabel || (imageUrl ? 'Sending photo...' : 'Sending...');
+    }
     try{
       const res = await fetch(`${API_BASE}/forms/messages`, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ sender_id:userId, receiver_id: activeThread, body: text })
+        body: JSON.stringify({ sender_id:userId, receiver_id: activeThread, body: text, image_url: imageUrl || null })
       });
       if(!res.ok){
         const errTxt = await res.text();
         throw new Error(errTxt || 'Failed to send');
       }
-      inputEl.value = '';
+      if(inputEl) inputEl.value = '';
       await fetchMessages();
       statusEl.textContent = 'Sent';
       markRead(activeThread);
@@ -2898,6 +2905,37 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }finally{
       sendBtn.disabled = false;
       setTimeout(()=> statusEl.textContent = '', 1200);
+    }
+  }
+
+  async function sendChatPhoto(file){
+    if(!file || !activeThread) return;
+    if(!file.type || !file.type.startsWith('image/')){
+      statusEl.textContent = 'Please choose an image file.';
+      setTimeout(()=>{ statusEl.textContent = ''; }, 1200);
+      return;
+    }
+    if(file.size > CHAT_PHOTO_MAX_BYTES){
+      statusEl.textContent = 'Photo must be under 5MB.';
+      setTimeout(()=>{ statusEl.textContent = ''; }, 1200);
+      return;
+    }
+    if(photoBtn) photoBtn.disabled = true;
+    if(sendBtn) sendBtn.disabled = true;
+    statusEl.textContent = 'Uploading photo...';
+    try{
+      const imageUrl = await uploadImageToCloudinary(file, 'chat');
+      if(!imageUrl) throw new Error('Upload failed');
+      await sendMessage({ imageUrl, statusLabel: 'Sending...' });
+    }catch(err){
+      statusEl.textContent = err.message || 'Upload failed';
+    }finally{
+      if(photoBtn) photoBtn.disabled = false;
+      if(sendBtn) sendBtn.disabled = false;
+      if(inputEl && isMobileChat()){
+        inputEl.focus({ preventScroll: true });
+      }
+      setTimeout(()=>{ statusEl.textContent = ''; }, 1200);
     }
   }
 
