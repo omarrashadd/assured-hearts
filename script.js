@@ -3933,3 +3933,48 @@ document.addEventListener('DOMContentLoaded', ()=>{
   window.addEventListener('touchend', onEnd);
   window.addEventListener('touchcancel', resetPull);
 });
+
+// Care+ typewriter intro
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(!document.body.classList.contains('careplus-page')) return;
+  const segments = Array.from(document.querySelectorAll('[data-typewriter-text]'));
+  if(segments.length === 0) return;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if(prefersReduced){
+    segments.forEach(seg => { seg.textContent = seg.dataset.typewriterText || ''; });
+    return;
+  }
+
+  segments.forEach(seg => { seg.textContent = ''; });
+
+  let segmentIndex = 0;
+  const baseSpeed = 28;
+  const pauseAfterSegment = 140;
+
+  const typeSegment = ()=>{
+    if(segmentIndex >= segments.length){
+      return;
+    }
+    const seg = segments[segmentIndex];
+    const text = seg.dataset.typewriterText || '';
+    let charIndex = 0;
+
+    const typeChar = ()=>{
+      seg.textContent = text.slice(0, charIndex + 1);
+      charIndex += 1;
+      if(charIndex < text.length){
+        const lastChar = text.charAt(charIndex - 1);
+        const delay = /[.,!?]/.test(lastChar) ? baseSpeed * 4 : baseSpeed;
+        setTimeout(typeChar, delay);
+        return;
+      }
+      segmentIndex += 1;
+      setTimeout(typeSegment, pauseAfterSegment);
+    };
+
+    typeChar();
+  };
+
+  typeSegment();
+});

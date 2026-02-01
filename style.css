@@ -128,6 +128,18 @@ body.landing h3,
 body.landing .logo span{
   font-family:'Space Grotesk',sans-serif;
 }
+
+body.careplus-page{
+  background:#ffffff;
+  color:#0b1718;
+  font-family:'DM Sans',sans-serif;
+}
+body.careplus-page h1,
+body.careplus-page h2,
+body.careplus-page h3,
+body.careplus-page .logo span{
+  font-family:'Space Grotesk',sans-serif;
+}
 body.landing .navbar{
   position:fixed;
   top:0;
@@ -4447,110 +4459,91 @@ body.chat-embed-active #chatLauncher{
 /* Care+ pricing page */
 .careplus-main{
   padding:32px 16px 72px;
-  max-width:1200px;
+  max-width:1100px;
 }
 .careplus-intro{
-  margin-top:-24px;
-  margin-bottom:28px;
-}
-.careplus-intro__panel{
-  background:linear-gradient(135deg, #06464E 0%, #0f1f24 100%);
-  color:#fff;
-  border-radius:24px;
-  padding:28px;
+  margin-top:12px;
+  margin-bottom:26px;
+  text-align:center;
   display:grid;
-  gap:24px;
+  gap:12px;
   position:relative;
-  overflow:hidden;
+  padding:18px 12px 8px;
 }
-.careplus-intro__panel::before{
+.careplus-intro::before{
   content:'';
   position:absolute;
-  right:-40px;
-  top:-40px;
-  width:180px;
-  height:180px;
-  background:radial-gradient(circle at center, rgba(103,179,194,0.35), rgba(6,70,78,0));
+  inset:-16px 0 0;
+  background-image:radial-gradient(rgba(6,70,78,0.08) 1px, transparent 0);
+  background-size:28px 28px;
+  opacity:0.35;
+  pointer-events:none;
 }
-.careplus-eyebrow{
-  text-transform:uppercase;
-  letter-spacing:0.12em;
-  font-size:11px;
-  font-weight:700;
-  color:rgba(255,255,255,0.7);
+.careplus-intro::after{
+  content:'';
+  position:absolute;
+  inset:-12px -20px auto auto;
+  width:220px;
+  height:220px;
+  background:radial-gradient(circle at 40% 40%, rgba(103,179,194,0.18), rgba(103,179,194,0));
+  pointer-events:none;
 }
-.careplus-intro__copy h2{
-  margin:8px 0 8px;
-  font-size:28px;
-}
-.careplus-intro__copy p{
-  margin:0 0 16px;
-  color:rgba(255,255,255,0.85);
-  line-height:1.6;
-}
-.careplus-cta{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.careplus-cta-btn{
-  background:#fff;
-  color:#06464E;
-  padding:10px 18px;
-  border-radius:999px;
-  font-weight:700;
-  text-decoration:none;
-  box-shadow:0 8px 16px rgba(0,0,0,0.18);
-  transition:transform .2s ease, box-shadow .2s ease;
-}
-.careplus-cta-btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 10px 20px rgba(0,0,0,0.2);
-}
-.careplus-cta-note{
-  font-size:12px;
-  color:rgba(255,255,255,0.7);
-}
-.careplus-intro__perks{
+.careplus-intro__inner{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
-  gap:14px;
+  gap:8px;
+  position:relative;
+  z-index:1;
 }
-.careplus-perk{
-  background:rgba(255,255,255,0.1);
-  border:1px solid rgba(255,255,255,0.12);
-  padding:12px 14px;
-  border-radius:14px;
+.careplus-intro__inner h1{
+  margin:0;
+  font-size:36px;
+  color:var(--accent);
+  letter-spacing:-0.02em;
 }
-.careplus-perk__title{
-  font-weight:700;
-  font-size:13px;
-  margin-bottom:6px;
+.careplus-title-text{
+  display:inline-block;
 }
-.careplus-perk__copy{
+.careplus-support{
+  margin:0 auto;
+  color:#374151;
+  line-height:1.7;
+  max-width:640px;
+  font-size:16px;
+  font-weight:500;
+}
+.careplus-support .careplus-emphasis{
+  background:linear-gradient(90deg, rgba(103,179,194,0.15), rgba(103,179,194,0));
+  border-radius:6px;
+  padding:0 4px;
+}
+.careplus-tag{
+  align-self:center;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(11,92,98,0.12);
+  color:var(--accent);
   font-size:12px;
-  color:rgba(255,255,255,0.75);
-  line-height:1.5;
+  font-weight:700;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
 }
 
 @media (max-width:719px){
   .careplus-intro{
-    margin-top:-16px;
+    margin-top:6px;
+    padding:14px 6px 4px;
   }
-  .careplus-intro__panel{
-    padding:20px;
+  .careplus-intro__inner h1{
+    font-size:26px;
   }
-  .careplus-intro__copy h2{
-    font-size:22px;
+  .careplus-support{
+    font-size:14px;
   }
-  .careplus-cta-btn{
-    width:100%;
-    text-align:center;
-  }
-  .careplus-cta-note{
-    width:100%;
-    text-align:center;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .careplus-title-text{
+    transition:none;
   }
 }
 
