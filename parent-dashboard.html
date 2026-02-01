@@ -539,7 +539,15 @@
 
       document.querySelectorAll('.provider-nav-item').forEach((btn) => {
         btn.addEventListener('click', () => {
-          if(btn.dataset.panel) activateParentPanel(btn.dataset.panel);
+          const panel = btn.dataset.panel;
+          if(!panel) return;
+          const isMobile = window.matchMedia('(max-width: 719px)').matches;
+          if(panel === 'inbox' && isMobile && typeof window.showChatWidget === 'function'){
+            activateParentPanel(panel);
+            window.showChatWidget();
+            return;
+          }
+          activateParentPanel(panel);
         });
         btn.addEventListener('keydown', (event) => {
           if(event.key === 'Enter' || event.key === ' ') {
@@ -566,6 +574,10 @@
       };
 
       document.getElementById('openParentProfileBtn')?.addEventListener('click', () => {
+        window.location.hash = 'profile';
+        activateParentPanel('profile');
+      });
+      document.getElementById('topProfileBtn')?.addEventListener('click', () => {
         window.location.hash = 'profile';
         activateParentPanel('profile');
       });

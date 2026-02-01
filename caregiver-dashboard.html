@@ -469,7 +469,15 @@
 
       document.querySelectorAll('.provider-nav-item').forEach((btn) => {
         btn.addEventListener('click', () => {
-          if(btn.dataset.panel) activateProviderPanel(btn.dataset.panel);
+          const panel = btn.dataset.panel;
+          if(!panel) return;
+          const isMobile = window.matchMedia('(max-width: 719px)').matches;
+          if(panel === 'inbox' && isMobile && typeof window.showChatWidget === 'function'){
+            activateProviderPanel(panel);
+            window.showChatWidget();
+            return;
+          }
+          activateProviderPanel(panel);
         });
         btn.addEventListener('keydown', (event) => {
           if(event.key === 'Enter' || event.key === ' ') {
@@ -483,6 +491,10 @@
       activateProviderPanel(initialPanel || 'dashboard');
 
       document.getElementById('openProfileBtn')?.addEventListener('click', () => {
+        window.location.hash = 'profile';
+        activateProviderPanel('profile');
+      });
+      document.getElementById('topProfileBtn')?.addEventListener('click', () => {
         window.location.hash = 'profile';
         activateProviderPanel('profile');
       });
