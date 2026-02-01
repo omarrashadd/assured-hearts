@@ -2591,6 +2591,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const contactCache = {};
   const requestCache = { map: {}, loadedAt: 0, inFlight: null };
   const REQUEST_CACHE_TTL = 15000;
+  const embedHost = document.getElementById('parentChatEmbed') || document.getElementById('providerChatEmbed');
+  const embedMedia = window.matchMedia('(min-width: 720px)');
 
   const launcher = document.createElement('button');
   launcher.id = 'chatLauncher';
@@ -2605,11 +2607,26 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const modal = document.createElement('div');
   modal.id = 'chatModal';
   modal.className = 'chat-modal';
-  Object.assign(modal.style, {
+  const modalBaseStyle = {
     position:'fixed', bottom:'70px', right:'20px', width:'360px', maxHeight:'70vh', background:'#fff',
     border:'1px solid #e5e7eb', borderRadius:'12px', boxShadow:'0 12px 30px rgba(0,0,0,0.18)',
     display:'none', zIndex:'9999', overflow:'hidden'
-  });
+  };
+  const modalEmbedStyle = {
+    position:'relative',
+    top:'auto',
+    right:'auto',
+    bottom:'auto',
+    left:'auto',
+    width:'100%',
+    maxHeight:'none',
+    height:'560px',
+    border:'none',
+    boxShadow:'none',
+    background:'transparent',
+    display:'block'
+  };
+  Object.assign(modal.style, modalBaseStyle);
   modal.innerHTML = `
     <div class="chat-shell">
       <div class="chat-list-view">
@@ -2703,6 +2720,35 @@ document.addEventListener('DOMContentLoaded', ()=>{
     </div>
   `;
   document.body.appendChild(modal);
+  const applyChatMode = (isEmbedded)=>{
+    if(isEmbedded && embedHost){
+      document.body.classList.add('chat-embed-active');
+      launcher.style.display = 'none';
+      if(modal.parentElement !== embedHost){
+        embedHost.appendChild(modal);
+      }
+      modal.classList.add('chat-modal--embedded');
+      Object.assign(modal.style, modalEmbedStyle);
+      modal.style.display = 'block';
+      return;
+    }
+    document.body.classList.remove('chat-embed-active');
+    launcher.style.display = '';
+    if(modal.parentElement !== document.body){
+      document.body.appendChild(modal);
+    }
+    modal.classList.remove('chat-modal--embedded');
+    Object.assign(modal.style, modalBaseStyle);
+    modal.style.display = 'none';
+  };
+  if(embedHost){
+    applyChatMode(embedMedia.matches);
+    if(embedMedia.addEventListener){
+      embedMedia.addEventListener('change', (event)=> applyChatMode(event.matches));
+    } else if(embedMedia.addListener){
+      embedMedia.addListener((event)=> applyChatMode(event.matches));
+    }
+  }
 
   const badgeEl = launcher.querySelector('#chatBadge');
   const threadsEl = modal.querySelector('#chatThreads');

@@ -1854,6 +1854,7 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   .glance-submit{width:100%;}
   .glance-provider-btn{width:100%;}
   .app-section{padding:30px 16px;}
+  .chat-embed{display:none;}
   .app-section h2{font-size:22px;}
   .app-subtitle{font-size:14px;margin-bottom:24px;}
   .app-showcase{margin-bottom:24px;}
@@ -2645,6 +2646,19 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   display:grid;
   gap:10px;
   margin-bottom:12px;
+}
+body.chat-embed-active .parent-messages-list,
+body.chat-embed-active #parentMessagesOpenBtn,
+body.chat-embed-active #providerMessagesOpenBtn,
+body.chat-embed-active #providerMessagesList{
+  display:none;
+}
+body.chat-embed-active #chatLauncher{
+  display:none;
+}
+.chat-embed{
+  margin-top:12px;
+  min-height:520px;
 }
 .parent-message-item{
   display:grid;
@@ -4433,6 +4447,21 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
 /* Chat widget */
 .chat-modal{
   font-family:inherit;
+}
+.chat-modal.chat-modal--embedded{
+  border:none;
+  box-shadow:none;
+  background:transparent;
+}
+.chat-modal.chat-modal--embedded .chat-shell{
+  height:100%;
+  background:#fff;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.08);
+  overflow:hidden;
+}
+.chat-modal.chat-modal--embedded .chat-close-btn{
+  display:none;
 }
 .chat-modal .chat-shell{
   display:flex;
