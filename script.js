@@ -2777,11 +2777,33 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   }
 
-  sendBtn.addEventListener('click', sendMessage);
+  let sendLock = false;
+  const triggerSend = ()=>{
+    if(sendLock) return;
+    const text = (inputEl?.value || '').trim();
+    if(!text || !activeThread) return;
+    sendLock = true;
+    Promise.resolve(sendMessage()).finally(()=>{
+      sendLock = false;
+      if(inputEl && window.matchMedia('(max-width: 719px)').matches){
+        inputEl.focus();
+      }
+    });
+  };
+  sendBtn.addEventListener('pointerdown', (e)=>{
+    if(window.matchMedia('(max-width: 719px)').matches){
+      e.preventDefault();
+      triggerSend();
+    }
+  });
+  sendBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    triggerSend();
+  });
   inputEl.addEventListener('keydown', (e)=> {
     if(e.key === 'Enter' && !e.shiftKey){
       e.preventDefault();
-      sendMessage();
+      triggerSend();
     }
   });
   inputEl.addEventListener('focus', ()=> setKeyboardState(true));
