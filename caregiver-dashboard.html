@@ -139,7 +139,10 @@
                     <h2>My requests</h2>
                     <p class="provider-card-sub">Requests sent to you.</p>
                   </div>
-                  <span id="areaRequestsCount" class="provider-card-pill">0 requests</span>
+                  <div class="provider-card-actions">
+                    <button id="providerRequestsToggle" class="provider-requests-toggle" type="button">Cancelled requests</button>
+                    <span id="areaRequestsCount" class="provider-card-pill">0 requests</span>
+                  </div>
                 </div>
                 <div class="provider-requests-table">
                   <div class="provider-requests-row provider-requests-head">
@@ -692,6 +695,7 @@
       let providerRequestsCache = [];
       let providerStatsCache = {};
       let providerApiBase = '';
+      let providerRequestsView = 'pending';
 
       const updateProviderMetrics = (requests) => {
         const acceptedRequests = (requests || []).filter((req) => {
@@ -856,6 +860,11 @@
       const isCancelled = (entry) => {
         const status = String(entry?.status || '').toLowerCase();
         return status.includes('cancel');
+      };
+
+      const isCancelledByProvider = (entry) => {
+        const status = String(entry?.status || '').toLowerCase();
+        return status === 'cancelled_by_you' || status === 'cancelled_by_provider';
       };
 
       const parseAgeGroup = (entry) => {
@@ -1029,14 +1038,25 @@
         return normalized === '' || normalized === 'pending' || normalized === 'requested';
       };
 
+      const filterRequestsForView = (requests) => {
+        if(providerRequestsView === 'cancelled') {
+          return (requests || []).filter((entry) => isCancelledByProvider(entry));
+        }
+        return (requests || []).filter((entry) => requestIsActionable(entry.status));
+      };
+
       const renderAreaRequests = (requests) => {
         const listEl = document.getElementById('areaRequestsList');
         const countEl = document.getElementById('areaRequestsCount');
-        const rows = (requests || []);
-        if(countEl) countEl.textContent = `${rows.length} requests`;
+        const rows = filterRequestsForView(requests);
+        const countLabel = providerRequestsView === 'cancelled' ? 'cancelled' : 'pending';
+        if(countEl) countEl.textContent = `${rows.length} ${countLabel}`;
         if(!listEl) return;
         if(rows.length === 0) {
-          listEl.innerHTML = '<div class="provider-requests-empty">No requests yet.</div>';
+          const emptyLabel = providerRequestsView === 'cancelled'
+            ? 'No cancelled requests yet.'
+            : 'No pending requests yet.';
+          listEl.innerHTML = `<div class="provider-requests-empty">${emptyLabel}</div>`;
           return;
         }
         listEl.innerHTML = rows.map((entry) => {
@@ -1050,12 +1070,12 @@
           const statusLabel = statusRaw.replace(/_/g, ' ').replace(/\b\w/g, (ch) => ch.toUpperCase());
           const canRespond = requestIsActionable(entry.status);
           const requestId = entry.id || '';
-          const actionMarkup = `
-            <div class="provider-requests-action ${canRespond ? '' : 'is-disabled'}">
-              <button class="provider-request-btn accept" type="button" data-action="accept" data-request-id="${requestId}" ${canRespond ? '' : 'disabled'}>Accept</button>
-              <button class="provider-request-btn decline" type="button" data-action="decline" data-request-id="${requestId}" ${canRespond ? '' : 'disabled'}>Decline</button>
+          const actionMarkup = canRespond ? `
+            <div class="provider-requests-action">
+              <button class="provider-request-btn accept" type="button" data-action="accept" data-request-id="${requestId}">Accept</button>
+              <button class="provider-request-btn decline" type="button" data-action="decline" data-request-id="${requestId}">Decline</button>
             </div>
-          `;
+          ` : '';
           return `
             <div class="provider-requests-row provider-requests-item" data-request-id="${requestId}">
               <div class="provider-requests-cell" data-label="Child">${childDisplay.label}</div>
@@ -1080,6 +1100,30 @@
           });
           listEl.dataset.actionsBound = 'true';
         }
+      };
+
+      const updateRequestsToggle = () => {
+        const toggleBtn = document.getElementById('providerRequestsToggle');
+        if(!toggleBtn) return;
+        if(providerRequestsView === 'cancelled') {
+          toggleBtn.textContent = 'Pending requests';
+          toggleBtn.setAttribute('aria-pressed', 'true');
+        } else {
+          toggleBtn.textContent = 'Cancelled requests';
+          toggleBtn.setAttribute('aria-pressed', 'false');
+        }
+      };
+
+      const bindRequestsToggle = () => {
+        const toggleBtn = document.getElementById('providerRequestsToggle');
+        if(!toggleBtn || toggleBtn.dataset.bound === 'true') return;
+        toggleBtn.dataset.bound = 'true';
+        toggleBtn.addEventListener('click', () => {
+          providerRequestsView = providerRequestsView === 'cancelled' ? 'pending' : 'cancelled';
+          updateRequestsToggle();
+          renderAreaRequests(providerRequestsCache);
+        });
+        updateRequestsToggle();
       };
 
       const respondToRequest = async (requestId, action, buttonEl) => {
@@ -1396,6 +1440,7 @@
 
         initAvailabilityEditor({ apiBase: API_BASE, userId });
         hookProviderMessages();
+        bindRequestsToggle();
 
         try {
           const resp = await fetch(`${API_BASE}/forms/provider/${userId}`);

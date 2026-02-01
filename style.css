@@ -1723,6 +1723,27 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   gap:12px;
   margin-bottom:12px;
 }
+.provider-card-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.provider-requests-toggle{
+  background:rgba(255,255,255,0.08);
+  color:#e2e8f0;
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+.provider-requests-toggle[aria-pressed="true"]{
+  background:rgba(103,179,194,0.2);
+  color:#cde9f0;
+  border-color:rgba(103,179,194,0.45);
+}
 .provider-card-head h2{
   margin:0;
   font-size:18px;
@@ -3461,6 +3482,10 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
     align-items:flex-start;
     gap:6px;
   }
+  .provider-card-actions{
+    width:100%;
+    justify-content:flex-start;
+  }
   .provider-card-pill{
     align-self:flex-start;
   }
@@ -4294,5 +4319,9 @@ input,textarea{padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-to
   }
   .chat-modal .chat-history{
     padding-bottom:96px;
+  }
+  .chat-modal .chat-bubble.chat-bubble--request{
+    max-width:100%;
+    width:100%;
   }
 }
