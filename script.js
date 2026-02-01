@@ -3978,3 +3978,20 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   typeSegment();
 });
+
+// Care+ nav profile photo
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(!document.body.classList.contains('careplus-page')) return;
+  const userId = parseInt(localStorage.getItem('user_id'), 10);
+  if(!userId || Number.isNaN(userId)) return;
+  const API_BASE = window.API_BASE || 'https://assured-hearts-backend.onrender.com';
+  fetch(`${API_BASE}/forms/parent/${userId}`)
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      const photoUrl = data?.profile?.photo_url || '';
+      if(photoUrl && typeof window.setTopProfilePhoto === 'function'){
+        window.setTopProfilePhoto(photoUrl);
+      }
+    })
+    .catch(() => {});
+});

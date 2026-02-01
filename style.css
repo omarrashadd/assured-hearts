@@ -133,12 +133,17 @@ body.careplus-page{
   background:#ffffff;
   color:#0b1718;
   font-family:'DM Sans',sans-serif;
+  --card:#ffffff;
 }
 body.careplus-page h1,
 body.careplus-page h2,
 body.careplus-page h3,
 body.careplus-page .logo span{
   font-family:'Space Grotesk',sans-serif;
+}
+body.careplus-page .navbar,
+body.careplus-page .navbar *{
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
 body.landing .navbar{
   position:fixed;
