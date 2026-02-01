@@ -1032,12 +1032,66 @@ document.addEventListener('DOMContentLoaded', () => {
     heroVideo.currentTime = 0;
   }
 
-  // Get Started button scroll to signup
+  // Get Started button
   const getStartedBtn = document.getElementById('getStartedBtn');
   if(getStartedBtn){
-    getStartedBtn.addEventListener('click', ()=> {
-      const signupSection = document.querySelector('.signup-section');
-      if(signupSection) signupSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    getStartedBtn.addEventListener('click', (event)=> {
+      if(getStartedBtn.tagName.toLowerCase() === 'a') return;
+      event.preventDefault();
+      window.location.href = 'signup.html';
+    });
+  }
+
+  if(document.body.classList.contains('landing')){
+    const toggleLandingNav = ()=>{
+      document.body.classList.toggle('nav-visible', window.scrollY > 40);
+    };
+    toggleLandingNav();
+    window.addEventListener('scroll', toggleLandingNav, { passive:true });
+  }
+
+  const escapeHtml = (value)=>{
+    return String(value).replace(/[&<>"']/g, (ch)=> {
+      switch(ch){
+        case '&': return '&amp;';
+        case '<': return '&lt;';
+        case '>': return '&gt;';
+        case '"': return '&quot;';
+        case "'": return '&#39;';
+        default: return ch;
+      }
+    });
+  };
+
+  const glanceForm = document.getElementById('glanceForm');
+  const glanceLocation = document.getElementById('glanceLocation');
+  const glanceResult = document.getElementById('glanceResult');
+  if(glanceForm && glanceLocation && glanceResult){
+    glanceForm.addEventListener('submit', async (event)=>{
+      event.preventDefault();
+      const location = String(glanceLocation.value || '').trim();
+      if(!location){
+        showBanner('Please enter a location.', 'info');
+        return;
+      }
+      glanceResult.textContent = 'Checking caregivers...';
+      let count = 0;
+      try{
+        const res = await fetch(`${API_BASE}/search?city=${encodeURIComponent(location)}`);
+        const data = await res.json().catch(() => ({}));
+        count = Number(data.caregivers || 0);
+        if(!Number.isFinite(count)) count = 0;
+      }catch(err){
+        console.warn('Glance search failed', err);
+      }
+      const safeLocation = escapeHtml(location);
+      glanceResult.innerHTML = `
+        <div class="glance-result-card">
+          <div class="glance-result-count">${count}</div>
+          <div class="glance-result-text">There are ${count} Muslim caregivers in ${safeLocation}. Sign up to see more.</div>
+          <a class="glance-result-btn" href="signup.html">Sign up</a>
+        </div>
+      `;
     });
   }
 
@@ -1055,6 +1109,15 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       window.location.href = 'signup.html';
     }
+  });
+  document.querySelectorAll('[data-login-open]').forEach((btn)=>{
+    btn.addEventListener('click', ()=> {
+      if(loginModal){
+        loginModal.classList.remove('hidden');
+      } else {
+        window.location.href = 'signup.html';
+      }
+    });
   });
   signupBtn && signupBtn.addEventListener('click', (e)=> { 
     e.preventDefault();
